@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 10, 2025 at 04:14 PM
+-- Generation Time: Aug 26, 2025 at 01:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -28,40 +28,161 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `appointments` (
-  `appointment_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `time` time NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `time` varchar(100) NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  `status` enum('pending','approved','declined','rescheduled','confirmed') DEFAULT 'pending',
+  `email` varchar(255) DEFAULT NULL,
   `parent_email` varchar(255) DEFAULT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `status` varchar(50) DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `appointments`
 --
 
-INSERT INTO `appointments` (`appointment_id`, `student_id`, `date`, `time`, `email`, `parent_email`, `reason`, `status`) VALUES
-(101, 23, '2025-05-21', '08:00:00', 'dsambere13@gmail.com', 'damudil@mailinator.com', 'Similique itaque eni', 'rescheduled'),
-(102, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'approved'),
-(103, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'approved'),
-(104, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'approved'),
-(105, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'approved'),
-(106, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'approved'),
-(107, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'approved'),
-(108, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'cancelled'),
-(109, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'cancelled'),
-(110, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'cancelled'),
-(111, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'cancelled'),
-(112, 40, '2025-06-04', '08:00:00', 'cipyqi@mailinator.com', 'dawizyqyda@mailinator.com', 'Quia magna quisquam ', 'cancelled'),
-(117, 40, '2025-06-04', '08:00:00', 'gojuqal@mailinator.com', 'vaqy@mailinator.com', 'Labore itaque debiti', 'declined'),
-(118, 40, '2025-06-04', '08:00:00', 'gojuqal@mailinator.com', 'vaqy@mailinator.com', 'Labore itaque debiti', 'cancelled'),
-(119, 40, '2025-06-04', '08:00:00', 'gojuqal@mailinator.com', 'vaqy@mailinator.com', 'Labore itaque debiti', 'cancelled'),
-(120, 40, '2025-06-11', '13:00:00', 'javik@mailinator.com', 'cexygycod@mailinator.com', 'Facere ratione moles', 'rescheduled'),
-(121, 40, '2025-06-11', '13:00:00', 'wepifiw@mailinator.com', 'runyric@mailinator.com', 'Iste eius provident', 'rescheduled'),
-(122, 40, '2025-06-19', '13:00:00', 'mukyfojiji@mailinator.com', 'hugoxozihi@mailinator.com', 'Fuga Elit optio n', 'rescheduled'),
-(123, 40, '2025-06-19', '13:00:00', 'mukyfojiji@mailinator.com', 'hugoxozihi@mailinator.com', 'Fuga Elit optio n', 'rescheduled');
+INSERT INTO `appointments` (`id`, `student_id`, `date`, `time`, `reason`, `status`, `email`, `parent_email`, `created_at`) VALUES
+(1, 40, '2025-08-18', '18:17-19:18', 'Aut dolores eligendi', 'pending', 'cuwanixid@mailinator.com', 'ziqefesu@mailinator.com', '2025-08-17 10:25:53'),
+(2, 34, '2025-08-18', '00:32-03:36', 'Eligendi iusto aliqu', 'pending', 'wylufaj@mailinator.com', 'luted@mailinator.com', '2025-08-17 16:48:19'),
+(3, 35, '2025-08-20', '01:17-01:47', 'Non et eu ipsa natu', 'pending', 'tejeqogiz@mailinator.com', 'bekox@mailinator.com', '2025-08-17 17:18:04'),
+(4, 35, '2025-08-20', '01:47-02:17', 'Animi sit irure re', 'pending', 'kykasokaby@mailinator.com', 'mucuvy@mailinator.com', '2025-08-17 17:18:09'),
+(5, 35, '2025-08-30', '15:50', 'Qui eligendi dolorem', 'rescheduled', 'mabemepo@mailinator.com', 'xukon@mailinator.com', '2025-08-17 17:32:43'),
+(6, 29, '2025-08-20', '10:30', 'Eum soluta recusanda', 'declined', 'fyhot@mailinator.com', 'ryma@mailinator.com', '2025-08-17 17:35:16'),
+(7, 40, '2025-08-20', '10:30', 'Aperiam Nam magni ma', 'pending', 'ragi@mailinator.com', 'vypisa@mailinator.com', '2025-08-18 03:29:43'),
+(8, 40, '2025-08-19', '03:01-03:31', 'Est ea molestiae ips', 'pending', 'nafoc@mailinator.com', 'vewy@mailinator.com', '2025-08-18 04:39:33'),
+(10, 40, '2025-08-22', '09:15-09:45', 'yawa', 'approved', 'jaynujangad03@gmail.com', 'cedricjade13@gmail.com', '2025-08-19 01:40:47');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `clinic_visits`
+--
+
+CREATE TABLE `clinic_visits` (
+  `id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `patient_name` varchar(255) NOT NULL,
+  `visit_date` date NOT NULL,
+  `visit_time` time DEFAULT NULL,
+  `visit_reason` varchar(500) DEFAULT NULL,
+  `visit_type` enum('appointment','prescription','walk_in','emergency') DEFAULT 'appointment',
+  `staff_member` varchar(255) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `clinic_visits`
+--
+
+INSERT INTO `clinic_visits` (`id`, `patient_id`, `patient_name`, `visit_date`, `visit_time`, `visit_reason`, `visit_type`, `staff_member`, `notes`, `created_at`, `updated_at`) VALUES
+(9, 21, 'Test Student', '2025-08-18', NULL, 'Fever and headache', 'prescription', 'Staff', NULL, '2025-08-18 20:13:07', '2025-08-18 20:13:07'),
+(10, 21, 'Abella, Joseph B.', '2025-08-18', NULL, 'asd', 'prescription', 'Staff', NULL, '2025-08-18 20:13:41', '2025-08-18 20:13:41'),
+(11, 21, 'Abella, Joseph B.', '2025-08-18', NULL, 'asd', 'prescription', 'Staff', NULL, '2025-08-18 20:14:00', '2025-08-18 20:14:00'),
+(12, 21, 'Abella, Joseph B.', '2025-08-18', NULL, 'asd', 'prescription', 'Staff', NULL, '2025-08-18 20:14:16', '2025-08-18 20:14:16'),
+(13, 21, 'Abella, Joseph B.', '2025-08-18', NULL, 'fevcer', 'prescription', 'Staff', NULL, '2025-08-18 20:33:09', '2025-08-18 20:33:09'),
+(14, 21, 'Abella, Joseph B.', '2025-08-18', NULL, 'fever', 'prescription', 'Staff', NULL, '2025-08-18 20:49:06', '2025-08-18 20:49:06'),
+(15, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Sakits ulo', 'prescription', 'Staff', NULL, '2025-08-19 07:35:33', '2025-08-19 07:35:33'),
+(16, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Qui occaecat magna v', 'prescription', 'Staff', NULL, '2025-08-19 07:37:15', '2025-08-19 07:37:15'),
+(17, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Dolore consequuntur ', 'prescription', 'Staff', NULL, '2025-08-19 07:37:31', '2025-08-19 07:37:31'),
+(18, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Doloribus praesentiu', 'prescription', 'Staff', NULL, '2025-08-19 07:37:49', '2025-08-19 07:37:49'),
+(19, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Recusandae Rerum te', 'prescription', 'Staff', NULL, '2025-08-19 07:38:02', '2025-08-19 07:38:02'),
+(20, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Enim qui eum asperio', 'prescription', 'Staff', NULL, '2025-08-19 07:38:16', '2025-08-19 07:38:16'),
+(21, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'fever', 'prescription', 'Staff', NULL, '2025-08-19 07:40:10', '2025-08-19 07:40:10'),
+(22, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Assumenda a ipsa as', 'prescription', 'Staff', NULL, '2025-08-19 08:11:22', '2025-08-19 08:11:22'),
+(23, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Repudiandae unde lau', 'prescription', 'Staff', NULL, '2025-08-19 08:13:01', '2025-08-19 08:13:01'),
+(24, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Ab nihil alias accus', 'prescription', 'Staff', NULL, '2025-08-19 08:41:54', '2025-08-19 08:41:54'),
+(25, 22, 'Abellana, Vincent Anthony Q.', '2025-08-19', NULL, 'Adipisci soluta est', 'prescription', 'Staff', NULL, '2025-08-19 08:42:17', '2025-08-19 08:42:17'),
+(26, 21, 'Abella, Joseph B.', '2025-08-19', NULL, 'Neque provident sae', 'prescription', 'Staff', NULL, '2025-08-19 08:42:29', '2025-08-19 08:42:29'),
+(27, 22, 'Abellana, Vincent Anthony Q.', '2025-08-19', NULL, 'Laboriosam culpa si', 'prescription', 'Staff', NULL, '2025-08-19 08:42:53', '2025-08-19 08:42:53'),
+(28, 23, 'Abendan, Christian James A.', '2025-08-19', NULL, 'Corrupti debitis qu', 'prescription', 'Staff', NULL, '2025-08-19 08:58:05', '2025-08-19 08:58:05'),
+(29, 23, 'Abendan, Christian James A.', '2025-08-19', NULL, 'Sit assumenda quod ', 'prescription', 'Staff', NULL, '2025-08-19 08:58:17', '2025-08-19 08:58:17'),
+(30, 23, 'Abendan, Christian James A.', '2025-08-19', NULL, 'Maiores ex sint sed ', 'prescription', 'Staff', NULL, '2025-08-19 08:58:28', '2025-08-19 08:58:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `doctors`
+--
+
+CREATE TABLE `doctors` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `specialization` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `doctor_schedules`
+--
+
+CREATE TABLE `doctor_schedules` (
+  `id` int(11) NOT NULL,
+  `doctor_name` varchar(255) NOT NULL,
+  `schedule_date` date NOT NULL,
+  `schedule_time` varchar(100) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `doctor_schedules`
+--
+
+INSERT INTO `doctor_schedules` (`id`, `doctor_name`, `schedule_date`, `schedule_time`, `created_at`) VALUES
+(78, 'rhona', '2025-08-20', '15:49-16:50', '2025-08-19 15:49:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `health_reminders`
+--
+
+CREATE TABLE `health_reminders` (
+  `id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `reminder_type` enum('appointment','vaccination','checkup','medication','general') NOT NULL,
+  `due_date` date DEFAULT NULL,
+  `is_completed` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `health_tips`
+--
+
+CREATE TABLE `health_tips` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `category` enum('first_aid','wellness','nutrition','mental_health','hygiene','emergency') NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `health_tips`
+--
+
+INSERT INTO `health_tips` (`id`, `title`, `content`, `category`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'Basic First Aid for Cuts and Scrapes', 'Clean the wound with soap and water. Apply an antiseptic and cover with a sterile bandage. Seek medical attention if the wound is deep or shows signs of infection.', 'first_aid', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(2, 'Hand Hygiene Best Practices', 'Wash your hands frequently with soap and water for at least 20 seconds. Use hand sanitizer when soap is not available. Avoid touching your face with unwashed hands.', 'hygiene', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(3, 'Healthy Eating for Students', 'Eat a balanced diet with plenty of fruits, vegetables, and whole grains. Stay hydrated by drinking water throughout the day. Avoid excessive junk food and sugary drinks.', 'nutrition', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(4, 'Stress Management Techniques', 'Practice deep breathing exercises. Take regular breaks during study sessions. Exercise regularly and get adequate sleep. Talk to someone if you feel overwhelmed.', 'mental_health', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(5, 'Emergency Contact Information', 'In case of emergency, call 911 immediately. For school-related health concerns, contact the school clinic. Always have emergency contacts readily available.', 'emergency', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(6, 'Preventing Common Illnesses', 'Get adequate sleep (7-9 hours for students). Eat nutritious meals and stay hydrated. Practice good hygiene and avoid close contact with sick individuals.', 'wellness', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(7, 'First Aid for Burns', 'Cool the burn under cold running water for 10-20 minutes. Do not apply ice or butter. Cover with a sterile bandage. Seek medical attention for severe burns.', 'first_aid', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(8, 'Mental Health Awareness', 'It\'s okay to not be okay. Reach out to school counselors, teachers, or trusted adults if you\'re struggling. You\'re not alone in your feelings.', 'mental_health', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(9, 'Exercise and Physical Activity', 'Aim for at least 60 minutes of physical activity daily. Include both cardio and strength training. Find activities you enjoy to stay motivated.', 'wellness', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49'),
+(10, 'Proper Mask Usage', 'Wear masks properly covering nose and mouth. Replace disposable masks regularly. Wash cloth masks after each use. Maintain social distance when possible.', 'hygiene', 1, '2025-08-18 04:20:49', '2025-08-18 04:20:49');
 
 -- --------------------------------------------------------
 
@@ -76,9 +197,20 @@ CREATE TABLE `imported_patients` (
   `dob` varchar(255) DEFAULT NULL,
   `gender` varchar(255) DEFAULT NULL,
   `address` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `parent_email` varchar(255) DEFAULT NULL,
+  `parent_phone` varchar(20) DEFAULT NULL,
+  `contact_number` varchar(20) DEFAULT NULL,
+  `religion` varchar(100) DEFAULT NULL,
+  `citizenship` varchar(100) DEFAULT NULL,
+  `course_program` varchar(255) DEFAULT NULL,
   `civil_status` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `year_level` varchar(255) DEFAULT NULL,
+  `guardian_name` varchar(255) DEFAULT NULL,
+  `guardian_contact` varchar(255) DEFAULT NULL,
+  `emergency_contact_name` varchar(255) DEFAULT NULL,
+  `emergency_contact_number` varchar(20) DEFAULT NULL,
   `upload_year` varchar(9) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -86,27 +218,27 @@ CREATE TABLE `imported_patients` (
 -- Dumping data for table `imported_patients`
 --
 
-INSERT INTO `imported_patients` (`id`, `student_id`, `name`, `dob`, `gender`, `address`, `civil_status`, `password`, `year_level`, `upload_year`) VALUES
-(21, 'SCC-22-00015336', 'Abella, Joseph B.', '3/19/2000', 'Male', 'Camarin Vito Minglanilla Cebu', 'Single', 'Abella', '1st Year', NULL),
-(22, 'SCC-22-00017358', 'Abellana, Vincent Anthony Q.', '7/8/2002', 'Male', 'Pakigne Minglanilla Cebu', 'Single', 'Abellana', '1st Year', NULL),
-(23, 'SCC-20-00010846', 'Abendan, Christian James A.', '4/27/2004', 'Male', 'Pob. Ward 2 Minglanilla, Cebu', 'Single', 'Abendan', '1st Year', NULL),
-(24, 'SCC-14-0001275', 'Abendan, Nino Rashean T.', '2/12/2002', 'Male', 'Ward 2 pob., Minglanilla, Cebu ', 'Single', 'Abendan', '1st Year', NULL),
-(25, 'SCC-21-00012754', 'Abellana, Ariel L', '10/1/2002', 'Male', 'Basak, Sibonga, Cebu', 'Single', 'Abellana', '2nd Year', NULL),
-(26, 'SCC-21-00012377', 'Acidillo, Baby John V.', '7/21/2000', 'Male', 'Bairan City of Naga', 'Single', 'Acidillo', '2nd Year', NULL),
-(27, 'SCC-21-00014490', 'Adona, Carl Macel C.', '3/29/2002', 'Male', 'Pob. Ward IV Minglanilla Cebu', 'Single', 'Adona', '2nd Year', NULL),
-(28, 'SCC-19-0009149', 'Albiso, Creshell Mary M.', '6/18/2003', 'Female', 'Bairan, City of Naga, Cebu', 'Single', 'Albiso', '2nd Year', NULL),
-(29, 'SCC-21-00014673', 'Alegado, John Raymon B.', '1/9/2002', 'Male', 'Tagjaguimit City of Naga Cebu', 'Single', 'Alegado', '2nd Year', NULL),
-(30, 'SCC-18-0007848', 'Aguilar, Jaymar C', '2/22/2000', 'Male', 'North Poblacion, San Fernando, Cebu', 'Single', 'Aguilar', '3rd Year', NULL),
-(31, 'SCC-18-0006048', 'Alicaya, Ralph Lorync D.', '1/17/2000', 'Male', 'Lower Pakigne, Minglanilla Cebu', 'Single', 'Alicaya', '3rd Year', NULL),
-(32, 'SCC-20-00011552', 'Baraclan, Genesis S.', '11/12/1999', 'Male', 'Bacay Tulay Minglanilla Cebu', 'Single', 'Baraclan', '3rd Year', NULL),
-(33, 'SCC-18-0007440', 'Base, Jev Adrian', '11/8/2001', 'Male', 'Sambag, Tuyan, City of Naga, Cebu', 'Single', 'Base', '3rd Year', NULL),
-(34, 'SCC-19-00010521', 'Booc, Aloysius A.', '6/6/1996', 'Male', 'Babag Lapulapu City', 'Single', 'Booc', '3rd Year', NULL),
-(35, 'SCC-18-0007793', 'Adlawan, Ealla Marie', '11/7/1999', 'Female', 'Spring Village Pakigne, Minglanilla', 'Single', 'Adlawan', '4th Year', NULL),
-(36, 'SCC-19-00010625', 'Alferez Jr., Bernardino S.', '8/12/1999', 'Male', 'Cantao-an Naga Cebu', 'Single', 'Alferez Jr.', '4th Year', NULL),
-(37, 'SCC-19-0009987', 'Almendras, Alistair A', '4/21/2000', 'Male', 'Purok Mahogany, Sambag Kolo, Tuyan City of Naga, Cebu', 'Single', 'Almendras', '4th Year', NULL),
-(38, 'SCC-17-0005276', 'Alvarado, Dexter Q.', '7/12/1999', 'Male', 'Babayongan Dalaguete Cebu', 'Single', 'Alvarado', '4th Year', NULL),
-(39, 'SCC-19-00010487', 'Amarille, Kim Ryan M', '10/31/1997', 'Male', 'Tungkop Minglanilla Cebu', 'Single', 'Amarille', '4th Year', NULL),
-(40, 'SCC-18-0008724', 'Arcamo Jr., Emmanuel P.', '10/1/1997', 'Male', 'Sitio Tabay Tunghaan, Minglanilla Cebu', 'Single', 'Arcamo Jr.', '4th Year', NULL);
+INSERT INTO `imported_patients` (`id`, `student_id`, `name`, `dob`, `gender`, `address`, `email`, `parent_email`, `parent_phone`, `contact_number`, `religion`, `citizenship`, `course_program`, `civil_status`, `password`, `year_level`, `guardian_name`, `guardian_contact`, `emergency_contact_name`, `emergency_contact_number`, `upload_year`) VALUES
+(21, 'SCC-22-00015336', 'Abella, Joseph B.', '3/19/2000', 'Male', 'Camarin Vito Minglanilla Cebu', 'joseph.abella@gmail.com', NULL, NULL, '09172345678', 'Roman Catholic', 'Filipino', 'BSHM', 'Single', 'Abella', '1st Year', 'Maria Abella', '09181234567', 'Juan Abella', '09987654321', NULL),
+(22, 'SCC-22-00017358', 'Abellana, Vincent Anthony Q.', '7/8/2002', 'Male', 'Pakigne Minglanilla Cebu', 'vincentanthony.abellana@gmail.com', NULL, NULL, '09354567890', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Abellana', '1st Year', 'Roberto Abellana', '09213456789', 'Grace Abellana', '09123456789', NULL),
+(23, 'SCC-20-00010846', 'Abendan, Christian James A.', '4/27/2004', 'Male', 'Pob. Ward 2 Minglanilla, Cebu', 'christianjames.abendan@gmail.com', NULL, NULL, '09475678901', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Abendan', '1st Year', 'Lourdes Abendan', '09354567890', 'Michael Abendan', '09221234567', NULL),
+(24, 'SCC-14-0001275', 'Abendan, Nino Rashean T.', '2/12/2002', 'Male', 'Ward 2 pob., Minglanilla, Cebu ', 'ninorashean.abendan@gmail.com', NULL, NULL, '09566789012', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Abendan', '1st Year', 'Antonio Abendan', '09475678901', 'Fatima Abendan', '09331234567', NULL),
+(25, 'SCC-21-00012754', 'Abellana, Ariel L', '10/1/2002', 'Male', 'Basak, Sibonga, Cebu', 'ariel.abellana@gmail.com', NULL, NULL, '09213456789', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Abellana', '2nd Year', 'Elena Abellana', '09566789012', 'Mario Abellana', '09441234567', NULL),
+(26, 'SCC-21-00012377', 'Acidillo, Baby John V.', '7/21/2000', 'Male', 'Bairan City of Naga', 'babyjohn.acidillo@gmail.com', NULL, NULL, '09657890123', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Acidillo', '2nd Year', 'Victor Acidillo', '09657890123', 'Ana Acidillo', '09551234567', NULL),
+(27, 'SCC-21-00014490', 'Adona, Carl Macel C.', '3/29/2002', 'Male', 'Pob. Ward IV Minglanilla Cebu', 'carlmacel.adona@gmail.com', NULL, NULL, '09919012345', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Adona', '2nd Year', 'Rosalinda Adona', '09778901234', 'Carlos Adona', '09661234567', NULL),
+(28, 'SCC-19-0009149', 'Albiso, Creshell Mary M.', '6/18/2003', 'Female', 'Bairan, City of Naga, Cebu', 'creshellmary.albiso@gmail.com', NULL, NULL, '09234567891', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Albiso', '2nd Year', 'Carmelita Albiso', '09919012345', 'Pedro Albiso', '09771234567', NULL),
+(29, 'SCC-21-00014673', 'Alegado, John Raymon B.', '1/9/2002', 'Male', 'Tagjaguimit City of Naga Cebu', 'johnraymon.alegado@gmail.com', NULL, NULL, '09365678902', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Alegado', '2nd Year', 'Benjamin Alegado', '09123456780', 'Marissa Alegado', '09881234567', NULL),
+(30, 'SCC-18-0007848', 'Aguilar, Jaymar C', '2/22/2000', 'Male', 'North Poblacion, San Fernando, Cebu', 'jaymar.aguilar@gmail.com', NULL, NULL, '09123456780', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Aguilar', '3rd Year', 'Cynthia Aguilar', '09234567891', 'Joseph Aguilar', '09991234567', NULL),
+(31, 'SCC-18-0006048', 'Alicaya, Ralph Lorync D.', '1/17/2000', 'Male', 'Lower Pakigne, Minglanilla Cebu', 'ralphlorync.alicaya@gmail.com', NULL, NULL, '09577890124', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Alicaya', '3rd Year', 'Daniel Alicaya', '09365678902', 'Sophia Alicaya', '09102345678', NULL),
+(32, 'SCC-20-00011552', 'Baraclan, Genesis S.', '11/12/1999', 'Male', 'Bacay Tulay Minglanilla Cebu', 'genesis.baraclan@gmail.com', NULL, NULL, '09242345678', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Baraclan', '3rd Year', 'Gloria Baraclan', '09486789013', 'Mark Baraclan', '09213456780', NULL),
+(33, 'SCC-18-0007440', 'Base, Jev Adrian', '11/8/2001', 'Male', 'Sambag, Tuyan, City of Naga, Cebu', 'jev.adrian.base@gmail.com', NULL, NULL, '09373456789', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Base', '3rd Year', 'Francisco Base', '09577890124', 'Jenny Base', '09334567890', NULL),
+(34, 'SCC-19-00010521', 'Booc, Aloysius A.', '6/6/1996', 'Male', 'Babag Lapulapu City', 'aloysious.booc@gmail.com', NULL, NULL, '09494567890', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Booc', '3rd Year', 'Teresa Booc', '09668901235', 'Arthur Booc', '09445678901', NULL),
+(35, 'SCC-18-0007793', 'Adlawan, Ealla Marie', '11/7/1999', 'Female', 'Spring Village Pakigne, Minglanilla', 'ealla.adlawan@gmail.com', NULL, NULL, '09778901234', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Adlawan', '4th Year', 'Rogelio Adlawan', '09789012346', 'Clara Adlawan', '09556789012', NULL),
+(36, 'SCC-19-00010625', 'Alferez Jr., Bernardino S.', '8/12/1999', 'Male', 'Cantao-an Naga Cebu', 'bernardino.alferezjr@gmail.com', NULL, NULL, '09486789013', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Alferez Jr.', '4th Year', 'Marites Alferez', '09920123457', 'Diego Alferez', '09667890123', NULL),
+(37, 'SCC-19-0009987', 'Almendras, Alistair A', '4/21/2000', 'Male', 'Purok Mahogany, Sambag Kolo, Tuyan City of Naga, Cebu', 'alistair.almendras@gmail.com', NULL, NULL, '09668901235', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Almendras', '4th Year', 'Edgar Almendras', '09131234567', 'Liza Almendras', '09778901234', NULL),
+(38, 'SCC-17-0005276', 'Alvarado, Dexter Q.', '7/12/1999', 'Male', 'Babayongan Dalaguete Cebu', 'dexter.alvarado@gmail.com', NULL, NULL, '09789012346', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Alvarado', '4th Year', 'Angela Alvarado', '09242345678', 'Mario Alvarado', '09889012345', NULL),
+(39, 'SCC-19-00010487', 'Amarille, Kim Ryan M', '10/31/1997', 'Male', 'Tungkop Minglanilla Cebu', 'kimryan.amarille@gmail.com', NULL, NULL, '09920123457', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Amarille', '4th Year', 'Ricardo Amarille', '09373456789', 'Helen Amarille', '09990123456', NULL),
+(40, 'SCC-18-0008724', 'Arcamo Jr., Emmanuel P.', '10/1/1997', 'Male', 'Sitio Tabay Tunghaan, Minglanilla Cebu', 'emmanuel.arcamojr@gmail.com', NULL, NULL, '09131234567', 'Roman Catholic', 'Filipino', 'BSIT', 'Single', 'Arcamo Jr.', '4th Year', 'Josephine Arcamo', '09494567890', 'Paul Arcamo', '09111234567', NULL);
 
 -- --------------------------------------------------------
 
@@ -418,7 +550,97 @@ INSERT INTO `logs` (`id`, `user_id`, `user_email`, `action`, `timestamp`) VALUES
 (289, NULL, 'Staff', 'Submitted prescription for patient: Abella, Joseph B.', '2025-08-10 18:33:43'),
 (290, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-10 18:33:56'),
 (291, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-10 18:38:43'),
-(292, NULL, 'jaynu13', 'Added medicine: Rexidol', '2025-08-10 19:19:20');
+(292, NULL, 'jaynu13', 'Added medicine: Rexidol', '2025-08-10 19:19:20'),
+(293, 6, 'jaynu123', 'Logged in', '2025-08-16 23:55:41'),
+(294, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-17 00:12:58'),
+(295, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-17 00:16:37'),
+(296, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-17 00:16:43'),
+(297, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-17 00:16:45'),
+(298, NULL, 'Staff', 'Issued prescription for patient: Abendan, Christian James A.', '2025-08-17 00:27:38'),
+(299, NULL, 'Staff', 'Issued prescription for patient: Abendan, Nino Rashean T.', '2025-08-17 00:29:27'),
+(300, NULL, 'Staff', 'Issued prescription for patient: Abendan, Nino Rashean T.', '2025-08-17 00:29:34'),
+(301, NULL, 'Staff', 'Issued prescription for patient: Abendan, Nino Rashean T.', '2025-08-17 00:29:38'),
+(302, NULL, 'Staff', 'Issued prescription for patient: Acidillo, Baby John V.', '2025-08-17 00:31:00'),
+(303, NULL, 'Staff', 'Issued prescription for patient: Adona, Carl Macel C.', '2025-08-17 00:34:02'),
+(304, NULL, 'Staff', 'Issued prescription for patient: Acidillo, Baby John V.', '2025-08-17 00:48:49'),
+(305, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-17 00:51:40'),
+(306, NULL, 'Staff', 'Issued prescription for patient: Abellana, Ariel L', '2025-08-17 00:52:39'),
+(307, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-17 00:53:20'),
+(308, NULL, 'Staff', 'Issued prescription for patient: Aguilar, Jaymar C', '2025-08-17 01:12:04'),
+(309, NULL, 'jaynu123', 'Added medicine: Bioflu', '2025-08-17 01:26:21'),
+(310, NULL, 'jaynu123', 'Added medicine: Bioflu', '2025-08-17 01:27:30'),
+(311, NULL, 'jaynu123', 'Added medicine: Bioflu', '2025-08-17 01:28:07'),
+(312, 10, 'admin', 'Logged in', '2025-08-17 06:39:12'),
+(313, 6, 'jaynu123', 'Logged in', '2025-08-17 06:39:19'),
+(314, 6, 'jaynu123', 'Logged in', '2025-08-17 06:49:31'),
+(315, 6, 'jaynu123', 'Logged in', '2025-08-17 06:55:01'),
+(316, 6, 'jaynu123', 'Logged in', '2025-08-17 07:04:33'),
+(317, 6, 'jaynu123', 'Logged in', '2025-08-17 07:05:13'),
+(318, 6, 'jaynu123', 'Logged in', '2025-08-17 07:05:37'),
+(319, NULL, 'jaynu123', 'Added medicine: Mefinamic', '2025-08-17 09:30:00'),
+(320, NULL, 'Staff', 'Issued prescription for patient: Abendan, Christian James A.', '2025-08-17 12:10:37'),
+(321, 6, 'jaynu123', 'Logged in', '2025-08-17 14:00:01'),
+(322, 6, 'jaynu123', 'Logged in', '2025-08-17 18:24:44'),
+(323, 10, 'admin', 'Logged in', '2025-08-17 18:25:14'),
+(324, 6, 'jaynu123', 'Logged in', '2025-08-17 18:32:25'),
+(325, 6, 'jaynu123', 'Logged in', '2025-08-17 19:01:17'),
+(326, 10, 'admin', 'Logged in', '2025-08-18 00:27:51'),
+(327, 6, 'jaynu123', 'Logged in', '2025-08-18 00:27:59'),
+(328, 6, 'jaynu123', 'Logged in', '2025-08-18 01:35:57'),
+(329, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 01:45:27'),
+(330, 6, 'jaynu123', 'Logged in', '2025-08-18 08:53:27'),
+(331, 10, 'admin', 'Logged in', '2025-08-18 10:40:01'),
+(332, 6, 'jaynu123', 'Logged in', '2025-08-18 10:40:06'),
+(333, 10, 'admin', 'Logged in', '2025-08-18 11:53:24'),
+(334, 6, 'jaynu123', 'Logged in', '2025-08-18 11:53:30'),
+(335, NULL, 'SCC-18-0008724', 'Added medicine: asd', '2025-08-18 12:40:13'),
+(336, 11, 'jaynu13', 'Logged in', '2025-08-18 15:27:36'),
+(337, 11, 'jaynu13', 'Logged in', '2025-08-18 15:29:11'),
+(338, 11, 'jaynu13', 'Logged in', '2025-08-18 15:45:32'),
+(339, 11, 'jaynu13', 'Logged in', '2025-08-18 15:48:27'),
+(340, 10, 'admin', 'Logged in', '2025-08-18 15:48:46'),
+(341, 11, 'jaynu13', 'Logged in', '2025-08-18 15:49:26'),
+(342, 10, 'admin', 'Logged in', '2025-08-18 15:57:31'),
+(343, 11, 'jaynu13', 'Logged in', '2025-08-18 16:30:41'),
+(344, 11, 'jaynu13', 'Logged in', '2025-08-18 16:33:13'),
+(345, 11, 'jaynu13', 'Logged in', '2025-08-18 16:34:07'),
+(346, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-18 19:15:42'),
+(347, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 19:17:39'),
+(348, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 19:34:15'),
+(349, NULL, 'Staff', 'Issued prescription for patient: Test Student', '2025-08-18 20:13:07'),
+(350, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 20:13:41'),
+(351, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 20:14:00'),
+(352, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 20:14:16'),
+(353, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 20:33:09'),
+(354, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-18 20:49:06'),
+(355, 10, 'admin', 'Logged in', '2025-08-19 07:33:23'),
+(356, 6, 'jaynu123', 'Logged in', '2025-08-19 07:33:29'),
+(357, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:35:33'),
+(358, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:37:15'),
+(359, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:37:31'),
+(360, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:37:49'),
+(361, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:38:02'),
+(362, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:38:16'),
+(363, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 07:40:10'),
+(364, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 08:11:22'),
+(365, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 08:13:01'),
+(366, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 08:41:54'),
+(367, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-19 08:42:17'),
+(368, NULL, 'Staff', 'Issued prescription for patient: Abella, Joseph B.', '2025-08-19 08:42:29'),
+(369, NULL, 'Staff', 'Issued prescription for patient: Abellana, Vincent Anthony Q.', '2025-08-19 08:42:53'),
+(370, NULL, 'Staff', 'Issued prescription for patient: Abendan, Christian James A.', '2025-08-19 08:58:05'),
+(371, NULL, 'Staff', 'Issued prescription for patient: Abendan, Christian James A.', '2025-08-19 08:58:17'),
+(372, NULL, 'Staff', 'Issued prescription for patient: Abendan, Christian James A.', '2025-08-19 08:58:28'),
+(373, 10, 'admin', 'Logged in', '2025-08-20 13:59:57'),
+(374, 6, 'jaynu123', 'Logged in', '2025-08-20 14:04:23'),
+(375, 11, 'jaynu13', 'Logged in', '2025-08-22 18:16:44'),
+(376, 10, 'admin', 'Logged in', '2025-08-22 18:42:07'),
+(377, 10, 'admin', 'Logged in', '2025-08-22 19:17:14'),
+(378, 10, 'admin', 'Logged in', '2025-08-22 19:52:36'),
+(379, 10, 'admin', 'Logged in', '2025-08-22 20:29:55'),
+(380, 11, 'jaynu13', 'Logged in', '2025-08-22 20:38:41'),
+(381, 10, 'admin', 'Logged in', '2025-08-23 06:52:22'),
+(382, 6, 'jaynu123', 'Logged in', '2025-08-23 06:52:38');
 
 -- --------------------------------------------------------
 
@@ -446,7 +668,10 @@ CREATE TABLE `medication_referrals` (
 --
 
 INSERT INTO `medication_referrals` (`id`, `patient_id`, `patient_name`, `subjective`, `objective`, `assessment`, `plan`, `intervention`, `evaluation`, `recorded_by`, `created_at`, `referral_to`) VALUES
-(1, 21, 'Abella, Joseph B.', 'sfdasdadsa', 'sdadsadsadsa', 'sdadsasdas', 'dsadsadsa', 'dsadadsa', 'dsadsasda', 'jaynu13', '2025-08-10 19:37:33', 'jaynu');
+(1, 21, 'Abella, Joseph B.', 'sfdasdadsa', 'sdadsadsadsa', 'sdadsasdas', 'dsadsadsa', 'dsadadsa', 'dsadsasda', 'jaynu13', '2025-08-10 19:37:33', 'jaynu'),
+(2, 28, 'Albiso, Creshell Mary M.', 'sdfsdsdf', 'SDFJSDJFQJDHJSJDFSDFSJDFDJS', 'SKJFSDFJSJDH', 'KSDJKFSKDFJK', 'KSJDKFJSKJD', 'KSJDFKSKFJKSDJF', 'jaynu123', '2025-08-17 01:12:48', NULL),
+(3, 26, 'Acidillo, Baby John V.', 'Deserunt iure porro ', 'Veniam excepturi in', 'Voluptas veniam exp', 'Quis sapiente natus ', 'Qui in deserunt quis', 'Ea id consectetur se', 'jaynu123', '2025-08-17 01:13:59', NULL),
+(4, 26, 'Acidillo, Baby John V.', 'Ea possimus digniss', 'Animi commodo quis ', 'Ipsum et officiis un', 'Nihil aut corrupti ', 'Et enim obcaecati ea', 'Magnam repellendus ', 'jaynu123', '2025-08-17 01:24:46', 'jhoonard');
 
 -- --------------------------------------------------------
 
@@ -468,10 +693,580 @@ CREATE TABLE `medicines` (
 --
 
 INSERT INTO `medicines` (`id`, `name`, `dosage`, `quantity`, `expiry`, `created_at`) VALUES
-(4, 'Diatabs', '350mg', 87, '2031-11-17', '2025-05-17 08:24:20'),
-(7, 'Neozep', '10mg', 267, '2050-05-18', '2025-05-18 01:21:57'),
-(12, 'Biogesic', '500mg', 488, '2029-06-05', '2025-05-28 17:55:41'),
-(26, 'Rexidol', '500mg', 500, '2029-12-31', '2025-08-10 19:19:20');
+(4, 'Diatabs', '350mg', 0, '2031-11-17', '2025-05-17 08:24:20'),
+(7, 'Neozep', '10mg', 134, '2050-05-18', '2025-05-18 01:21:57'),
+(12, 'Biogesic', '500mg', 35, '2029-06-05', '2025-05-28 17:55:41'),
+(26, 'Rexidol', '500mg', 158, '2029-12-31', '2025-08-10 19:19:20'),
+(27, 'Bioflu', '500mg', 330, '2027-10-17', '2025-08-17 01:26:21'),
+(28, 'Bioflu', '500mg', 0, '2025-10-27', '2025-08-17 01:27:30'),
+(29, 'Bioflu', '500mg', 0, '2025-08-17', '2025-08-17 01:28:07'),
+(30, 'Mefinamic', '500mg', 523, '2024-06-04', '2025-08-17 09:30:00'),
+(31, 'asd', 'asd', 64, '2025-08-18', '2025-08-18 12:40:13');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `medicine_requests`
+--
+
+CREATE TABLE `medicine_requests` (
+  `id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `prescription_id` int(11) DEFAULT NULL,
+  `medicine_name` varchar(255) NOT NULL,
+  `quantity_requested` varchar(100) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `status` enum('pending','approved','declined','completed') DEFAULT 'pending',
+  `staff_notes` text DEFAULT NULL,
+  `requested_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `processed_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `sender_name` varchar(255) NOT NULL,
+  `sender_role` varchar(50) NOT NULL,
+  `recipient_id` int(11) NOT NULL,
+  `recipient_name` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `is_read` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `sender_id`, `sender_name`, `sender_role`, `recipient_id`, `recipient_name`, `subject`, `message`, `is_read`, `created_at`) VALUES
+(1, 6, 'Staff', 'doctor/nurse', 21, 'Abella, Joseph B.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(2, 6, 'Staff', 'doctor/nurse', 25, 'Abellana, Ariel L', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(3, 6, 'Staff', 'doctor/nurse', 22, 'Abellana, Vincent Anthony Q.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(4, 6, 'Staff', 'doctor/nurse', 23, 'Abendan, Christian James A.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(5, 6, 'Staff', 'doctor/nurse', 24, 'Abendan, Nino Rashean T.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(6, 6, 'Staff', 'doctor/nurse', 26, 'Acidillo, Baby John V.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(7, 6, 'Staff', 'doctor/nurse', 35, 'Adlawan, Ealla Marie', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:21:50'),
+(8, 6, 'Staff', 'doctor/nurse', 27, 'Adona, Carl Macel C.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(9, 6, 'Staff', 'doctor/nurse', 30, 'Aguilar, Jaymar C', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:21:50'),
+(10, 6, 'Staff', 'doctor/nurse', 28, 'Albiso, Creshell Mary M.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(11, 6, 'Staff', 'doctor/nurse', 29, 'Alegado, John Raymon B.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:21:50'),
+(12, 6, 'Staff', 'doctor/nurse', 36, 'Alferez Jr., Bernardino S.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(13, 6, 'Staff', 'doctor/nurse', 31, 'Alicaya, Ralph Lorync D.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(14, 6, 'Staff', 'doctor/nurse', 37, 'Almendras, Alistair A', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(15, 6, 'Staff', 'doctor/nurse', 38, 'Alvarado, Dexter Q.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(16, 6, 'Staff', 'doctor/nurse', 39, 'Amarille, Kim Ryan M', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(17, 6, 'Staff', 'doctor/nurse', 40, 'Arcamo Jr., Emmanuel P.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:21:50'),
+(18, 6, 'Staff', 'doctor/nurse', 32, 'Baraclan, Genesis S.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:21:50'),
+(19, 6, 'Staff', 'doctor/nurse', 33, 'Base, Jev Adrian', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:21:50'),
+(20, 6, 'Staff', 'doctor/nurse', 34, 'Booc, Aloysius A.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:21:50'),
+(21, 6, 'Staff', 'doctor/nurse', 21, 'Abella, Joseph B.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(22, 6, 'Staff', 'doctor/nurse', 25, 'Abellana, Ariel L', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(23, 6, 'Staff', 'doctor/nurse', 22, 'Abellana, Vincent Anthony Q.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(24, 6, 'Staff', 'doctor/nurse', 23, 'Abendan, Christian James A.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(25, 6, 'Staff', 'doctor/nurse', 24, 'Abendan, Nino Rashean T.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(26, 6, 'Staff', 'doctor/nurse', 26, 'Acidillo, Baby John V.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(27, 6, 'Staff', 'doctor/nurse', 35, 'Adlawan, Ealla Marie', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:22:27'),
+(28, 6, 'Staff', 'doctor/nurse', 27, 'Adona, Carl Macel C.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(29, 6, 'Staff', 'doctor/nurse', 30, 'Aguilar, Jaymar C', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:22:27'),
+(30, 6, 'Staff', 'doctor/nurse', 28, 'Albiso, Creshell Mary M.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:27'),
+(31, 6, 'Staff', 'doctor/nurse', 29, 'Alegado, John Raymon B.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:22:27'),
+(32, 6, 'Staff', 'doctor/nurse', 36, 'Alferez Jr., Bernardino S.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:28'),
+(33, 6, 'Staff', 'doctor/nurse', 31, 'Alicaya, Ralph Lorync D.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:28'),
+(34, 6, 'Staff', 'doctor/nurse', 37, 'Almendras, Alistair A', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:28'),
+(35, 6, 'Staff', 'doctor/nurse', 38, 'Alvarado, Dexter Q.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:28'),
+(36, 6, 'Staff', 'doctor/nurse', 39, 'Amarille, Kim Ryan M', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:28'),
+(37, 6, 'Staff', 'doctor/nurse', 40, 'Arcamo Jr., Emmanuel P.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:22:28'),
+(38, 6, 'Staff', 'doctor/nurse', 32, 'Baraclan, Genesis S.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:22:28'),
+(39, 6, 'Staff', 'doctor/nurse', 33, 'Base, Jev Adrian', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 0, '2025-08-17 07:22:28'),
+(40, 6, 'Staff', 'doctor/nurse', 34, 'Booc, Aloysius A.', 'agenda', 'ksjakdkasdakskdjakdkjaksjdkjaksdkaskdj', 1, '2025-08-17 07:22:28'),
+(41, 6, 'Staff', 'doctor/nurse', 21, 'Abella, Joseph B.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(42, 6, 'Staff', 'doctor/nurse', 25, 'Abellana, Ariel L', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(43, 6, 'Staff', 'doctor/nurse', 22, 'Abellana, Vincent Anthony Q.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(44, 6, 'Staff', 'doctor/nurse', 23, 'Abendan, Christian James A.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(45, 6, 'Staff', 'doctor/nurse', 24, 'Abendan, Nino Rashean T.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(46, 6, 'Staff', 'doctor/nurse', 26, 'Acidillo, Baby John V.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(47, 6, 'Staff', 'doctor/nurse', 35, 'Adlawan, Ealla Marie', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 1, '2025-08-17 07:41:19'),
+(48, 6, 'Staff', 'doctor/nurse', 27, 'Adona, Carl Macel C.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(49, 6, 'Staff', 'doctor/nurse', 30, 'Aguilar, Jaymar C', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 1, '2025-08-17 07:41:19'),
+(50, 6, 'Staff', 'doctor/nurse', 28, 'Albiso, Creshell Mary M.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(51, 6, 'Staff', 'doctor/nurse', 29, 'Alegado, John Raymon B.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 1, '2025-08-17 07:41:19'),
+(52, 6, 'Staff', 'doctor/nurse', 36, 'Alferez Jr., Bernardino S.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(53, 6, 'Staff', 'doctor/nurse', 31, 'Alicaya, Ralph Lorync D.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(54, 6, 'Staff', 'doctor/nurse', 37, 'Almendras, Alistair A', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(55, 6, 'Staff', 'doctor/nurse', 38, 'Alvarado, Dexter Q.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(56, 6, 'Staff', 'doctor/nurse', 39, 'Amarille, Kim Ryan M', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(57, 6, 'Staff', 'doctor/nurse', 40, 'Arcamo Jr., Emmanuel P.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 1, '2025-08-17 07:41:19'),
+(58, 6, 'Staff', 'doctor/nurse', 32, 'Baraclan, Genesis S.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 1, '2025-08-17 07:41:19'),
+(59, 6, 'Staff', 'doctor/nurse', 33, 'Base, Jev Adrian', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 0, '2025-08-17 07:41:19'),
+(60, 6, 'Staff', 'doctor/nurse', 34, 'Booc, Aloysius A.', 'meeting', 'aksdadkajskdasdkaksdaksdkjaskdjakjsd', 1, '2025-08-17 07:41:19'),
+(61, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(62, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(63, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(64, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(65, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(66, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(67, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(68, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(69, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(70, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(71, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(72, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(73, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(74, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(75, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(76, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(77, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Yawa', 'Mga yawa mo tanan', 1, '2025-08-18 11:29:20'),
+(78, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(79, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(80, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Yawa', 'Mga yawa mo tanan', 0, '2025-08-18 11:29:20'),
+(81, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(82, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(83, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(84, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(85, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(86, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(87, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(88, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(89, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(90, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(91, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(92, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(93, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(94, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(95, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(96, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(97, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'asdasd', 'asdasdasd', 1, '2025-08-18 12:39:14'),
+(98, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(99, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(100, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'asdasd', 'asdasdasd', 0, '2025-08-18 12:39:14'),
+(101, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(102, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(103, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(104, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(105, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(106, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(107, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(108, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(109, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(110, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(111, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(112, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(113, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(114, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(115, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(116, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(117, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'test', 'test', 1, '2025-08-18 12:43:25'),
+(118, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(119, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(120, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'test', 'test', 0, '2025-08-18 12:43:25'),
+(121, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(122, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(123, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(124, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(125, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(126, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(127, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(128, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(129, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(130, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(131, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(132, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(133, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(134, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(135, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(136, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(137, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'test', 'test', 1, '2025-08-18 12:44:30'),
+(138, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(139, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(140, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'test', 'test', 0, '2025-08-18 12:44:30'),
+(141, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(142, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(143, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(144, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(145, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(146, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(147, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(148, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(149, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(150, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(151, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(152, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(153, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(154, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(155, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(156, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(157, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'asd', 'asd', 1, '2025-08-18 12:44:42'),
+(158, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(159, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(160, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'asd', 'asd', 0, '2025-08-18 12:44:42'),
+(161, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(162, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(163, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(164, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(165, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(166, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(167, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(168, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(169, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(170, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(171, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(172, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(173, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(174, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(175, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(176, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(177, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'asd', 'asd', 1, '2025-08-18 12:44:46'),
+(178, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(179, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(180, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'asd', 'asd', 0, '2025-08-18 12:44:46'),
+(181, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(182, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(183, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(184, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(185, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(186, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(187, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(188, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(189, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(190, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(191, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(192, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(193, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(194, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(195, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(196, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(197, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'asd', 'asd', 1, '2025-08-18 13:10:05'),
+(198, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(199, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(200, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'asd', 'asd', 0, '2025-08-18 13:10:05'),
+(201, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(202, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(203, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(204, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(205, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(206, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(207, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(208, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(209, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(210, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(211, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(212, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(213, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(214, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(215, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(216, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(217, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'asd', 'asd', 1, '2025-08-18 13:10:07'),
+(218, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(219, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(220, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'asd', 'asd', 0, '2025-08-18 13:10:07'),
+(221, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(222, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(223, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(224, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(225, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(226, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(227, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(228, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(229, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(230, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(231, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(232, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(233, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(234, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(235, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(236, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(237, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 1, '2025-08-18 13:10:13'),
+(238, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:13'),
+(239, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:14'),
+(240, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:14'),
+(241, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(242, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(243, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(244, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(245, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(246, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(247, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(248, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(249, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(250, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(251, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(252, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(253, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(254, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(255, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(256, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(257, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 1, '2025-08-18 13:10:17'),
+(258, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(259, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(260, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Ipsum mollitia moll', 'Temporibus ut ut vel', 0, '2025-08-18 13:10:17'),
+(261, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(262, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(263, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(264, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(265, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(266, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(267, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(268, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(269, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(270, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(271, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(272, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(273, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(274, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(275, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(276, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(277, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 1, '2025-08-18 13:10:50'),
+(278, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(279, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(280, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:50'),
+(281, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(282, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(283, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(284, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(285, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(286, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(287, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(288, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(289, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(290, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(291, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(292, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(293, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(294, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(295, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(296, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(297, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 1, '2025-08-18 13:10:52'),
+(298, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(299, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(300, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:10:52'),
+(301, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(302, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(303, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(304, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(305, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(306, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(307, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(308, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(309, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(310, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(311, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(312, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(313, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(314, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(315, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(316, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(317, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 1, '2025-08-18 13:11:00'),
+(318, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(319, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(320, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:00'),
+(321, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(322, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(323, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(324, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(325, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(326, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(327, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(328, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(329, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(330, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(331, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(332, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(333, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(334, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(335, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(336, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(337, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 1, '2025-08-18 13:11:02'),
+(338, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(339, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(340, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Dolor qui placeat e', 'Sed aut eum tenetur', 0, '2025-08-18 13:11:02'),
+(341, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(342, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(343, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(344, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(345, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(346, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(347, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(348, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(349, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(350, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(351, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(352, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(353, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(354, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(355, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(356, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(357, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'yati', 'Quam enim exercitati', 1, '2025-08-18 13:11:42'),
+(358, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(359, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(360, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:42'),
+(361, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(362, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(363, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(364, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(365, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(366, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(367, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(368, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(369, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(370, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(371, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(372, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(373, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(374, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(375, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(376, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(377, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'yati', 'Quam enim exercitati', 1, '2025-08-18 13:11:57'),
+(378, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(379, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(380, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:11:57'),
+(381, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(382, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(383, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(384, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(385, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(386, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(387, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(388, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(389, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(390, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(391, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(392, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(393, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(394, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(395, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(396, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(397, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'yati', 'Quam enim exercitati', 1, '2025-08-18 13:14:43'),
+(398, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(399, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(400, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:43'),
+(401, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(402, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(403, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(404, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(405, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(406, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(407, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(408, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(409, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(410, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(411, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(412, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(413, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(414, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(415, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(416, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(417, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'yati', 'Quam enim exercitati', 1, '2025-08-18 13:14:45'),
+(418, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(419, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(420, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:45'),
+(421, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(422, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52');
+INSERT INTO `messages` (`id`, `sender_id`, `sender_name`, `sender_role`, `recipient_id`, `recipient_name`, `subject`, `message`, `is_read`, `created_at`) VALUES
+(423, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(424, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(425, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(426, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(427, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(428, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(429, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(430, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(431, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(432, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(433, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(434, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(435, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(436, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(437, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'yati', 'Quam enim exercitati', 1, '2025-08-18 13:14:52'),
+(438, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(439, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(440, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'yati', 'Quam enim exercitati', 0, '2025-08-18 13:14:52'),
+(441, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(442, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(443, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(444, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(445, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(446, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(447, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(448, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(449, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(450, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(451, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(452, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(453, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(454, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(455, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(456, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(457, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 1, '2025-08-18 13:15:00'),
+(458, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(459, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(460, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:00'),
+(461, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(462, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(463, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(464, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(465, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(466, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(467, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(468, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(469, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(470, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(471, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(472, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(473, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(474, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(475, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(476, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(477, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 1, '2025-08-18 13:15:07'),
+(478, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(479, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(480, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'Dolor ratione id qui', 'Sunt aut nisi et ani', 0, '2025-08-18 13:15:07'),
+(481, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(482, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(483, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(484, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(485, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(486, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(487, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(488, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(489, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(490, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(491, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(492, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(493, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(494, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(495, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(496, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(497, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'animal oi', 'Id exercitationem s', 1, '2025-08-18 13:15:17'),
+(498, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(499, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(500, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'animal oi', 'Id exercitationem s', 0, '2025-08-18 13:15:17'),
+(501, 40, 'Staff', 'student', 21, 'Abella, Joseph B.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(502, 40, 'Staff', 'student', 25, 'Abellana, Ariel L', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(503, 40, 'Staff', 'student', 22, 'Abellana, Vincent Anthony Q.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(504, 40, 'Staff', 'student', 23, 'Abendan, Christian James A.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(505, 40, 'Staff', 'student', 24, 'Abendan, Nino Rashean T.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(506, 40, 'Staff', 'student', 26, 'Acidillo, Baby John V.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(507, 40, 'Staff', 'student', 35, 'Adlawan, Ealla Marie', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(508, 40, 'Staff', 'student', 27, 'Adona, Carl Macel C.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(509, 40, 'Staff', 'student', 30, 'Aguilar, Jaymar C', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(510, 40, 'Staff', 'student', 28, 'Albiso, Creshell Mary M.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(511, 40, 'Staff', 'student', 29, 'Alegado, John Raymon B.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(512, 40, 'Staff', 'student', 36, 'Alferez Jr., Bernardino S.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(513, 40, 'Staff', 'student', 31, 'Alicaya, Ralph Lorync D.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(514, 40, 'Staff', 'student', 37, 'Almendras, Alistair A', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(515, 40, 'Staff', 'student', 38, 'Alvarado, Dexter Q.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(516, 40, 'Staff', 'student', 39, 'Amarille, Kim Ryan M', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(517, 40, 'Staff', 'student', 40, 'Arcamo Jr., Emmanuel P.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 1, '2025-08-19 15:51:28'),
+(518, 40, 'Staff', 'student', 32, 'Baraclan, Genesis S.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(519, 40, 'Staff', 'student', 33, 'Base, Jev Adrian', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28'),
+(520, 40, 'Staff', 'student', 34, 'Booc, Aloysius A.', 'agenda', 'sjhdkjahkdhaskahdkaskhad', 0, '2025-08-19 15:51:28');
 
 -- --------------------------------------------------------
 
@@ -566,7 +1361,92 @@ INSERT INTO `notifications` (`id`, `student_id`, `message`, `type`, `is_read`, `
 (72, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-06-11</b> at <b>13:00</b> (Fuga Elit optio n).', 'appointment', 0, '2025-06-01 11:53:27'),
 (73, 40, 'Your appointment for 2025-06-11 13:00:00 has been <span class=\'text-green-600 font-semibold\'>approved</span>.', 'appointment', 0, '2025-06-01 11:53:39'),
 (74, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-06-11</b> at <b>13:00</b> (Fuga Elit optio n).', 'appointment', 0, '2025-06-01 11:53:45'),
-(75, 40, 'Your appointment for Fuga Elit optio n has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-06-19</b> at <b>13:00:00</b>.', 'appointment', 0, '2025-07-31 18:23:49');
+(75, 40, 'Your appointment for Fuga Elit optio n has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-06-19</b> at <b>13:00:00</b>.', 'appointment', 0, '2025-07-31 18:23:49'),
+(76, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-18</b> at <b>18:17-19:18</b> (Molestias maiores cu).', 'appointment', 0, '2025-08-17 18:18:45'),
+(77, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-18</b> at <b>18:17-19:18</b> (Molestias maiores cu).', 'appointment', 0, '2025-08-17 18:18:54'),
+(78, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-18</b> at <b>18:17-19:18</b> (Et nulla nostrud ut ).', 'appointment', 0, '2025-08-17 18:19:31'),
+(79, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-18</b> at <b>18:17-19:18</b> (Aliquip dolor in par).', 'appointment', 0, '2025-08-17 18:20:02'),
+(80, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-18</b> at <b>18:17-19:18</b> (Expedita pariatur N).', 'appointment', 0, '2025-08-17 18:21:34'),
+(81, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-18</b> at <b>18:17-19:18</b> (Aut dolores eligendi).', 'appointment', 0, '2025-08-17 18:25:53'),
+(82, 40, 'Your appointment for 2025-08-18 18:17-19:18 has been <span class=\'text-green-600 font-semibold\'>approved</span>.', 'appointment', 0, '2025-08-17 18:26:11'),
+(83, NULL, 'A new appointment has been booked by <b>Booc, Aloysius A.</b> for <b>2025-08-18</b> at <b>00:32-03:36</b> (Eligendi iusto aliqu).', 'appointment', 0, '2025-08-18 00:48:19'),
+(84, 34, 'Your appointment for 2025-08-18 00:32-03:36 has been <span class=\'text-green-600 font-semibold\'>approved</span>.', 'appointment', 0, '2025-08-18 00:48:40'),
+(85, NULL, 'A new appointment has been booked by <b>Adlawan, Ealla Marie</b> for <b>2025-08-20</b> at <b>01:17-01:47</b> (Non et eu ipsa natu).', 'appointment', 0, '2025-08-18 01:18:04'),
+(86, NULL, 'A new appointment has been booked by <b>Adlawan, Ealla Marie</b> for <b>2025-08-20</b> at <b>01:47-02:17</b> (Animi sit irure re).', 'appointment', 0, '2025-08-18 01:18:09'),
+(87, NULL, 'A new appointment has been booked by <b>Adlawan, Ealla Marie</b> for <b>2025-08-19</b> at <b>01:31-02:01</b> (Qui eligendi dolorem).', 'appointment', 0, '2025-08-18 01:32:43'),
+(88, NULL, 'A new appointment has been booked by <b>Alegado, John Raymon B.</b> for <b>2025-08-19</b> at <b>02:01-02:31</b> (Eum soluta recusanda).', 'appointment', 0, '2025-08-18 01:35:16'),
+(89, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-19</b> at <b>02:31-03:01</b> (Aperiam Nam magni ma).', 'appointment', 0, '2025-08-18 11:29:43'),
+(90, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-19</b> at <b>03:01-03:31</b> (Est ea molestiae ips).', 'appointment', 0, '2025-08-18 12:39:33'),
+(91, 35, 'Your appointment for Qui eligendi dolorem has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-08-30</b> at <b>15:50</b>.', 'appointment', 0, '2025-08-18 15:50:14'),
+(92, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:29-14:59</b> (asd).', 'appointment', 0, '2025-08-18 16:33:52'),
+(93, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-22</b> at <b>09:15-09:45</b> (yawa).', 'appointment', 0, '2025-08-19 09:40:47'),
+(94, 40, 'Your appointment for 2025-08-22 09:15-09:45 has been <span class=\'text-green-600 font-semibold\'>approved</span>.', 'appointment', 0, '2025-08-19 09:48:53'),
+(95, 40, 'Your appointment for asd has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-08-21</b> at <b>09:51</b>.', 'appointment', 0, '2025-08-19 09:49:08'),
+(96, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:59-15:29</b> (yawa).', 'appointment', 0, '2025-08-19 09:50:26'),
+(97, 40, 'Your appointment for yawa has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-08-21</b> at <b>09:51</b>.', 'appointment', 0, '2025-08-19 09:50:43'),
+(98, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:29-14:59</b> (yati).', 'appointment', 0, '2025-08-19 09:56:41'),
+(99, 40, 'Your appointment for yati has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>9:57 AM</b>.', 'appointment', 0, '2025-08-19 09:56:55'),
+(100, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:29-14:59</b> (yati).', 'appointment', 0, '2025-08-19 10:00:26'),
+(101, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:59-15:29</b> (minatay).', 'appointment', 0, '2025-08-19 10:00:54'),
+(102, 40, 'Your appointment for minatay has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>10:02 AM</b>.', 'appointment', 0, '2025-08-19 10:01:16'),
+(103, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>15:29-15:59</b> (huhu).', 'appointment', 0, '2025-08-19 10:06:31'),
+(104, 40, 'Your appointment for huhu has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>10:07 AM</b>.', 'appointment', 0, '2025-08-19 10:06:56'),
+(105, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:59-15:29</b> (bogo).', 'appointment', 0, '2025-08-19 10:07:19'),
+(106, 40, 'Your appointment for bogo has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>10:08 AM</b>.', 'appointment', 0, '2025-08-19 10:07:34'),
+(107, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>15:29-15:59</b> (hahays).', 'appointment', 0, '2025-08-19 10:13:46'),
+(108, 40, 'Your appointment for hahays has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>10:15 AM</b>.', 'appointment', 0, '2025-08-19 10:14:37'),
+(109, NULL, 'A new appointment has been booked by <b>Arcamo Jr., Emmanuel P.</b> for <b>2025-08-20</b> at <b>14:59-15:29</b> (huhays).', 'appointment', 0, '2025-08-19 10:18:40'),
+(110, 40, 'Your appointment for huhays has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>10:19 AM</b>.', 'appointment', 0, '2025-08-19 10:19:02'),
+(111, 40, 'Your appointment for yati has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>August 21, 2025</b> at <b>10:25 AM</b>.', 'appointment', 0, '2025-08-19 10:25:00'),
+(112, 35, 'Your appointment for 2025-08-20 01:47-02:17 has been <span class=\'text-green-600 font-semibold\'>approved</span>.', 'appointment', 0, '2025-08-19 10:26:12'),
+(113, 35, 'Your appointment for 2025-08-20 01:17-01:47 has been <span class=\'text-red-600 font-semibold\'>declined</span>.', 'appointment', 0, '2025-08-19 10:26:23'),
+(114, 40, 'Your appointment for Aperiam Nam magni ma has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-08-20</b> at <b>10:30</b>.', 'appointment', 0, '2025-08-19 10:29:40'),
+(115, 29, 'Your appointment for Eum soluta recusanda has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-08-20</b> at <b>10:30</b>.', 'appointment', 0, '2025-08-19 10:29:57'),
+(116, 35, 'Your appointment for Qui eligendi dolorem has been <span class=\'text-blue-600 font-semibold\'>rescheduled</span> to <b>2025-08-30</b> at <b>15:50</b>.', 'appointment', 0, '2025-08-19 10:33:36'),
+(117, 40, 'Your appointment for 2025-08-22 09:15-09:45 has been <span class=\'text-green-600 font-semibold\'>approved</span>.', 'appointment', 0, '2025-08-19 10:33:49'),
+(118, 29, 'Your appointment for 2025-08-20 10:30 has been <span class=\'text-red-600 font-semibold\'>declined</span>.', 'appointment', 0, '2025-08-19 10:33:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `parent_alerts`
+--
+
+CREATE TABLE `parent_alerts` (
+  `id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `patient_name` varchar(255) NOT NULL,
+  `parent_email` varchar(255) NOT NULL,
+  `visit_count` int(11) NOT NULL,
+  `week_start_date` date NOT NULL,
+  `week_end_date` date NOT NULL,
+  `alert_sent_at` datetime DEFAULT current_timestamp(),
+  `alert_status` enum('pending','sent','failed') DEFAULT 'pending',
+  `email_content` text DEFAULT NULL,
+  `sent_by` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `parent_alerts`
+--
+
+INSERT INTO `parent_alerts` (`id`, `patient_id`, `patient_name`, `parent_email`, `visit_count`, `week_start_date`, `week_end_date`, `alert_sent_at`, `alert_status`, `email_content`, `sent_by`, `created_at`) VALUES
+(1, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 07:51:38', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 07:51:38'),
+(2, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 07:51:45', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 07:51:45'),
+(3, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 07:53:38', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 07:53:38'),
+(4, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 07:58:55', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 07:58:55'),
+(5, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 07:59:03', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 07:59:03'),
+(6, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 08:02:44', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:02:44'),
+(7, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 08:02:54', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:02:54');
+INSERT INTO `parent_alerts` (`id`, `patient_id`, `patient_name`, `parent_email`, `visit_count`, `week_start_date`, `week_end_date`, `alert_sent_at`, `alert_status`, `email_content`, `sent_by`, `created_at`) VALUES
+(8, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 08:10:48', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:10:48'),
+(9, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 15, '2025-08-18', '2025-08-24', '2025-08-19 08:10:57', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>15 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:10:57'),
+(11, 21, 'Abella, Joseph B.', 'sicecyre@mailinator.com', 16, '2025-08-18', '2025-08-24', '2025-08-19 08:11:31', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>16 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 16:</strong> Aug 19, 2025 at 8:11 AM<br>Reason: Assumenda a ipsa as<br>Medication: [{&quot;medicine&quot;:&quot;Mefinamic&quot;,&quot;dosage&quot;:&quot;Quo pariatur Labori&quot;,&quot;quantity&quot;:&quot;30&quot;,&quot;frequency&quot;:&quot;Delectus enim cumqu&quot;,&quot;instructions&quot;:&quot;Dolor illum quis au&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:11:31'),
+(12, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 17, '2025-08-18', '2025-08-24', '2025-08-19 08:13:07', 'failed', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>17 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 16:</strong> Aug 19, 2025 at 8:11 AM<br>Reason: Assumenda a ipsa as<br>Medication: [{&quot;medicine&quot;:&quot;Mefinamic&quot;,&quot;dosage&quot;:&quot;Quo pariatur Labori&quot;,&quot;quantity&quot;:&quot;30&quot;,&quot;frequency&quot;:&quot;Delectus enim cumqu&quot;,&quot;instructions&quot;:&quot;Dolor illum quis au&quot;}]<br><br><strong>Visit 17:</strong> Aug 19, 2025 at 8:13 AM<br>Reason: Repudiandae unde lau<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Voluptas error Nam m&quot;,&quot;quantity&quot;:&quot;84&quot;,&quot;frequency&quot;:&quot;Inventore modi aliqu&quot;,&quot;instructions&quot;:&quot;Neque et rerum dolor&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:13:07'),
+(13, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 17, '2025-08-18', '2025-08-24', '2025-08-19 08:27:57', 'sent', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abella, Joseph B.</strong>, has received medication from the clinic <strong>17 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 1:45 AM<br>Reason: Fever<br>Medication: [{&quot;medicine&quot;:&quot;Neozep&quot;,&quot;dosage&quot;:&quot;Quo odit ipsa in ea&quot;,&quot;quantity&quot;:&quot;38&quot;,&quot;frequency&quot;:&quot;Cum numquam in ea ex&quot;,&quot;instructions&quot;:&quot;Nesciunt labore dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 18, 2025 at 7:17 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 3:</strong> Aug 18, 2025 at 7:34 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 4:</strong> Aug 18, 2025 at 8:13 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 5:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 6:</strong> Aug 18, 2025 at 8:14 PM<br>Reason: asd<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;asd&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 7:</strong> Aug 18, 2025 at 8:33 PM<br>Reason: fevcer<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 8:</strong> Aug 18, 2025 at 8:49 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;asd&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 9:</strong> Aug 19, 2025 at 7:35 AM<br>Reason: Sakits ulo<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Mollitia qui facilis&quot;,&quot;quantity&quot;:&quot;11&quot;,&quot;frequency&quot;:&quot;Iste explicabo Rem &quot;,&quot;instructions&quot;:&quot;Natus quos harum sae&quot;}]<br><br><strong>Visit 10:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Qui occaecat magna v<br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Omnis velit dolor m&quot;,&quot;quantity&quot;:&quot;71&quot;,&quot;frequency&quot;:&quot;Consequat Itaque in&quot;,&quot;instructions&quot;:&quot;Quia rerum eveniet &quot;}]<br><br><strong>Visit 11:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Dolore consequuntur <br>Medication: [{&quot;medicine&quot;:&quot;Diatabs&quot;,&quot;dosage&quot;:&quot;Ut rerum quis cupida&quot;,&quot;quantity&quot;:&quot;75&quot;,&quot;frequency&quot;:&quot;Autem obcaecati ut c&quot;,&quot;instructions&quot;:&quot;Fugiat enim a dolor &quot;}]<br><br><strong>Visit 12:</strong> Aug 19, 2025 at 7:37 AM<br>Reason: Doloribus praesentiu<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Non laborum Digniss&quot;,&quot;quantity&quot;:&quot;29&quot;,&quot;frequency&quot;:&quot;Commodo rerum id co&quot;,&quot;instructions&quot;:&quot;Voluptatem Velit of&quot;}]<br><br><strong>Visit 13:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Recusandae Rerum te<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Quis porro ipsum co&quot;,&quot;quantity&quot;:&quot;42&quot;,&quot;frequency&quot;:&quot;Dolor aliquip nisi q&quot;,&quot;instructions&quot;:&quot;Sint atque ab incid&quot;}]<br><br><strong>Visit 14:</strong> Aug 19, 2025 at 7:38 AM<br>Reason: Enim qui eum asperio<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Iusto optio anim do&quot;,&quot;quantity&quot;:&quot;16&quot;,&quot;frequency&quot;:&quot;Qui qui deserunt ips&quot;,&quot;instructions&quot;:&quot;Voluptas officiis po&quot;}]<br><br><strong>Visit 15:</strong> Aug 19, 2025 at 7:40 AM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;frequency&quot;:&quot;asd&quot;,&quot;instructions&quot;:&quot;asd&quot;}]<br><br><strong>Visit 16:</strong> Aug 19, 2025 at 8:11 AM<br>Reason: Assumenda a ipsa as<br>Medication: [{&quot;medicine&quot;:&quot;Mefinamic&quot;,&quot;dosage&quot;:&quot;Quo pariatur Labori&quot;,&quot;quantity&quot;:&quot;30&quot;,&quot;frequency&quot;:&quot;Delectus enim cumqu&quot;,&quot;instructions&quot;:&quot;Dolor illum quis au&quot;}]<br><br><strong>Visit 17:</strong> Aug 19, 2025 at 8:13 AM<br>Reason: Repudiandae unde lau<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Voluptas error Nam m&quot;,&quot;quantity&quot;:&quot;84&quot;,&quot;frequency&quot;:&quot;Inventore modi aliqu&quot;,&quot;instructions&quot;:&quot;Neque et rerum dolor&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:27:57'),
+(16, 22, 'Abellana, Vincent Anthony Q.', 'jaynujangad03@gmail.com', 3, '2025-08-18', '2025-08-24', '2025-08-19 08:43:03', 'sent', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;\'>\r\n                <h2 style=\'color: #2563eb;\'>Clinic Medication Visit Alert</h2>\r\n                <p>Dear Parent/Guardian,</p>\r\n                <p>We are writing to inform you that your child, <strong>Abellana, Vincent Anthony Q.</strong>, has received medication from the clinic <strong>3 times</strong> this week (Monday to Sunday).</p>\r\n                <div style=\'background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;\'>\r\n                    <h3 style=\'margin-top: 0; color: #374151;\'>Medication Visit Details This Week:</h3>\r\n                    <p style=\'margin-bottom: 0;\'><strong>Visit 1:</strong> Aug 18, 2025 at 7:15 PM<br>Reason: fever<br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;500mg&quot;,&quot;quantity&quot;:&quot;2&quot;,&quot;frequency&quot;:&quot;3x a day&quot;,&quot;instructions&quot;:&quot;after meals&quot;}]<br><br><strong>Visit 2:</strong> Aug 19, 2025 at 8:42 AM<br>Reason: Adipisci soluta est<br>Medication: [{&quot;medicine&quot;:&quot;Biogesic&quot;,&quot;dosage&quot;:&quot;Dolorum dolore nisi &quot;,&quot;quantity&quot;:&quot;59&quot;,&quot;frequency&quot;:&quot;Et vel adipisci quia&quot;,&quot;instructions&quot;:&quot;Placeat et consequa&quot;}]<br><br><strong>Visit 3:</strong> Aug 19, 2025 at 8:42 AM<br>Reason: Laboriosam culpa si<br>Medication: [{&quot;medicine&quot;:&quot;Rexidol&quot;,&quot;dosage&quot;:&quot;Consequuntur eos cu&quot;,&quot;quantity&quot;:&quot;72&quot;,&quot;frequency&quot;:&quot;Laboriosam consecte&quot;,&quot;instructions&quot;:&quot;Rerum aliquid non se&quot;}]<br><br></p>\r\n                </div>\r\n                <p>We recommend that you:</p>\r\n                <ul>\r\n                    <li>Check up on your child\'s health and wellbeing</li>\r\n                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>\r\n                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>\r\n                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>\r\n                </ul>\r\n                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>\r\n                <p>If you have any questions or concerns, please don\'t hesitate to contact us.</p>\r\n                <p style=\'margin-top: 30px;\'>\r\n                    Best regards,<br>\r\n                    <strong>Clinic Management Team</strong>\r\n                </p>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:43:03'),
+(17, 23, 'Abendan, Christian James A.', 'jaynujangad03@gmail.com', 3, '2025-08-18', '2025-08-24', '2025-08-19 08:58:35', 'sent', '\r\n            <div style=\'font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;\'>\r\n                <div style=\'background-color: #2563eb; color: white; padding: 20px; text-align: center;\'>\r\n                    <h1 style=\'margin: 0; font-size: 24px;\'>School Health Clinic</h1>\r\n                    <p style=\'margin: 5px 0 0 0; font-size: 16px;\'>Student Health Notification</p>\r\n                </div>\r\n                \r\n                <div style=\'padding: 30px 20px;\'>\r\n                    <p style=\'font-size: 16px; color: #333333; margin-bottom: 20px;\'>Dear Parent/Guardian,</p>\r\n                    \r\n                    <p style=\'font-size: 16px; color: #333333; line-height: 1.6;\'>\r\n                        We are writing to inform you that your child, <strong style=\'color: #2563eb;\'>Abendan, Christian James A.</strong>, \r\n                        has visited the school clinic for medication <strong>3 times</strong> during this week \r\n                        (Monday through Sunday).\r\n                    </p>\r\n                    \r\n                    <div style=\'background-color: #f8f9fa; padding: 20px; border-left: 4px solid #2563eb; margin: 25px 0;\'>\r\n                        <h3 style=\'margin-top: 0; color: #374151; font-size: 18px;\'>This Week\'s Clinic Visits:</h3>\r\n                        <div style=\'font-size: 14px; color: #555555;\'>\r\n                            <strong>Visit 1:</strong> Aug 19, 2025 at 8:58 AM<br>Reason: Corrupti debitis qu<br>Medication: [{&quot;medicine&quot;:&quot;Rexidol&quot;,&quot;dosage&quot;:&quot;Voluptas est quis mo&quot;,&quot;quantity&quot;:&quot;55&quot;,&quot;frequency&quot;:&quot;Incididunt laudantiu&quot;,&quot;instructions&quot;:&quot;Qui sint eum in dic&quot;}]<br><br><strong>Visit 2:</strong> Aug 19, 2025 at 8:58 AM<br>Reason: Sit assumenda quod <br>Medication: [{&quot;medicine&quot;:&quot;Mefinamic&quot;,&quot;dosage&quot;:&quot;Ex debitis architect&quot;,&quot;quantity&quot;:&quot;47&quot;,&quot;frequency&quot;:&quot;Quasi veritatis cupi&quot;,&quot;instructions&quot;:&quot;Harum laborum Repel&quot;}]<br><br><strong>Visit 3:</strong> Aug 19, 2025 at 8:58 AM<br>Reason: Maiores ex sint sed <br>Medication: [{&quot;medicine&quot;:&quot;Bioflu&quot;,&quot;dosage&quot;:&quot;Perferendis autem de&quot;,&quot;quantity&quot;:&quot;80&quot;,&quot;frequency&quot;:&quot;Porro dolor voluptas&quot;,&quot;instructions&quot;:&quot;Voluptates natus duc&quot;}]<br><br>\r\n                        </div>\r\n                    </div>\r\n                    \r\n                    <div style=\'background-color: #fff3cd; padding: 15px; border-radius: 6px; margin: 20px 0;\'>\r\n                        <h4 style=\'margin-top: 0; color: #856404;\'>???? Recommended Actions:</h4>\r\n                        <ul style=\'margin-bottom: 0; color: #856404;\'>\r\n                            <li>Monitor your child\'s health and wellbeing at home</li>\r\n                            <li>Contact our clinic if you have concerns about frequent visits</li>\r\n                            <li>Consider scheduling a consultation with your family doctor</li>\r\n                            <li>Review any patterns that might be causing recurring symptoms</li>\r\n                        </ul>\r\n                    </div>\r\n                    \r\n                    <p style=\'font-size: 16px; color: #333333; line-height: 1.6;\'>\r\n                        Multiple clinic visits in one week may indicate a health concern that requires attention. \r\n                        We encourage you to follow up with your child\'s healthcare provider if you have any concerns.\r\n                    </p>\r\n                    \r\n                    <p style=\'font-size: 16px; color: #333333; line-height: 1.6;\'>\r\n                        If you have any questions about your child\'s clinic visits, please don\'t hesitate to contact us.\r\n                    </p>\r\n                </div>\r\n                \r\n                <div style=\'background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #dee2e6;\'>\r\n                    <p style=\'margin: 0; font-size: 14px; color: #666666;\'>\r\n                        <strong>School Health Clinic</strong><br>\r\n                        This is an automated notification for your child\'s health and safety.<br>\r\n                        Please do not reply to this email. Contact the clinic directly for inquiries.\r\n                    </p>\r\n                </div>\r\n            </div>\r\n        ', 'Staff', '2025-08-19 08:58:35');
 
 -- --------------------------------------------------------
 
@@ -686,6 +1566,30 @@ INSERT INTO `password_resets` (`id`, `user_id`, `email`, `token`, `expires_at`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `patient_medical_info`
+--
+
+CREATE TABLE `patient_medical_info` (
+  `id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `allergies` text DEFAULT NULL,
+  `medical_conditions` text DEFAULT NULL,
+  `current_medications` text DEFAULT NULL,
+  `emergency_contact_name` varchar(255) DEFAULT NULL,
+  `emergency_contact_phone` varchar(50) DEFAULT NULL,
+  `emergency_contact_relationship` varchar(100) DEFAULT NULL,
+  `blood_type` enum('A+','A-','B+','B-','AB+','AB-','O+','O-') DEFAULT NULL,
+  `height_cm` decimal(5,2) DEFAULT NULL,
+  `weight_kg` decimal(5,2) DEFAULT NULL,
+  `insurance_provider` varchar(255) DEFAULT NULL,
+  `insurance_number` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `pending_prescriptions`
 --
 
@@ -698,6 +1602,7 @@ CREATE TABLE `pending_prescriptions` (
   `prescribed_by` varchar(255) DEFAULT NULL,
   `prescription_date` datetime DEFAULT current_timestamp(),
   `medicines` text DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -705,11 +1610,11 @@ CREATE TABLE `pending_prescriptions` (
 -- Dumping data for table `pending_prescriptions`
 --
 
-INSERT INTO `pending_prescriptions` (`id`, `patient_id`, `patient_name`, `patient_email`, `parent_email`, `prescribed_by`, `prescription_date`, `medicines`, `notes`) VALUES
-(66, 21, 'Abella, Joseph B.', 'sawowadi@mailinator.com', 'bumimu@mailinator.com', 'Staff', '2025-06-01 12:41:11', '[{\"medicine\":\"diatabs\",\"dosage\":\"A illum aute pariat\",\"quantity\":\"78\",\"frequency\":\"Suscipit quia omnis \",\"instructions\":\"Aliquam ratione labo\"}]', 'Odio fugiat natus q'),
-(67, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 12:45:34', '[]', 'just sleep'),
-(68, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 12:45:35', '[]', 'just sleep'),
-(69, 21, 'Abella, Joseph B.', 'xywuter@mailinator.com', 'kizoxyga@mailinator.com', 'Staff', '2025-06-01 12:45:56', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Dolorem quis volupta\",\"quantity\":\"1\",\"frequency\":\"Neque aliqua Id qua\",\"instructions\":\"Atque nostrud volupt\"}]', 'Velit do sit minima ');
+INSERT INTO `pending_prescriptions` (`id`, `patient_id`, `patient_name`, `patient_email`, `parent_email`, `prescribed_by`, `prescription_date`, `medicines`, `reason`, `notes`) VALUES
+(66, 21, 'Abella, Joseph B.', 'sawowadi@mailinator.com', 'bumimu@mailinator.com', 'Staff', '2025-06-01 12:41:11', '[{\"medicine\":\"diatabs\",\"dosage\":\"A illum aute pariat\",\"quantity\":\"78\",\"frequency\":\"Suscipit quia omnis \",\"instructions\":\"Aliquam ratione labo\"}]', NULL, 'Odio fugiat natus q'),
+(67, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 12:45:34', '[]', NULL, 'just sleep'),
+(68, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 12:45:35', '[]', NULL, 'just sleep'),
+(69, 21, 'Abella, Joseph B.', 'xywuter@mailinator.com', 'kizoxyga@mailinator.com', 'Staff', '2025-06-01 12:45:56', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Dolorem quis volupta\",\"quantity\":\"1\",\"frequency\":\"Neque aliqua Id qua\",\"instructions\":\"Atque nostrud volupt\"}]', NULL, 'Velit do sit minima ');
 
 -- --------------------------------------------------------
 
@@ -726,6 +1631,7 @@ CREATE TABLE `prescriptions` (
   `prescribed_by` varchar(255) DEFAULT NULL,
   `prescription_date` datetime DEFAULT current_timestamp(),
   `medicines` text DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
   `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -733,83 +1639,168 @@ CREATE TABLE `prescriptions` (
 -- Dumping data for table `prescriptions`
 --
 
-INSERT INTO `prescriptions` (`id`, `patient_id`, `patient_name`, `patient_email`, `parent_email`, `prescribed_by`, `prescription_date`, `medicines`, `notes`) VALUES
-(3, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-17 06:43:11', '[{\"medicine\":\"rexidol\",\"dosage\":\"Voluptate consequatu\",\"quantity\":\"2\",\"frequency\":\"Facilis commodo ea m\",\"instructions\":\"Excepturi officiis e\"}]', 'Nostrum sunt reprehe'),
-(4, 22, 'Abellana, Vincent Anthony Q.', NULL, NULL, 'Staff', '2025-05-17 07:48:15', '[{\"medicine\":\"rexidol\",\"dosage\":\"Eos quisquam ration\",\"quantity\":\"96\",\"frequency\":\"Et voluptate aute mo\",\"instructions\":\"Quae mollitia eum it\"}]', 'Cupidatat et ea amet'),
-(5, 23, 'Abendan, Christian James A.', NULL, NULL, 'Staff', '2025-05-17 07:57:11', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Fugiat porro et qui\",\"quantity\":\"73\",\"frequency\":\"Officiis qui dolores\",\"instructions\":\"Voluptas et itaque e\"}]', 'Eaque quos officiis '),
-(6, 26, 'Acidillo, Baby John V.', NULL, NULL, 'Staff', '2025-05-17 08:21:01', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Qui iste animi volu\",\"quantity\":\"20\",\"frequency\":\"Est esse cupiditat\",\"instructions\":\"Itaque sed vel incid\"}]', 'Et vel quia vitae pr'),
-(7, 26, 'Acidillo, Baby John V.', NULL, NULL, 'Staff', '2025-05-18 01:11:11', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Eligendi quas cumque\",\"quantity\":\"6\",\"frequency\":\"Ut exercitation plac\",\"instructions\":\"Exercitation fugit \"}]', 'Assumenda nobis qui '),
-(8, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-18 01:21:14', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Numquam non nesciunt\",\"quantity\":\"83\",\"frequency\":\"Aut qui nostrud aut \",\"instructions\":\"Architecto dolores n\"}]', 'Quia et omnis soluta'),
-(9, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-18 20:13:42', '[{\"medicine\":\"Dolor eiusmod quidem\",\"dosage\":\"Consequatur culpa f\",\"quantity\":\"28\",\"frequency\":\"Illo fugiat accusam\",\"instructions\":\"Dicta nihil labore a\"}]', 'Necessitatibus aliqu'),
-(10, 25, 'Abellana, Ariel L', NULL, NULL, 'Staff', '2025-05-19 02:17:16', '[{\"medicine\":\"mefinamic\",\"dosage\":\"Nihil sunt ut offic\",\"quantity\":\"84\",\"frequency\":\"Officiis quia asperi\",\"instructions\":\"Voluptatem aut enim\"}]', 'Quis adipisci eu bea'),
-(11, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-19 03:16:33', '[{\"medicine\":\"Biogesics\",\"dosage\":\"Unde sit recusandae\",\"quantity\":\"2\",\"frequency\":\"Labore veniam iusto\",\"instructions\":\"Ex duis autem accusa\"}]', 'Ducimus aut sint pe'),
-(12, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-19 21:30:46', '[{\"medicine\":\"rexidol\",\"dosage\":\"Non adipisci blandit\",\"quantity\":\"91\",\"frequency\":\"Nulla aliquip fuga \",\"instructions\":\"In eveniet accusant\"}]', 'Voluptatem ea sunt '),
-(13, 23, 'Abendan, Christian James A.', NULL, NULL, 'Staff', '2025-05-19 22:11:18', '[{\"medicine\":\"Consectetur fugiat\",\"dosage\":\"Ea dolores qui autem\",\"quantity\":\"89\",\"frequency\":\"fgf\",\"instructions\":\"\"}]', 'Voluptatibus id labo'),
-(14, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 02:16:52', '[{\"medicine\":\"mefinamic\",\"dosage\":\"Atque iusto Nam dese\",\"quantity\":\"14\",\"frequency\":\"Voluptas deserunt di\",\"instructions\":\"Voluptas ut expedita\"}]', 'Rerum enim sint aut '),
-(15, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 22:06:41', '[{\"medicine\":\"Biogesics\",\"dosage\":\"500mg\",\"quantity\":\"19\",\"frequency\":\"3 times a day\",\"instructions\":\"After Meals\"}]', 'Ay sig ginahig ulo'),
-(16, 36, 'Alferez Jr., Bernardino S.', NULL, NULL, 'Staff', '2025-05-20 23:27:28', '[{\"medicine\":\"Alaxan\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Diatabs\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd'),
-(17, 36, 'Alferez Jr., Bernardino S.', NULL, NULL, 'Staff', '2025-05-20 23:27:28', '[{\"medicine\":\"Alaxan\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Diatabs\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd'),
-(18, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:27:56', '[{\"medicine\":\"Alaxan\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd'),
-(19, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:27:56', '[{\"medicine\":\"Alaxan\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd'),
-(20, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-20 23:28:07', '[{\"medicine\":\"rexidol\",\"dosage\":\"Ut dolor aut non nul\",\"quantity\":\"1\",\"frequency\":\"Facere ipsum autem \",\"instructions\":\"Odio ullam nihil qua\"},{\"medicine\":\"Laurel Dejesus\",\"dosage\":\"Est mollit eos esse\",\"quantity\":\"1\",\"frequency\":\"Ut in maiores ad fug\",\"instructions\":\"Maxime fugit accusa\"}]', 'Recusandae Odio et '),
-(21, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-20 23:28:07', '[{\"medicine\":\"rexidol\",\"dosage\":\"Ut dolor aut non nul\",\"quantity\":\"1\",\"frequency\":\"Facere ipsum autem \",\"instructions\":\"Odio ullam nihil qua\"},{\"medicine\":\"Laurel Dejesus\",\"dosage\":\"Est mollit eos esse\",\"quantity\":\"1\",\"frequency\":\"Ut in maiores ad fug\",\"instructions\":\"Maxime fugit accusa\"}]', 'Recusandae Odio et '),
-(22, 29, 'Alegado, John Raymon B.', NULL, NULL, 'Staff', '2025-05-20 23:28:56', '[{\"medicine\":\"mefinamic\",\"dosage\":\"Id libero quia fuga\",\"quantity\":\"1\",\"frequency\":\"Hic est reiciendis v\",\"instructions\":\"Consectetur nulla m\"},{\"medicine\":\"Laurel Dejesus\",\"dosage\":\"Facere omnis velit \",\"quantity\":\"1\",\"frequency\":\"Qui perspiciatis pe\",\"instructions\":\"Qui aut quas dolor q\"}]', 'Animi non voluptate'),
-(23, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:29:05', '[{\"medicine\":\"rexidol\",\"dosage\":\"Id sed qui itaque it\",\"quantity\":\"1\",\"frequency\":\"Eiusmod temporibus e\",\"instructions\":\"Omnis deleniti offic\"},{\"medicine\":\"Biogesics\",\"dosage\":\"Aliquam omnis enim a\",\"quantity\":\"1\",\"frequency\":\"Accusantium laboris \",\"instructions\":\"Hic sit cupidatat ve\"}]', 'Voluptatem consequat'),
-(24, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 23:30:02', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Sequi illum rerum a\",\"instructions\":\"Voluptatem accusanti\"},{\"medicine\":\"Rexidol\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Consequat Omnis vol\",\"instructions\":\"Fugit consectetur \"},{\"medicine\":\"Diatabs\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Tempore voluptatibu\",\"instructions\":\"Illo et eos qui sunt\"}]', 'Adipisci esse do imp'),
-(25, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 23:30:02', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Sequi illum rerum a\",\"instructions\":\"Voluptatem accusanti\"},{\"medicine\":\"Rexidol\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Consequat Omnis vol\",\"instructions\":\"Fugit consectetur \"},{\"medicine\":\"Diatabs\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Tempore voluptatibu\",\"instructions\":\"Illo et eos qui sunt\"}]', 'Adipisci esse do imp'),
-(26, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 23:30:08', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Sequi illum rerum a\",\"instructions\":\"Voluptatem accusanti\"},{\"medicine\":\"Rexidol\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Consequat Omnis vol\",\"instructions\":\"Fugit consectetur \"},{\"medicine\":\"Diatabs\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Tempore voluptatibu\",\"instructions\":\"Illo et eos qui sunt\"}]', 'Adipisci esse do imp'),
-(27, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:30:17', '[{\"medicine\":\"Fugit voluptate bea\",\"dosage\":\"Magni consectetur al\",\"quantity\":\"6\",\"frequency\":\"Adipisicing quidem i\",\"instructions\":\"Accusamus itaque dol\"}]', 'Nemo minus voluptate'),
-(28, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:30:17', '[{\"medicine\":\"Fugit voluptate bea\",\"dosage\":\"Magni consectetur al\",\"quantity\":\"6\",\"frequency\":\"Adipisicing quidem i\",\"instructions\":\"Accusamus itaque dol\"}]', 'Nemo minus voluptate'),
-(29, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:30:21', '[{\"medicine\":\"rexidol\",\"dosage\":\"Possimus rerum rati\",\"quantity\":\"11\",\"frequency\":\"Non in quis quia arc\",\"instructions\":\"Voluptatem vero cons\"}]', 'Laborum vero natus a'),
-(30, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:12:51', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', 'Sint sint in reici'),
-(31, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:12:51', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', 'Sint sint in reici'),
-(32, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:13:19', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', 'Sint sint in reici'),
-(33, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:13:19', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', 'Sint sint in reici'),
-(34, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:13:27', '[{\"medicine\":\"Neozep\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Ullam earum omnis in\",\"instructions\":\"Laborum Aperiam eaq\"}]', 'Et sit ad aut alias'),
-(35, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:16:48', '[{\"medicine\":\"rexidol\",\"dosage\":\"Neque vero aut sed n\",\"quantity\":\"41\",\"frequency\":\"Magni nostrum ex qui\",\"instructions\":\"Dignissimos illo obc\"}]', 'Aut ex facilis velit'),
-(36, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:16:48', '[{\"medicine\":\"rexidol\",\"dosage\":\"Neque vero aut sed n\",\"quantity\":\"41\",\"frequency\":\"Magni nostrum ex qui\",\"instructions\":\"Dignissimos illo obc\"}]', 'Aut ex facilis velit'),
-(37, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:17:17', '[{\"medicine\":\"mefinamic\",\"dosage\":\"In aliqua Tempore \",\"quantity\":\"63\",\"frequency\":\"Cillum culpa dolor \",\"instructions\":\"Consequuntur dolorum\"}]', 'Laboriosam Nam ut a'),
-(38, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:17:17', '[{\"medicine\":\"mefinamic\",\"dosage\":\"In aliqua Tempore \",\"quantity\":\"63\",\"frequency\":\"Cillum culpa dolor \",\"instructions\":\"Consequuntur dolorum\"}]', 'Laboriosam Nam ut a'),
-(39, 27, 'Adona, Carl Macel C.', NULL, NULL, 'Staff', '2025-05-21 00:19:05', '[{\"medicine\":\"rexidol\",\"dosage\":\"Sit esse sunt qui i\",\"quantity\":\"64\",\"frequency\":\"Excepteur autem illo\",\"instructions\":\"Assumenda mollit deb\"}]', 'Vel provident atque'),
-(40, 27, 'Adona, Carl Macel C.', NULL, NULL, 'Staff', '2025-05-21 00:19:06', '[{\"medicine\":\"rexidol\",\"dosage\":\"Sit esse sunt qui i\",\"quantity\":\"64\",\"frequency\":\"Excepteur autem illo\",\"instructions\":\"Assumenda mollit deb\"}]', 'Vel provident atque'),
-(41, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:19:10', '[{\"medicine\":\"Fugit voluptate bea\",\"dosage\":\"Vel delectus volupt\",\"quantity\":\"57\",\"frequency\":\"Modi et tempor sit \",\"instructions\":\"Consequatur consequa\"}]', 'Magni nemo autem com'),
-(42, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:20:13', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Unde recusandae Ut \",\"quantity\":\"1\",\"frequency\":\"Eius dolorem anim re\",\"instructions\":\"Unde omnis ut sed od\"}]', 'Natus quo deserunt a'),
-(43, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:20:13', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Unde recusandae Ut \",\"quantity\":\"1\",\"frequency\":\"Eius dolorem anim re\",\"instructions\":\"Unde omnis ut sed od\"}]', 'Natus quo deserunt a'),
-(44, 23, 'Abendan, Christian James A.', NULL, NULL, 'Staff', '2025-05-21 00:20:59', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Dolor voluptatem Sa\",\"quantity\":\"1\",\"frequency\":\"Aut nisi reiciendis \",\"instructions\":\"Enim ipsum consectet\"}]', 'Et dolorum nisi aut '),
-(45, 22, 'Abellana, Vincent Anthony Q.', NULL, NULL, 'Staff', '2025-05-21 00:21:25', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consectetur pariatur\",\"quantity\":\"1\",\"frequency\":\"Eos iure voluptatem\",\"instructions\":\"Consequat Sapiente \"}]', 'Accusamus irure ipsu'),
-(46, 22, 'Abellana, Vincent Anthony Q.', NULL, NULL, 'Staff', '2025-05-21 00:21:25', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consectetur pariatur\",\"quantity\":\"1\",\"frequency\":\"Eos iure voluptatem\",\"instructions\":\"Consequat Sapiente \"}]', 'Accusamus irure ipsu'),
-(47, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:23:24', '[{\"medicine\":\"Neozep\",\"dosage\":\"Placeat sint irure \",\"quantity\":\"1\",\"frequency\":\"Placeat obcaecati r\",\"instructions\":\"Pariatur Totam eum \"}]', 'Vel ducimus molliti'),
-(48, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:23:24', '[{\"medicine\":\"Neozep\",\"dosage\":\"Placeat sint irure \",\"quantity\":\"1\",\"frequency\":\"Placeat obcaecati r\",\"instructions\":\"Pariatur Totam eum \"}]', 'Vel ducimus molliti'),
-(49, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:32:16', '[{\"medicine\":\"Neozep\",\"dosage\":\"Numquam earum labore\",\"quantity\":\"1\",\"frequency\":\"Est quia dolor accus\",\"instructions\":\"Quia vel aut nostrum\"}]', 'Dolorum natus dolori'),
-(50, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:37:17', '[{\"medicine\":\"Alaxan\",\"dosage\":\"Sunt illum sed duc\",\"quantity\":\"1\",\"frequency\":\"Velit officiis duis\",\"instructions\":\"Commodo nesciunt pe\"}]', 'Ut neque impedit et'),
-(51, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 05:35:49', '[{\"medicine\":\"Neozep\",\"dosage\":\"Laborum Ipsam est \",\"quantity\":\"62\",\"frequency\":\"Totam vero et et nec\",\"instructions\":\"Obcaecati non doloru\"}]', 'Placeat distinctio'),
-(52, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 05:35:53', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Aut eaque incidunt \",\"quantity\":\"45\",\"frequency\":\"Ullam voluptates tem\",\"instructions\":\"Ex ea laborum cumque\"}]', 'Dolor irure reprehen'),
-(53, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 05:36:04', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Voluptates ea quas s\",\"quantity\":\"55\",\"frequency\":\"Quas eveniet obcaec\",\"instructions\":\"Consequatur Aliquip\"}]', 'Ex esse illo beatae'),
-(54, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:05:18', '[{\"medicine\":\"Alaxan\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', 'asd'),
-(55, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:05:51', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Consequuntur dolore \",\"quantity\":\"1\",\"frequency\":\"Consectetur pariatur\",\"instructions\":\"Laborum Est tempora\"}]', 'Do tempore ut minus'),
-(56, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:06:18', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Voluptas pariatur Q\",\"quantity\":\"1\",\"frequency\":\"Est ut sed dolore a \",\"instructions\":\"Odit sunt voluptate\"}]', 'Quos non quis ad dol'),
-(57, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:08:31', '[{\"medicine\":\"Neozep\",\"dosage\":\"Delectus quo cum si\",\"quantity\":\"1\",\"frequency\":\"Odit commodi provide\",\"instructions\":\"Omnis irure maiores \"}]', 'Maiores voluptatem e'),
-(58, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:09:11', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Eos quas qui aut in\",\"quantity\":\"1\",\"frequency\":\"Quia eos elit pari\",\"instructions\":\"Anim iusto ducimus \"}]', 'Consectetur dolorum '),
-(59, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:09:14', '[{\"medicine\":\"Neozep\",\"dosage\":\"Labore officia ut su\",\"quantity\":\"1\",\"frequency\":\"Tempor consequatur \",\"instructions\":\"Aut enim commodo qui\"}]', 'Illum ullam et fuga'),
-(60, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:12:10', '[{\"medicine\":\"Neozep\",\"dosage\":\"Labore officia ut su\",\"quantity\":\"1\",\"frequency\":\"Tempor consequatur \",\"instructions\":\"Aut enim commodo qui\"}]', 'Illum ullam et fuga'),
-(61, 22, 'Abellana, Vincent Anthony Q.', 'sellonmeow@gmail.com', 'kimxyzian@gmail.com', 'Staff', '2025-05-21 06:24:53', '[{\"medicine\":\"Neozep\",\"dosage\":\"Officiis quo reprehe\",\"quantity\":\"1\",\"frequency\":\"Aut sit nostrud cons\",\"instructions\":\"Possimus minim ab o\"}]', 'Fugiat eaque aspern'),
-(62, 22, 'Abellana, Vincent Anthony Q.', 'sellonmeow@gmail.com', 'kimxyzian@gmail.com', 'Staff', '2025-05-21 06:25:15', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Officiis dolor repre\",\"quantity\":\"9\",\"frequency\":\"Adipisci sed qui qua\",\"instructions\":\"Ut voluptas cupidita\"}]', 'Facere odio qui poss'),
-(63, 21, 'Abella, Joseph B.', NULL, NULL, 'Staff', '2025-05-21 22:53:53', '[{\"medicine\":\"Neozep\",\"dosage\":\"Itaque dignissimos d\",\"quantity\":\"15\",\"frequency\":\"Qui sit assumenda co\",\"instructions\":\"Adipisci perferendis\"}]', 'Sed ducimus maiores'),
-(64, 21, 'Abella, Joseph B.', 'waryku@mailinator.com', 'wefyzineha@mailinator.com', 'Staff', '2025-05-22 00:47:47', '[{\"medicine\":\"Neozep\",\"dosage\":\"Sed accusantium qui \",\"quantity\":\"57\",\"frequency\":\"Mollit praesentium q\",\"instructions\":\"Et non voluptas volu\"}]', 'Quo magna explicabo'),
-(65, 22, 'Abellana, Vincent Anthony Q.', 'sellonmeow@gmail.com', 'kimxyzian@gmail.com', 'Staff', '2025-05-22 00:48:02', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Dolor deserunt obcae\",\"quantity\":\"9\",\"frequency\":\"Ullamco ex voluptate\",\"instructions\":\"Hic consequuntur qui\"}]', 'Doloremque et mollit'),
-(66, 26, 'Acidillo, Baby John V.', 'dybepedehy@mailinator.com', 'jijiplays991@mailinator.com', 'Staff', '2025-05-22 01:28:54', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Quas illo corrupti \",\"quantity\":\"65\",\"frequency\":\"Doloremque cupidatat\",\"instructions\":\"Sed enim sed laudant\"}]', 'Voluptatem magnam e'),
-(67, 26, 'Acidillo, Baby John V.', 'dumuqexe@mailinator.com', 'jijiplays991@mailinator.com', 'Staff', '2025-05-22 01:28:55', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Vero totam nihil occ\",\"quantity\":\"60\",\"frequency\":\"Velit dolore dolorib\",\"instructions\":\"Ex quis exercitation\"}]', 'Quis adipisicing vol'),
-(68, 26, 'Acidillo, Baby John V.', 'decyj@mailinator.com', 'jijiplays991@mailinator.com', 'Staff', '2025-05-22 01:28:55', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Earum voluptate vel \",\"quantity\":\"59\",\"frequency\":\"Molestias reprehende\",\"instructions\":\"Reprehenderit esse\"}]', 'Delectus qui est no'),
-(69, 21, 'Abella, Joseph B.', 'kavob@mailinator.com', 'nygyqu@mailinator.com', 'Staff', '2025-05-22 01:29:17', '[{\"medicine\":\"Atay\",\"dosage\":\"Incidunt adipisci e\",\"quantity\":\"57\",\"frequency\":\"Officia voluptas aut\",\"instructions\":\"Deleniti occaecat re\"}]', 'In eiusmod explicabo'),
-(70, 30, 'Aguilar, Jaymar C', 'hujinymeci@mailinator.com', 'jijiplays991@gmail.com', 'Staff', '2025-05-22 01:31:37', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Aperiam fugiat inven\",\"quantity\":\"59\",\"frequency\":\"Totam animi cupidat\",\"instructions\":\"Culpa sint sunt aut\"}]', 'Amet sapiente tempo'),
-(71, 30, 'Aguilar, Jaymar C', 'vyqysykote@mailinator.com', 'jijiplays991@gmail.com', 'Staff', '2025-05-22 01:31:40', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Rerum molestiae qui \",\"quantity\":\"86\",\"frequency\":\"Proident est assume\",\"instructions\":\"Aspernatur irure sed\"}]', 'Qui qui sunt et sap'),
-(72, 30, 'Aguilar, Jaymar C', 'jasury@mailinator.com', 'jijiplays991@gmail.com', 'Staff', '2025-05-22 01:31:42', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Commodo aut necessit\",\"quantity\":\"34\",\"frequency\":\"Earum sunt minus nih\",\"instructions\":\"Ea consequatur Veli\"}]', 'Tempore vitae modi '),
-(73, 40, 'Arcamo Jr., Emmanuel P.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 11:57:30', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"After meal\"}]', 'Imna na ha'),
-(74, 40, 'Arcamo Jr., Emmanuel P.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 11:59:32', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"After Meal\"}]', 'imna na waa ka'),
-(75, 40, 'Arcamo Jr., Emmanuel P.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 11:59:35', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"After Meal\"}]', 'Imna na inatay na'),
-(76, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-10 18:32:47', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', ''),
-(77, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-10 18:33:56', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', ''),
-(78, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-10 18:38:43', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', '');
+INSERT INTO `prescriptions` (`id`, `patient_id`, `patient_name`, `patient_email`, `parent_email`, `prescribed_by`, `prescription_date`, `medicines`, `reason`, `notes`) VALUES
+(3, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-17 06:43:11', '[{\"medicine\":\"rexidol\",\"dosage\":\"Voluptate consequatu\",\"quantity\":\"2\",\"frequency\":\"Facilis commodo ea m\",\"instructions\":\"Excepturi officiis e\"}]', NULL, 'Nostrum sunt reprehe'),
+(4, 22, 'Abellana, Vincent Anthony Q.', NULL, NULL, 'Staff', '2025-05-17 07:48:15', '[{\"medicine\":\"rexidol\",\"dosage\":\"Eos quisquam ration\",\"quantity\":\"96\",\"frequency\":\"Et voluptate aute mo\",\"instructions\":\"Quae mollitia eum it\"}]', NULL, 'Cupidatat et ea amet'),
+(5, 23, 'Abendan, Christian James A.', NULL, NULL, 'Staff', '2025-05-17 07:57:11', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Fugiat porro et qui\",\"quantity\":\"73\",\"frequency\":\"Officiis qui dolores\",\"instructions\":\"Voluptas et itaque e\"}]', NULL, 'Eaque quos officiis '),
+(6, 26, 'Acidillo, Baby John V.', NULL, NULL, 'Staff', '2025-05-17 08:21:01', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Qui iste animi volu\",\"quantity\":\"20\",\"frequency\":\"Est esse cupiditat\",\"instructions\":\"Itaque sed vel incid\"}]', NULL, 'Et vel quia vitae pr'),
+(7, 26, 'Acidillo, Baby John V.', NULL, NULL, 'Staff', '2025-05-18 01:11:11', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Eligendi quas cumque\",\"quantity\":\"6\",\"frequency\":\"Ut exercitation plac\",\"instructions\":\"Exercitation fugit \"}]', NULL, 'Assumenda nobis qui '),
+(8, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-18 01:21:14', '[{\"medicine\":\"Excepturi qui in vit\",\"dosage\":\"Numquam non nesciunt\",\"quantity\":\"83\",\"frequency\":\"Aut qui nostrud aut \",\"instructions\":\"Architecto dolores n\"}]', NULL, 'Quia et omnis soluta'),
+(9, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-18 20:13:42', '[{\"medicine\":\"Dolor eiusmod quidem\",\"dosage\":\"Consequatur culpa f\",\"quantity\":\"28\",\"frequency\":\"Illo fugiat accusam\",\"instructions\":\"Dicta nihil labore a\"}]', NULL, 'Necessitatibus aliqu'),
+(10, 25, 'Abellana, Ariel L', NULL, NULL, 'Staff', '2025-05-19 02:17:16', '[{\"medicine\":\"mefinamic\",\"dosage\":\"Nihil sunt ut offic\",\"quantity\":\"84\",\"frequency\":\"Officiis quia asperi\",\"instructions\":\"Voluptatem aut enim\"}]', NULL, 'Quis adipisci eu bea'),
+(11, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-19 03:16:33', '[{\"medicine\":\"Biogesics\",\"dosage\":\"Unde sit recusandae\",\"quantity\":\"2\",\"frequency\":\"Labore veniam iusto\",\"instructions\":\"Ex duis autem accusa\"}]', NULL, 'Ducimus aut sint pe'),
+(12, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-19 21:30:46', '[{\"medicine\":\"rexidol\",\"dosage\":\"Non adipisci blandit\",\"quantity\":\"91\",\"frequency\":\"Nulla aliquip fuga \",\"instructions\":\"In eveniet accusant\"}]', NULL, 'Voluptatem ea sunt '),
+(13, 23, 'Abendan, Christian James A.', NULL, NULL, 'Staff', '2025-05-19 22:11:18', '[{\"medicine\":\"Consectetur fugiat\",\"dosage\":\"Ea dolores qui autem\",\"quantity\":\"89\",\"frequency\":\"fgf\",\"instructions\":\"\"}]', NULL, 'Voluptatibus id labo'),
+(14, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 02:16:52', '[{\"medicine\":\"mefinamic\",\"dosage\":\"Atque iusto Nam dese\",\"quantity\":\"14\",\"frequency\":\"Voluptas deserunt di\",\"instructions\":\"Voluptas ut expedita\"}]', NULL, 'Rerum enim sint aut '),
+(15, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 22:06:41', '[{\"medicine\":\"Biogesics\",\"dosage\":\"500mg\",\"quantity\":\"19\",\"frequency\":\"3 times a day\",\"instructions\":\"After Meals\"}]', NULL, 'Ay sig ginahig ulo'),
+(16, 36, 'Alferez Jr., Bernardino S.', NULL, NULL, 'Staff', '2025-05-20 23:27:28', '[{\"medicine\":\"Alaxan\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Diatabs\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', NULL, 'asd'),
+(17, 36, 'Alferez Jr., Bernardino S.', NULL, NULL, 'Staff', '2025-05-20 23:27:28', '[{\"medicine\":\"Alaxan\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Diatabs\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', NULL, 'asd'),
+(18, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:27:56', '[{\"medicine\":\"Alaxan\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', NULL, 'asd'),
+(19, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:27:56', '[{\"medicine\":\"Alaxan\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"},{\"medicine\":\"Biogesic\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', NULL, 'asd'),
+(20, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-20 23:28:07', '[{\"medicine\":\"rexidol\",\"dosage\":\"Ut dolor aut non nul\",\"quantity\":\"1\",\"frequency\":\"Facere ipsum autem \",\"instructions\":\"Odio ullam nihil qua\"},{\"medicine\":\"Laurel Dejesus\",\"dosage\":\"Est mollit eos esse\",\"quantity\":\"1\",\"frequency\":\"Ut in maiores ad fug\",\"instructions\":\"Maxime fugit accusa\"}]', NULL, 'Recusandae Odio et '),
+(21, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-20 23:28:07', '[{\"medicine\":\"rexidol\",\"dosage\":\"Ut dolor aut non nul\",\"quantity\":\"1\",\"frequency\":\"Facere ipsum autem \",\"instructions\":\"Odio ullam nihil qua\"},{\"medicine\":\"Laurel Dejesus\",\"dosage\":\"Est mollit eos esse\",\"quantity\":\"1\",\"frequency\":\"Ut in maiores ad fug\",\"instructions\":\"Maxime fugit accusa\"}]', NULL, 'Recusandae Odio et '),
+(22, 29, 'Alegado, John Raymon B.', NULL, NULL, 'Staff', '2025-05-20 23:28:56', '[{\"medicine\":\"mefinamic\",\"dosage\":\"Id libero quia fuga\",\"quantity\":\"1\",\"frequency\":\"Hic est reiciendis v\",\"instructions\":\"Consectetur nulla m\"},{\"medicine\":\"Laurel Dejesus\",\"dosage\":\"Facere omnis velit \",\"quantity\":\"1\",\"frequency\":\"Qui perspiciatis pe\",\"instructions\":\"Qui aut quas dolor q\"}]', NULL, 'Animi non voluptate'),
+(23, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:29:05', '[{\"medicine\":\"rexidol\",\"dosage\":\"Id sed qui itaque it\",\"quantity\":\"1\",\"frequency\":\"Eiusmod temporibus e\",\"instructions\":\"Omnis deleniti offic\"},{\"medicine\":\"Biogesics\",\"dosage\":\"Aliquam omnis enim a\",\"quantity\":\"1\",\"frequency\":\"Accusantium laboris \",\"instructions\":\"Hic sit cupidatat ve\"}]', NULL, 'Voluptatem consequat'),
+(24, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 23:30:02', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Sequi illum rerum a\",\"instructions\":\"Voluptatem accusanti\"},{\"medicine\":\"Rexidol\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Consequat Omnis vol\",\"instructions\":\"Fugit consectetur \"},{\"medicine\":\"Diatabs\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Tempore voluptatibu\",\"instructions\":\"Illo et eos qui sunt\"}]', NULL, 'Adipisci esse do imp'),
+(25, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 23:30:02', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Sequi illum rerum a\",\"instructions\":\"Voluptatem accusanti\"},{\"medicine\":\"Rexidol\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Consequat Omnis vol\",\"instructions\":\"Fugit consectetur \"},{\"medicine\":\"Diatabs\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Tempore voluptatibu\",\"instructions\":\"Illo et eos qui sunt\"}]', NULL, 'Adipisci esse do imp'),
+(26, 40, 'Arcamo Jr., Emmanuel P.', NULL, NULL, 'Staff', '2025-05-20 23:30:08', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Sequi illum rerum a\",\"instructions\":\"Voluptatem accusanti\"},{\"medicine\":\"Rexidol\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Consequat Omnis vol\",\"instructions\":\"Fugit consectetur \"},{\"medicine\":\"Diatabs\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Tempore voluptatibu\",\"instructions\":\"Illo et eos qui sunt\"}]', NULL, 'Adipisci esse do imp'),
+(27, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:30:17', '[{\"medicine\":\"Fugit voluptate bea\",\"dosage\":\"Magni consectetur al\",\"quantity\":\"6\",\"frequency\":\"Adipisicing quidem i\",\"instructions\":\"Accusamus itaque dol\"}]', NULL, 'Nemo minus voluptate'),
+(28, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:30:17', '[{\"medicine\":\"Fugit voluptate bea\",\"dosage\":\"Magni consectetur al\",\"quantity\":\"6\",\"frequency\":\"Adipisicing quidem i\",\"instructions\":\"Accusamus itaque dol\"}]', NULL, 'Nemo minus voluptate'),
+(29, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-20 23:30:21', '[{\"medicine\":\"rexidol\",\"dosage\":\"Possimus rerum rati\",\"quantity\":\"11\",\"frequency\":\"Non in quis quia arc\",\"instructions\":\"Voluptatem vero cons\"}]', NULL, 'Laborum vero natus a'),
+(30, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:12:51', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', NULL, 'Sint sint in reici'),
+(31, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:12:51', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', NULL, 'Sint sint in reici'),
+(32, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:13:19', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', NULL, 'Sint sint in reici'),
+(33, 30, 'Aguilar, Jaymar C', NULL, NULL, 'Staff', '2025-05-21 00:13:19', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consequatur maiores\",\"quantity\":\"1\",\"frequency\":\"Unde eius praesentiu\",\"instructions\":\"Aut consequuntur quo\"}]', NULL, 'Sint sint in reici'),
+(34, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:13:27', '[{\"medicine\":\"Neozep\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"Ullam earum omnis in\",\"instructions\":\"Laborum Aperiam eaq\"}]', NULL, 'Et sit ad aut alias'),
+(35, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:16:48', '[{\"medicine\":\"rexidol\",\"dosage\":\"Neque vero aut sed n\",\"quantity\":\"41\",\"frequency\":\"Magni nostrum ex qui\",\"instructions\":\"Dignissimos illo obc\"}]', NULL, 'Aut ex facilis velit'),
+(36, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:16:48', '[{\"medicine\":\"rexidol\",\"dosage\":\"Neque vero aut sed n\",\"quantity\":\"41\",\"frequency\":\"Magni nostrum ex qui\",\"instructions\":\"Dignissimos illo obc\"}]', NULL, 'Aut ex facilis velit'),
+(37, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:17:17', '[{\"medicine\":\"mefinamic\",\"dosage\":\"In aliqua Tempore \",\"quantity\":\"63\",\"frequency\":\"Cillum culpa dolor \",\"instructions\":\"Consequuntur dolorum\"}]', NULL, 'Laboriosam Nam ut a'),
+(38, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:17:17', '[{\"medicine\":\"mefinamic\",\"dosage\":\"In aliqua Tempore \",\"quantity\":\"63\",\"frequency\":\"Cillum culpa dolor \",\"instructions\":\"Consequuntur dolorum\"}]', NULL, 'Laboriosam Nam ut a'),
+(39, 27, 'Adona, Carl Macel C.', NULL, NULL, 'Staff', '2025-05-21 00:19:05', '[{\"medicine\":\"rexidol\",\"dosage\":\"Sit esse sunt qui i\",\"quantity\":\"64\",\"frequency\":\"Excepteur autem illo\",\"instructions\":\"Assumenda mollit deb\"}]', NULL, 'Vel provident atque'),
+(40, 27, 'Adona, Carl Macel C.', NULL, NULL, 'Staff', '2025-05-21 00:19:06', '[{\"medicine\":\"rexidol\",\"dosage\":\"Sit esse sunt qui i\",\"quantity\":\"64\",\"frequency\":\"Excepteur autem illo\",\"instructions\":\"Assumenda mollit deb\"}]', NULL, 'Vel provident atque'),
+(41, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:19:10', '[{\"medicine\":\"Fugit voluptate bea\",\"dosage\":\"Vel delectus volupt\",\"quantity\":\"57\",\"frequency\":\"Modi et tempor sit \",\"instructions\":\"Consequatur consequa\"}]', NULL, 'Magni nemo autem com'),
+(42, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:20:13', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Unde recusandae Ut \",\"quantity\":\"1\",\"frequency\":\"Eius dolorem anim re\",\"instructions\":\"Unde omnis ut sed od\"}]', NULL, 'Natus quo deserunt a'),
+(43, 24, 'Abendan, Nino Rashean T.', NULL, NULL, 'Staff', '2025-05-21 00:20:13', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Unde recusandae Ut \",\"quantity\":\"1\",\"frequency\":\"Eius dolorem anim re\",\"instructions\":\"Unde omnis ut sed od\"}]', NULL, 'Natus quo deserunt a'),
+(44, 23, 'Abendan, Christian James A.', NULL, NULL, 'Staff', '2025-05-21 00:20:59', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Dolor voluptatem Sa\",\"quantity\":\"1\",\"frequency\":\"Aut nisi reiciendis \",\"instructions\":\"Enim ipsum consectet\"}]', NULL, 'Et dolorum nisi aut '),
+(45, 22, 'Abellana, Vincent Anthony Q.', NULL, NULL, 'Staff', '2025-05-21 00:21:25', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consectetur pariatur\",\"quantity\":\"1\",\"frequency\":\"Eos iure voluptatem\",\"instructions\":\"Consequat Sapiente \"}]', NULL, 'Accusamus irure ipsu'),
+(46, 22, 'Abellana, Vincent Anthony Q.', NULL, NULL, 'Staff', '2025-05-21 00:21:25', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Consectetur pariatur\",\"quantity\":\"1\",\"frequency\":\"Eos iure voluptatem\",\"instructions\":\"Consequat Sapiente \"}]', NULL, 'Accusamus irure ipsu'),
+(47, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:23:24', '[{\"medicine\":\"Neozep\",\"dosage\":\"Placeat sint irure \",\"quantity\":\"1\",\"frequency\":\"Placeat obcaecati r\",\"instructions\":\"Pariatur Totam eum \"}]', NULL, 'Vel ducimus molliti'),
+(48, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:23:24', '[{\"medicine\":\"Neozep\",\"dosage\":\"Placeat sint irure \",\"quantity\":\"1\",\"frequency\":\"Placeat obcaecati r\",\"instructions\":\"Pariatur Totam eum \"}]', NULL, 'Vel ducimus molliti'),
+(49, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:32:16', '[{\"medicine\":\"Neozep\",\"dosage\":\"Numquam earum labore\",\"quantity\":\"1\",\"frequency\":\"Est quia dolor accus\",\"instructions\":\"Quia vel aut nostrum\"}]', NULL, 'Dolorum natus dolori'),
+(50, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 00:37:17', '[{\"medicine\":\"Alaxan\",\"dosage\":\"Sunt illum sed duc\",\"quantity\":\"1\",\"frequency\":\"Velit officiis duis\",\"instructions\":\"Commodo nesciunt pe\"}]', NULL, 'Ut neque impedit et'),
+(51, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 05:35:49', '[{\"medicine\":\"Neozep\",\"dosage\":\"Laborum Ipsam est \",\"quantity\":\"62\",\"frequency\":\"Totam vero et et nec\",\"instructions\":\"Obcaecati non doloru\"}]', NULL, 'Placeat distinctio'),
+(52, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 05:35:53', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Aut eaque incidunt \",\"quantity\":\"45\",\"frequency\":\"Ullam voluptates tem\",\"instructions\":\"Ex ea laborum cumque\"}]', NULL, 'Dolor irure reprehen'),
+(53, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 05:36:04', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Voluptates ea quas s\",\"quantity\":\"55\",\"frequency\":\"Quas eveniet obcaec\",\"instructions\":\"Consequatur Aliquip\"}]', NULL, 'Ex esse illo beatae'),
+(54, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:05:18', '[{\"medicine\":\"Alaxan\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', NULL, 'asd'),
+(55, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:05:51', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Consequuntur dolore \",\"quantity\":\"1\",\"frequency\":\"Consectetur pariatur\",\"instructions\":\"Laborum Est tempora\"}]', NULL, 'Do tempore ut minus'),
+(56, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:06:18', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Voluptas pariatur Q\",\"quantity\":\"1\",\"frequency\":\"Est ut sed dolore a \",\"instructions\":\"Odit sunt voluptate\"}]', NULL, 'Quos non quis ad dol'),
+(57, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:08:31', '[{\"medicine\":\"Neozep\",\"dosage\":\"Delectus quo cum si\",\"quantity\":\"1\",\"frequency\":\"Odit commodi provide\",\"instructions\":\"Omnis irure maiores \"}]', NULL, 'Maiores voluptatem e'),
+(58, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:09:11', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Eos quas qui aut in\",\"quantity\":\"1\",\"frequency\":\"Quia eos elit pari\",\"instructions\":\"Anim iusto ducimus \"}]', NULL, 'Consectetur dolorum '),
+(59, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:09:14', '[{\"medicine\":\"Neozep\",\"dosage\":\"Labore officia ut su\",\"quantity\":\"1\",\"frequency\":\"Tempor consequatur \",\"instructions\":\"Aut enim commodo qui\"}]', NULL, 'Illum ullam et fuga'),
+(60, 21, 'Abella, Joseph B.', NULL, 'jijiplays991@gmail.com', 'Staff', '2025-05-21 06:12:10', '[{\"medicine\":\"Neozep\",\"dosage\":\"Labore officia ut su\",\"quantity\":\"1\",\"frequency\":\"Tempor consequatur \",\"instructions\":\"Aut enim commodo qui\"}]', NULL, 'Illum ullam et fuga'),
+(61, 22, 'Abellana, Vincent Anthony Q.', 'sellonmeow@gmail.com', 'kimxyzian@gmail.com', 'Staff', '2025-05-21 06:24:53', '[{\"medicine\":\"Neozep\",\"dosage\":\"Officiis quo reprehe\",\"quantity\":\"1\",\"frequency\":\"Aut sit nostrud cons\",\"instructions\":\"Possimus minim ab o\"}]', NULL, 'Fugiat eaque aspern'),
+(62, 22, 'Abellana, Vincent Anthony Q.', 'sellonmeow@gmail.com', 'kimxyzian@gmail.com', 'Staff', '2025-05-21 06:25:15', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Officiis dolor repre\",\"quantity\":\"9\",\"frequency\":\"Adipisci sed qui qua\",\"instructions\":\"Ut voluptas cupidita\"}]', NULL, 'Facere odio qui poss'),
+(63, 21, 'Abella, Joseph B.', NULL, NULL, 'Staff', '2025-05-21 22:53:53', '[{\"medicine\":\"Neozep\",\"dosage\":\"Itaque dignissimos d\",\"quantity\":\"15\",\"frequency\":\"Qui sit assumenda co\",\"instructions\":\"Adipisci perferendis\"}]', NULL, 'Sed ducimus maiores'),
+(64, 21, 'Abella, Joseph B.', 'waryku@mailinator.com', 'wefyzineha@mailinator.com', 'Staff', '2025-05-22 00:47:47', '[{\"medicine\":\"Neozep\",\"dosage\":\"Sed accusantium qui \",\"quantity\":\"57\",\"frequency\":\"Mollit praesentium q\",\"instructions\":\"Et non voluptas volu\"}]', NULL, 'Quo magna explicabo'),
+(65, 22, 'Abellana, Vincent Anthony Q.', 'sellonmeow@gmail.com', 'kimxyzian@gmail.com', 'Staff', '2025-05-22 00:48:02', '[{\"medicine\":\"Kremil-S\",\"dosage\":\"Dolor deserunt obcae\",\"quantity\":\"9\",\"frequency\":\"Ullamco ex voluptate\",\"instructions\":\"Hic consequuntur qui\"}]', NULL, 'Doloremque et mollit'),
+(66, 26, 'Acidillo, Baby John V.', 'dybepedehy@mailinator.com', 'jijiplays991@mailinator.com', 'Staff', '2025-05-22 01:28:54', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Quas illo corrupti \",\"quantity\":\"65\",\"frequency\":\"Doloremque cupidatat\",\"instructions\":\"Sed enim sed laudant\"}]', NULL, 'Voluptatem magnam e'),
+(67, 26, 'Acidillo, Baby John V.', 'dumuqexe@mailinator.com', 'jijiplays991@mailinator.com', 'Staff', '2025-05-22 01:28:55', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Vero totam nihil occ\",\"quantity\":\"60\",\"frequency\":\"Velit dolore dolorib\",\"instructions\":\"Ex quis exercitation\"}]', NULL, 'Quis adipisicing vol'),
+(68, 26, 'Acidillo, Baby John V.', 'decyj@mailinator.com', 'jijiplays991@mailinator.com', 'Staff', '2025-05-22 01:28:55', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Earum voluptate vel \",\"quantity\":\"59\",\"frequency\":\"Molestias reprehende\",\"instructions\":\"Reprehenderit esse\"}]', NULL, 'Delectus qui est no'),
+(69, 21, 'Abella, Joseph B.', 'kavob@mailinator.com', 'nygyqu@mailinator.com', 'Staff', '2025-05-22 01:29:17', '[{\"medicine\":\"Atay\",\"dosage\":\"Incidunt adipisci e\",\"quantity\":\"57\",\"frequency\":\"Officia voluptas aut\",\"instructions\":\"Deleniti occaecat re\"}]', NULL, 'In eiusmod explicabo'),
+(70, 30, 'Aguilar, Jaymar C', 'hujinymeci@mailinator.com', 'jijiplays991@gmail.com', 'Staff', '2025-05-22 01:31:37', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Aperiam fugiat inven\",\"quantity\":\"59\",\"frequency\":\"Totam animi cupidat\",\"instructions\":\"Culpa sint sunt aut\"}]', NULL, 'Amet sapiente tempo'),
+(71, 30, 'Aguilar, Jaymar C', 'vyqysykote@mailinator.com', 'jijiplays991@gmail.com', 'Staff', '2025-05-22 01:31:40', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Rerum molestiae qui \",\"quantity\":\"86\",\"frequency\":\"Proident est assume\",\"instructions\":\"Aspernatur irure sed\"}]', NULL, 'Qui qui sunt et sap'),
+(72, 30, 'Aguilar, Jaymar C', 'jasury@mailinator.com', 'jijiplays991@gmail.com', 'Staff', '2025-05-22 01:31:42', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Commodo aut necessit\",\"quantity\":\"34\",\"frequency\":\"Earum sunt minus nih\",\"instructions\":\"Ea consequatur Veli\"}]', NULL, 'Tempore vitae modi '),
+(73, 40, 'Arcamo Jr., Emmanuel P.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 11:57:30', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"After meal\"}]', NULL, 'Imna na ha'),
+(74, 40, 'Arcamo Jr., Emmanuel P.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 11:59:32', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"After Meal\"}]', NULL, 'imna na waa ka'),
+(75, 40, 'Arcamo Jr., Emmanuel P.', 'cedricjade13@gmail.com', 'clydegetuaban@gmail.com', 'Staff', '2025-06-01 11:59:35', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"After Meal\"}]', NULL, 'Imna na inatay na'),
+(76, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-10 18:32:47', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', NULL, ''),
+(77, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-10 18:33:56', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', NULL, ''),
+(78, 21, 'Abella, Joseph B.', 'cedricjade13@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-10 18:38:43', '[{\"medicine\":\"Biogesic\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', NULL, ''),
+(79, 21, 'Abella, Joseph B.', 'qysupikame@mailinator.com', 'fusego@mailinator.com', 'Staff', '2025-08-17 00:12:58', '[{\"medicine\":\"Neozep\",\"dosage\":\"Accusantium est fuga\",\"quantity\":\"13\",\"frequency\":\"Ut quasi nisi sunt i\",\"instructions\":\"Quasi libero illo se\"}]', NULL, 'Sit deserunt in quam'),
+(80, 22, 'Abellana, Vincent Anthony Q.', 'jykibonif@mailinator.com', 'nelucu@mailinator.com', 'Staff', '2025-08-17 00:16:37', '[{\"medicine\":\"Biogesic\",\"dosage\":\"In voluptas deserunt\",\"quantity\":\"46\",\"frequency\":\"Consequatur do offic\",\"instructions\":\"Soluta autem reprehe\"}]', NULL, 'Reprehenderit minus'),
+(81, 22, 'Abellana, Vincent Anthony Q.', 'jykibonif@mailinator.com', 'nelucu@mailinator.com', 'Staff', '2025-08-17 00:16:43', '[{\"medicine\":\"Biogesic\",\"dosage\":\"In voluptas deserunt\",\"quantity\":\"46\",\"frequency\":\"Consequatur do offic\",\"instructions\":\"Soluta autem reprehe\"}]', NULL, 'Reprehenderit minus'),
+(82, 22, 'Abellana, Vincent Anthony Q.', 'jykibonif@mailinator.com', 'nelucu@mailinator.com', 'Staff', '2025-08-17 00:16:44', '[{\"medicine\":\"Biogesic\",\"dosage\":\"In voluptas deserunt\",\"quantity\":\"46\",\"frequency\":\"Consequatur do offic\",\"instructions\":\"Soluta autem reprehe\"}]', NULL, 'Reprehenderit minus'),
+(83, 23, 'Abendan, Christian James A.', 'xyzamu@mailinator.com', 'hizakop@mailinator.com', 'Staff', '2025-08-17 00:27:38', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Velit Nam odit dele\",\"quantity\":\"23\",\"frequency\":\"Id officia ad in qu\",\"instructions\":\"Odit voluptas nostru\"}]', NULL, 'Ut omnis magna irure'),
+(84, 24, 'Abendan, Nino Rashean T.', 'bypo@mailinator.com', 'qahuv@mailinator.com', 'Staff', '2025-08-17 00:29:27', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Eiusmod asperiores m\",\"quantity\":\"48\",\"frequency\":\"Itaque mollit in dol\",\"instructions\":\"Aliquid ea quia iste\"}]', NULL, 'Recusandae Magnam h'),
+(85, 24, 'Abendan, Nino Rashean T.', 'bypo@mailinator.com', 'qahuv@mailinator.com', 'Staff', '2025-08-17 00:29:34', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Eiusmod asperiores m\",\"quantity\":\"48\",\"frequency\":\"Itaque mollit in dol\",\"instructions\":\"Aliquid ea quia iste\"}]', NULL, 'Recusandae Magnam h'),
+(86, 24, 'Abendan, Nino Rashean T.', 'bypo@mailinator.com', 'bypo@mailinator.com', 'Staff', '2025-08-17 00:29:38', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Eiusmod asperiores m\",\"quantity\":\"48\",\"frequency\":\"Itaque mollit in dol\",\"instructions\":\"Aliquid ea quia iste\"}]', NULL, 'Recusandae Magnam h'),
+(87, 26, 'Acidillo, Baby John V.', 'fawyjyxesu@mailinator.com', 'saleg@mailinator.com', 'Staff', '2025-08-17 00:31:00', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Non ipsa magna culp\",\"quantity\":\"96\",\"frequency\":\"Ducimus quia commod\",\"instructions\":\"Voluptas et consequa\"}]', NULL, 'Rem ipsa non volupt'),
+(88, 27, 'Adona, Carl Macel C.', 'haqupo@mailinator.com', 'vakuqaluz@mailinator.com', 'Staff', '2025-08-17 00:34:02', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Dolor est minim culp\",\"quantity\":\"4\",\"frequency\":\"Cumque eius eaque qu\",\"instructions\":\"Nihil reprehenderit\"}]', NULL, 'Nihil id rerum labor'),
+(89, 26, 'Acidillo, Baby John V.', 'naja@mailinator.com', 'wunuhig@mailinator.com', 'Staff', '2025-08-17 00:48:49', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Ea quam voluptatibus\",\"quantity\":\"66\",\"frequency\":\"Quasi tempore molli\",\"instructions\":\"Sapiente doloremque \"}]', NULL, 'Doloribus odit quia '),
+(90, 22, 'Abellana, Vincent Anthony Q.', 'hezy@mailinator.com', 'haputec@mailinator.com', 'Staff', '2025-08-17 00:51:40', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Do exercitationem mi\",\"quantity\":\"40\",\"frequency\":\"Consequatur vel et v\",\"instructions\":\"Dolore cillum nihil \"}]', NULL, 'Aut pariatur Facere'),
+(91, 25, 'Abellana, Ariel L', 'bixotehel@mailinator.com', 'fejukatur@mailinator.com', 'Staff', '2025-08-17 00:52:39', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Quo nihil nisi in sa\",\"quantity\":\"69\",\"frequency\":\"Nihil ipsum aliqua \",\"instructions\":\"Qui iste natus bland\"}]', NULL, 'Rem et vel quia et e'),
+(92, 22, 'Abellana, Vincent Anthony Q.', 'jule@mailinator.com', 'dybawaxoga@mailinator.com', 'Staff', '2025-08-17 00:53:20', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Fugiat debitis aut e\",\"quantity\":\"48\",\"frequency\":\"Aliquid distinctio \",\"instructions\":\"Ipsam ipsum ut delec\"}]', NULL, 'Ipsum culpa sequi cu'),
+(93, 30, 'Aguilar, Jaymar C', 'dynymaq@mailinator.com', 'roxivyzopy@mailinator.com', 'Staff', '2025-08-17 01:12:04', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Quis porro ratione e\",\"quantity\":\"85\",\"frequency\":\"In explicabo Optio\",\"instructions\":\"Nam voluptatum aut p\"}]', NULL, 'Rerum ea qui et expe'),
+(94, 23, 'Abendan, Christian James A.', 'salaqy@mailinator.com', 'kukusohak@mailinator.com', 'Staff', '2025-08-17 12:10:37', '[{\"medicine\":\"Neozep\",\"dosage\":\"Similique nobis iste\",\"quantity\":\"82\",\"frequency\":\"Molestias vel pariat\",\"instructions\":\"Ea et aute voluptas \"}]', NULL, 'Quia laborum sunt qu'),
+(95, 21, 'Abella, Joseph B.', 'sytujon@mailinator.com', 'zawuhiqe@mailinator.com', 'Staff', '2025-08-18 01:45:27', '[{\"medicine\":\"Neozep\",\"dosage\":\"Quo odit ipsa in ea\",\"quantity\":\"38\",\"frequency\":\"Cum numquam in ea ex\",\"instructions\":\"Nesciunt labore dic\"}]', 'Fever', 'Odio laudantium a q'),
+(96, 22, 'Abellana, Vincent Anthony Q.', 'asd@gmail.com', 'asdsa@gmail.com', 'Staff', '2025-08-18 19:15:42', '[{\"medicine\":\"Bioflu\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', 'fever', ''),
+(97, 21, 'Abella, Joseph B.', 'asd@gmail.com', 'asdsa@gmail.com', 'Staff', '2025-08-18 19:17:39', '[{\"medicine\":\"Bioflu\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', 'fever', ''),
+(98, 21, 'Abella, Joseph B.', 'ceasda@gmail.com', 'asdsa@gmail.com', 'Staff', '2025-08-18 19:34:15', '[{\"medicine\":\"Bioflu\",\"dosage\":\"500mg\",\"quantity\":\"2\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', 'fever', ''),
+(99, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:50:22', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(100, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:50:26', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(101, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:50:42', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(102, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:51:05', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(103, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:51:07', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(104, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:51:17', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(105, 1, 'Test Student', NULL, NULL, 'Nurse Jane', '2025-08-18 19:53:14', 'Paracetamol, Vitamin C', 'Fever and headache', NULL),
+(106, 1, 'Test Student', NULL, 'parent@example.com', 'Staff', '2025-08-18 20:10:54', '[{\"medicine\":\"Paracetamol\",\"quantity\":\"2\"}]', 'Fever and headache', NULL),
+(107, 21, 'Test Student', NULL, 'parent@example.com', 'Staff', '2025-08-18 20:13:07', '[{\"medicine\":\"Paracetamol\",\"quantity\":\"2\"}]', 'Fever and headache', NULL),
+(108, 21, 'Abella, Joseph B.', 'asd@gmail.com', 'asdsa@gmail.com', 'Staff', '2025-08-18 20:13:41', '[{\"medicine\":\"asd\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd', ''),
+(109, 21, 'Abella, Joseph B.', 'asd@gmail.com', 'asdsa@gmail.com', 'Staff', '2025-08-18 20:14:00', '[{\"medicine\":\"asd\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd', ''),
+(110, 21, 'Abella, Joseph B.', 'xaxil@mailinator.com', 'ticaqaxi@mailinator.com', 'Staff', '2025-08-18 20:14:16', '[{\"medicine\":\"asd\",\"dosage\":\"asd\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'asd', ''),
+(111, 21, 'Abella, Joseph B.', 'sellonmeow@gmail.com', 'cedricjade13@gmail.com', 'Staff', '2025-08-18 20:33:09', '[{\"medicine\":\"Bioflu\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"3x a day\",\"instructions\":\"after meals\"}]', 'fevcer', ''),
+(112, 21, 'Abella, Joseph B.', 'dumuqexe@mailinator.com', 'jaynu13@gmail.com', 'Staff', '2025-08-18 20:49:06', '[{\"medicine\":\"asd\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'fever', ''),
+(113, 21, 'Abella, Joseph B.', 'synysin@mailinator.com', 'fyxaj@mailinator.com', 'Staff', '2025-08-19 07:35:33', '[{\"medicine\":\"Bioflu\",\"dosage\":\"Mollitia qui facilis\",\"quantity\":\"11\",\"frequency\":\"Iste explicabo Rem \",\"instructions\":\"Natus quos harum sae\"}]', 'Sakits ulo', 'Harum magni dignissi'),
+(114, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'fawajuzih@mailinator.com', 'Staff', '2025-08-19 07:37:15', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Omnis velit dolor m\",\"quantity\":\"71\",\"frequency\":\"Consequat Itaque in\",\"instructions\":\"Quia rerum eveniet \"}]', 'Qui occaecat magna v', 'Et ex ipsum aut eve'),
+(115, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'cyxi@mailinator.com', 'Staff', '2025-08-19 07:37:31', '[{\"medicine\":\"Diatabs\",\"dosage\":\"Ut rerum quis cupida\",\"quantity\":\"75\",\"frequency\":\"Autem obcaecati ut c\",\"instructions\":\"Fugiat enim a dolor \"}]', 'Dolore consequuntur ', 'Aut voluptatem ipsum'),
+(116, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'marif@mailinator.com', 'Staff', '2025-08-19 07:37:49', '[{\"medicine\":\"Bioflu\",\"dosage\":\"Non laborum Digniss\",\"quantity\":\"29\",\"frequency\":\"Commodo rerum id co\",\"instructions\":\"Voluptatem Velit of\"}]', 'Doloribus praesentiu', 'Ipsa quos pariatur'),
+(117, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'nuremoj@mailinator.com', 'Staff', '2025-08-19 07:38:02', '[{\"medicine\":\"Bioflu\",\"dosage\":\"Quis porro ipsum co\",\"quantity\":\"42\",\"frequency\":\"Dolor aliquip nisi q\",\"instructions\":\"Sint atque ab incid\"}]', 'Recusandae Rerum te', 'Deserunt iste at sun'),
+(118, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'wenesuxi@mailinator.com', 'Staff', '2025-08-19 07:38:16', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Iusto optio anim do\",\"quantity\":\"16\",\"frequency\":\"Qui qui deserunt ips\",\"instructions\":\"Voluptas officiis po\"}]', 'Enim qui eum asperio', 'Error expedita quis '),
+(119, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 07:40:10', '[{\"medicine\":\"Bioflu\",\"dosage\":\"500mg\",\"quantity\":\"1\",\"frequency\":\"asd\",\"instructions\":\"asd\"}]', 'fever', ''),
+(120, 21, 'Abella, Joseph B.', 'kylozugopu@mailinator.com', 'sicecyre@mailinator.com', 'Staff', '2025-08-19 08:11:22', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Quo pariatur Labori\",\"quantity\":\"30\",\"frequency\":\"Delectus enim cumqu\",\"instructions\":\"Dolor illum quis au\"}]', 'Assumenda a ipsa as', 'Quo non lorem labori'),
+(121, 21, 'Abella, Joseph B.', 'jaynujangad03@gmail.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:13:01', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Voluptas error Nam m\",\"quantity\":\"84\",\"frequency\":\"Inventore modi aliqu\",\"instructions\":\"Neque et rerum dolor\"}]', 'Repudiandae unde lau', 'Molestiae nobis ut n'),
+(122, 21, 'Abella, Joseph B.', 'duwyho@mailinator.com', 'nukixygez@mailinator.com', 'Staff', '2025-08-19 08:41:54', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Voluptas ullam conse\",\"quantity\":\"1\",\"frequency\":\"Consequatur Sequi o\",\"instructions\":\"In do animi soluta \"}]', 'Ab nihil alias accus', 'Rerum quos rerum qui'),
+(123, 22, 'Abellana, Vincent Anthony Q.', 'cupatijyja@mailinator.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:42:17', '[{\"medicine\":\"Biogesic\",\"dosage\":\"Dolorum dolore nisi \",\"quantity\":\"59\",\"frequency\":\"Et vel adipisci quia\",\"instructions\":\"Placeat et consequa\"}]', 'Adipisci soluta est', 'Aut saepe alias blan'),
+(124, 21, 'Abella, Joseph B.', 'paxipywo@mailinator.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:42:29', '[{\"medicine\":\"asd\",\"dosage\":\"Praesentium eiusmod \",\"quantity\":\"4\",\"frequency\":\"Magna porro et molli\",\"instructions\":\"Iste dignissimos vol\"}]', 'Neque provident sae', 'Recusandae Nisi est'),
+(125, 22, 'Abellana, Vincent Anthony Q.', 'toqufyjylu@mailinator.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:42:53', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Consequuntur eos cu\",\"quantity\":\"72\",\"frequency\":\"Laboriosam consecte\",\"instructions\":\"Rerum aliquid non se\"}]', 'Laboriosam culpa si', 'Aut rerum aute ex ut'),
+(126, 23, 'Abendan, Christian James A.', 'duzydy@mailinator.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:58:05', '[{\"medicine\":\"Rexidol\",\"dosage\":\"Voluptas est quis mo\",\"quantity\":\"55\",\"frequency\":\"Incididunt laudantiu\",\"instructions\":\"Qui sint eum in dic\"}]', 'Corrupti debitis qu', 'Do ut nemo excepturi'),
+(127, 23, 'Abendan, Christian James A.', 'zuhatule@mailinator.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:58:17', '[{\"medicine\":\"Mefinamic\",\"dosage\":\"Ex debitis architect\",\"quantity\":\"47\",\"frequency\":\"Quasi veritatis cupi\",\"instructions\":\"Harum laborum Repel\"}]', 'Sit assumenda quod ', 'Nihil minus atque la'),
+(128, 23, 'Abendan, Christian James A.', 'mejugituh@mailinator.com', 'jaynujangad03@gmail.com', 'Staff', '2025-08-19 08:58:28', '[{\"medicine\":\"Bioflu\",\"dosage\":\"Perferendis autem de\",\"quantity\":\"80\",\"frequency\":\"Porro dolor voluptas\",\"instructions\":\"Voluptates natus duc\"}]', 'Maiores ex sint sed ', 'Mollitia veritatis o');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `reports`
+--
+
+CREATE TABLE `reports` (
+  `id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `summary` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reports`
+--
+
+INSERT INTO `reports` (`id`, `date`, `type`, `summary`, `created_at`) VALUES
+(1, '2025-08-22', 'Visits', 'Total: 126 visits', '2025-08-22 12:44:40'),
+(2, '2025-08-21', 'Medications', 'Diatabs low stock', '2025-08-22 12:44:40'),
+(3, '2025-08-21', 'Medications', 'No soon-to-expire', '2025-08-22 12:44:40'),
+(4, '2025-08-20', 'Appointments', '4 pending appointments', '2025-08-22 12:44:40'),
+(5, '2025-08-19', 'Inventory', 'Monthly stock review completed', '2025-08-22 12:44:40'),
+(6, '2025-08-18', 'Visits', 'Weekly patient summary', '2025-08-22 12:44:40'),
+(7, '2025-08-17', 'Medications', 'Prescription analysis report', '2025-08-22 12:44:40'),
+(8, '2025-08-16', 'Appointments', 'Daily appointment summary', '2025-08-22 12:44:40'),
+(9, '2025-08-15', 'Inventory', 'Low stock alert report', '2025-08-22 12:44:40'),
+(10, '2025-08-14', 'Visits', 'Patient demographics analysis', '2025-08-22 12:44:40'),
+(11, '2025-08-13', 'Medications', 'Drug interaction review', '2025-08-22 12:44:40'),
+(12, '2025-08-12', 'Appointments', 'Missed appointments report', '2025-08-22 12:44:40'),
+(13, '2025-08-11', 'Inventory', 'Expiry date monitoring', '2025-08-22 12:44:40'),
+(14, '2025-08-10', 'Visits', 'Treatment outcome analysis', '2025-08-22 12:44:40'),
+(15, '2025-08-09', 'Medications', 'Prescription volume report', '2025-08-22 12:44:40');
 
 -- --------------------------------------------------------
 
@@ -873,10 +1864,31 @@ CREATE TABLE `vital_signs` (
 --
 
 INSERT INTO `vital_signs` (`id`, `patient_id`, `patient_name`, `vital_date`, `weight`, `height`, `body_temp`, `resp_rate`, `pulse`, `blood_pressure`, `oxygen_sat`, `remarks`, `recorded_by`, `created_at`) VALUES
-(10, 21, 'Abella, Joseph B.', '2025-08-10', 12.00, 67.00, 12.00, 12, 12, '120/80', 12.00, 'okay', 'jaynu13', '2025-08-10 19:42:59'),
+(10, 21, 'Abella, Joseph B.', '2025-08-10', 12.00, 67.00, 12.00, 12, 14, '120/80', 12.00, 'okay', 'jaynu123', '2025-08-10 19:42:59'),
 (11, 23, 'John Doe', '2025-01-06', NULL, NULL, 36.50, 16, 72, NULL, NULL, NULL, 'Nurse Smith', '2025-08-10 20:30:27'),
 (12, 24, 'Jane Smith', '2025-01-06', NULL, NULL, 36.80, 18, 68, NULL, NULL, NULL, 'Nurse Johnson', '2025-08-10 20:30:27'),
 (13, 22, 'Abellana, Vincent Anthony Q.', '2025-08-10', 20.00, 20.00, 20.00, 20, 20, '20/80', 20.00, 'asd', 'jaynu13', '2025-08-10 21:54:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `weekly_visit_summary`
+--
+
+CREATE TABLE `weekly_visit_summary` (
+  `id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `patient_name` varchar(255) NOT NULL,
+  `week_start_date` date NOT NULL,
+  `week_end_date` date NOT NULL,
+  `total_visits` int(11) DEFAULT 0,
+  `visit_types` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`visit_types`)),
+  `last_visit_date` date DEFAULT NULL,
+  `needs_alert` tinyint(1) DEFAULT 0,
+  `alert_sent` tinyint(1) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -886,8 +1898,45 @@ INSERT INTO `vital_signs` (`id`, `patient_id`, `patient_name`, `vital_date`, `we
 -- Indexes for table `appointments`
 --
 ALTER TABLE `appointments`
-  ADD PRIMARY KEY (`appointment_id`),
-  ADD KEY `student_id` (`student_id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_student` (`student_id`),
+  ADD KEY `idx_date` (`date`),
+  ADD KEY `idx_status` (`status`);
+
+--
+-- Indexes for table `clinic_visits`
+--
+ALTER TABLE `clinic_visits`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_patient_date` (`patient_id`,`visit_date`),
+  ADD KEY `idx_visit_date` (`visit_date`),
+  ADD KEY `idx_patient_id` (`patient_id`);
+
+--
+-- Indexes for table `doctors`
+--
+ALTER TABLE `doctors`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `doctor_schedules`
+--
+ALTER TABLE `doctor_schedules`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_schedule` (`doctor_name`,`schedule_date`,`schedule_time`);
+
+--
+-- Indexes for table `health_reminders`
+--
+ALTER TABLE `health_reminders`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `patient_id` (`patient_id`);
+
+--
+-- Indexes for table `health_tips`
+--
+ALTER TABLE `health_tips`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `imported_patients`
@@ -914,6 +1963,22 @@ ALTER TABLE `medicines`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `medicine_requests`
+--
+ALTER TABLE `medicine_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `patient_id` (`patient_id`);
+
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_recipient` (`recipient_id`),
+  ADD KEY `idx_sender` (`sender_id`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
 -- Indexes for table `notifications`
 --
 ALTER TABLE `notifications`
@@ -921,10 +1986,26 @@ ALTER TABLE `notifications`
   ADD KEY `student_id` (`student_id`);
 
 --
+-- Indexes for table `parent_alerts`
+--
+ALTER TABLE `parent_alerts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_patient_week` (`patient_id`,`week_start_date`),
+  ADD KEY `idx_alert_date` (`alert_sent_at`),
+  ADD KEY `idx_status` (`alert_status`);
+
+--
 -- Indexes for table `password_resets`
 --
 ALTER TABLE `password_resets`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `patient_medical_info`
+--
+ALTER TABLE `patient_medical_info`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_patient` (`patient_id`);
 
 --
 -- Indexes for table `pending_prescriptions`
@@ -936,6 +2017,12 @@ ALTER TABLE `pending_prescriptions`
 -- Indexes for table `prescriptions`
 --
 ALTER TABLE `prescriptions`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `reports`
+--
+ALTER TABLE `reports`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -953,6 +2040,15 @@ ALTER TABLE `vital_signs`
   ADD UNIQUE KEY `unique_patient_date` (`patient_id`,`vital_date`);
 
 --
+-- Indexes for table `weekly_visit_summary`
+--
+ALTER TABLE `weekly_visit_summary`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_patient_week` (`patient_id`,`week_start_date`),
+  ADD KEY `idx_needs_alert` (`needs_alert`),
+  ADD KEY `idx_week_dates` (`week_start_date`,`week_end_date`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -960,7 +2056,37 @@ ALTER TABLE `vital_signs`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT for table `clinic_visits`
+--
+ALTER TABLE `clinic_visits`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `doctors`
+--
+ALTER TABLE `doctors`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `doctor_schedules`
+--
+ALTER TABLE `doctor_schedules`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+
+--
+-- AUTO_INCREMENT for table `health_reminders`
+--
+ALTER TABLE `health_reminders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `health_tips`
+--
+ALTER TABLE `health_tips`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `imported_patients`
@@ -972,31 +2098,55 @@ ALTER TABLE `imported_patients`
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=293;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=383;
 
 --
 -- AUTO_INCREMENT for table `medication_referrals`
 --
 ALTER TABLE `medication_referrals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `medicines`
 --
 ALTER TABLE `medicines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT for table `medicine_requests`
+--
+ALTER TABLE `medicine_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `messages`
+--
+ALTER TABLE `messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=521;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
+
+--
+-- AUTO_INCREMENT for table `parent_alerts`
+--
+ALTER TABLE `parent_alerts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+
+--
+-- AUTO_INCREMENT for table `patient_medical_info`
+--
+ALTER TABLE `patient_medical_info`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `pending_prescriptions`
@@ -1008,7 +2158,13 @@ ALTER TABLE `pending_prescriptions`
 -- AUTO_INCREMENT for table `prescriptions`
 --
 ALTER TABLE `prescriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
+
+--
+-- AUTO_INCREMENT for table `reports`
+--
+ALTER TABLE `reports`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1023,14 +2179,32 @@ ALTER TABLE `vital_signs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
+-- AUTO_INCREMENT for table `weekly_visit_summary`
+--
+ALTER TABLE `weekly_visit_summary`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `appointments`
+-- Constraints for table `clinic_visits`
 --
-ALTER TABLE `appointments`
-  ADD CONSTRAINT `appointments_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `imported_patients` (`id`);
+ALTER TABLE `clinic_visits`
+  ADD CONSTRAINT `clinic_visits_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `health_reminders`
+--
+ALTER TABLE `health_reminders`
+  ADD CONSTRAINT `health_reminders_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `medicine_requests`
+--
+ALTER TABLE `medicine_requests`
+  ADD CONSTRAINT `medicine_requests_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `notifications`
@@ -1039,161 +2213,22 @@ ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `imported_patients` (`id`);
 
 --
--- --------------------------------------------------------
+-- Constraints for table `parent_alerts`
 --
--- Database structure for tracking clinic visits and parent alerts
--- Run this SQL to create the necessary tables
+ALTER TABLE `parent_alerts`
+  ADD CONSTRAINT `parent_alerts_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE;
+
 --
+-- Constraints for table `patient_medical_info`
+--
+ALTER TABLE `patient_medical_info`
+  ADD CONSTRAINT `patient_medical_info_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE;
 
--- Table to track all clinic visits
-CREATE TABLE IF NOT EXISTS `clinic_visits` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `patient_id` int(11) NOT NULL,
-  `patient_name` varchar(255) NOT NULL,
-  `visit_date` date NOT NULL,
-  `visit_time` time DEFAULT NULL,
-  `visit_reason` varchar(500) DEFAULT NULL,
-  `visit_type` enum('appointment','prescription','walk_in','emergency') DEFAULT 'appointment',
-  `staff_member` varchar(255) DEFAULT NULL,
-  `notes` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `idx_patient_date` (`patient_id`,`visit_date`),
-  KEY `idx_visit_date` (`visit_date`),
-  KEY `idx_patient_id` (`patient_id`),
-  CONSTRAINT `clinic_visits_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
--- Table to track parent alert notifications
-CREATE TABLE IF NOT EXISTS `parent_alerts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `patient_id` int(11) NOT NULL,
-  `patient_name` varchar(255) NOT NULL,
-  `parent_email` varchar(255) NOT NULL,
-  `visit_count` int(11) NOT NULL,
-  `week_start_date` date NOT NULL,
-  `week_end_date` date NOT NULL,
-  `alert_sent_at` datetime DEFAULT current_timestamp(),
-  `alert_status` enum('pending','sent','failed') DEFAULT 'pending',
-  `email_content` text DEFAULT NULL,
-  `sent_by` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `idx_patient_week` (`patient_id`,`week_start_date`),
-  KEY `idx_alert_date` (`alert_sent_at`),
-  KEY `idx_status` (`alert_status`),
-  CONSTRAINT `parent_alerts_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
--- Table to store weekly visit summaries (for better performance)
-CREATE TABLE IF NOT EXISTS `weekly_visit_summary` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `patient_id` int(11) NOT NULL,
-  `patient_name` varchar(255) NOT NULL,
-  `week_start_date` date NOT NULL,
-  `week_end_date` date NOT NULL,
-  `total_visits` int(11) DEFAULT 0,
-  `visit_types` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`visit_types`)),
-  `last_visit_date` date DEFAULT NULL,
-  `needs_alert` tinyint(1) DEFAULT 0,
-  `alert_sent` tinyint(1) DEFAULT 0,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_patient_week` (`patient_id`,`week_start_date`),
-  KEY `idx_needs_alert` (`needs_alert`),
-  KEY `idx_week_dates` (`week_start_date`,`week_end_date`),
-  CONSTRAINT `weekly_visit_summary_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
--- Add parent_email column to imported_patients if it doesn't exist
-ALTER TABLE `imported_patients` 
-ADD COLUMN IF NOT EXISTS `parent_email` varchar(255) DEFAULT NULL AFTER `email`;
-
--- Add parent_phone column for future SMS notifications
-ALTER TABLE `imported_patients` 
-ADD COLUMN IF NOT EXISTS `parent_phone` varchar(20) DEFAULT NULL AFTER `parent_email`;
-
--- --------------------------------------------------------
-
--- Create a view for easy querying of current week alerts
-CREATE OR REPLACE VIEW `current_week_alerts` AS
-SELECT 
-    `cv`.`patient_id` AS `patient_id`,
-    `cv`.`patient_name` AS `patient_name`,
-    `ip`.`parent_email` AS `parent_email`,
-    `ip`.`parent_phone` AS `parent_phone`,
-    COUNT(*) AS `visit_count`,
-    MIN(`cv`.`visit_date`) AS `first_visit_this_week`,
-    MAX(`cv`.`visit_date`) AS `last_visit_this_week`,
-    GROUP_CONCAT(DISTINCT `cv`.`visit_type` ORDER BY `cv`.`visit_date` ASC SEPARATOR ',') AS `visit_types`,
-    GROUP_CONCAT(DISTINCT `cv`.`visit_reason` ORDER BY `cv`.`visit_date` ASC SEPARATOR '; ') AS `visit_reasons`
-FROM (`clinic_visits` `cv` JOIN `imported_patients` `ip` ON(`cv`.`patient_id` = `ip`.`id`))
-WHERE `cv`.`visit_date` BETWEEN DATE_SUB(CURDATE(),INTERVAL WEEKDAY(CURDATE()) DAY) AND DATE_ADD(DATE_SUB(CURDATE(),INTERVAL WEEKDAY(CURDATE()) DAY),INTERVAL 6 DAY)
-GROUP BY `cv`.`patient_id`,`cv`.`patient_name`,`ip`.`parent_email`,`ip`.`parent_phone`
-HAVING `visit_count` >= 3
-ORDER BY `visit_count` DESC,`cv`.`patient_name` ASC;
-
--- --------------------------------------------------------
-
--- Stored procedure to automatically log visits from existing data
-DELIMITER //
-CREATE PROCEDURE IF NOT EXISTS `sync_clinic_visits`()
-BEGIN
-    -- Insert visits from prescriptions
-    INSERT IGNORE INTO `clinic_visits` (`patient_id`, `patient_name`, `visit_date`, `visit_type`, `visit_reason`, `staff_member`)
-    SELECT 
-        `p`.`patient_id`,
-        `p`.`patient_name`,
-        DATE(`p`.`prescription_date`) AS `visit_date`,
-        'prescription' AS `visit_type`,
-        COALESCE(`p`.`reason`, 'Prescription issued') AS `visit_reason`,
-        `p`.`prescribed_by` AS `staff_member`
-    FROM `prescriptions` `p`
-    WHERE `p`.`prescription_date` >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
-    
-    -- Insert visits from appointments (approved ones)
-    INSERT IGNORE INTO `clinic_visits` (`patient_id`, `patient_name`, `visit_date`, `visit_time`, `visit_type`, `visit_reason`)
-    SELECT 
-        `ip`.`id` AS `patient_id`,
-        `ip`.`name` AS `patient_name`,
-        `a`.`date` AS `visit_date`,
-        STR_TO_DATE(`a`.`time`, '%H:%i') AS `visit_time`,
-        'appointment' AS `visit_type`,
-        `a`.`reason` AS `visit_reason`
-    FROM (`appointments` `a` JOIN `imported_patients` `ip` ON(`a`.`student_id` = `ip`.`id`))
-    WHERE `a`.`status` IN ('approved', 'confirmed', 'completed')
-    AND `a`.`date` >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);
-    
-    -- Update weekly summary
-    INSERT INTO `weekly_visit_summary` (`patient_id`, `patient_name`, `week_start_date`, `week_end_date`, `total_visits`, `needs_alert`)
-    SELECT 
-        `cv`.`patient_id`,
-        `cv`.`patient_name`,
-        DATE_SUB(`cv`.`visit_date`, INTERVAL WEEKDAY(`cv`.`visit_date`) DAY) AS `week_start`,
-        DATE_ADD(DATE_SUB(`cv`.`visit_date`, INTERVAL WEEKDAY(`cv`.`visit_date`) DAY), INTERVAL 6 DAY) AS `week_end`,
-        COUNT(*) AS `total_visits`,
-        CASE WHEN COUNT(*) >= 3 THEN TRUE ELSE FALSE END AS `needs_alert`
-    FROM `clinic_visits` `cv`
-    WHERE `cv`.`visit_date` >= DATE_SUB(CURDATE(), INTERVAL 4 WEEK)
-    GROUP BY `cv`.`patient_id`, DATE_SUB(`cv`.`visit_date`, INTERVAL WEEKDAY(`cv`.`visit_date`) DAY)
-    ON DUPLICATE KEY UPDATE
-        `total_visits` = VALUES(`total_visits`),
-        `needs_alert` = VALUES(`needs_alert`),
-        `updated_at` = CURRENT_TIMESTAMP;
-END//
-DELIMITER ;
-
--- Call the sync procedure to populate initial data
-CALL `sync_clinic_visits`();
-
+--
+-- Constraints for table `weekly_visit_summary`
+--
+ALTER TABLE `weekly_visit_summary`
+  ADD CONSTRAINT `weekly_visit_summary_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `imported_patients` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
