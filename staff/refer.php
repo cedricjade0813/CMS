@@ -54,12 +54,27 @@ try {
 }
 ?>
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<style>
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+</style>
 
 <main class="flex-1 overflow-y-auto bg-gray-50 p-6 ml-16 md:ml-64 mt-[56px]">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Referral Records</h2>
+        <!-- Search Bar (matches admin/users.php, no dropdown) -->
+        <div class="mb-4 flex items-center gap-4 flex-wrap">
+            <div class="flex items-center flex-1 max-w-xs">
+                <input type="text" id="userSearch" name="userSearch" placeholder="Search referral..." class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+            </div>
+        </div>
         <div class="bg-white rounded shadow p-6">
             <div class="overflow-x-auto">
                 <table id="referralTable" class="min-w-full divide-y divide-gray-200 text-sm">
@@ -72,18 +87,19 @@ try {
                             <th class="px-4 py-2 text-center font-semibold text-gray-600">Status</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="referralTableBody">
                         <?php foreach ($referrals as $referral): ?>
-                        <tr>
+                        <tr
+                            data-name="<?php echo htmlspecialchars($referral['patient_name']); ?>"
+                            data-patient-id="<?php echo htmlspecialchars($referral['patient_id']); ?>"
+                            data-recorded-by="<?php echo htmlspecialchars($referral['recorded_by'] ?? 'Staff'); ?>"
+                            data-status="<?php echo htmlspecialchars($referral['status'] ?? 'Pending'); ?>"
+                        >
                             <td class="px-4 py-2"><?php echo date('Y-m-d', strtotime($referral['created_at'])); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($referral['patient_name']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($referral['patient_id']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($referral['recorded_by'] ?? 'Staff'); ?></td>
                             <td class="px-4 py-2 text-center">
-                                <!-- Debug info -->
-                                <!-- Referral ID: <?php echo htmlspecialchars($referral['referral_patient_id'] ?? 'NULL'); ?> -->
-                                <!-- Matched Student ID: <?php echo htmlspecialchars($referral['matched_student_id'] ?? 'NULL'); ?> -->
-                                <!-- Year Level: <?php echo htmlspecialchars($referral['year_level'] ?? 'NULL'); ?> -->
                                 <button class="viewReferralBtn px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700" 
                                         data-id="<?php echo $referral['id']; ?>"
                                         data-patient-name="<?php echo htmlspecialchars($referral['patient_name']); ?>"
@@ -115,6 +131,80 @@ try {
                     </tbody>
                 </table>
             </div>
+            <!-- Pagination and Records Info (PHP, matches Pending Appointments design) -->
+            <?php 
+            $referral_records_per_page = 10;
+            $referral_page = isset($_GET['referral_page']) ? (int)$_GET['referral_page'] : 1;
+            $referral_page = max($referral_page, 1);
+            $referral_offset = ($referral_page - 1) * $referral_records_per_page;
+            $referral_total_records = count($referrals);
+            $referral_total_pages = ceil($referral_total_records / $referral_records_per_page);
+            $referral_start = $referral_offset + 1;
+            $referral_end = min($referral_offset + $referral_records_per_page, $referral_total_records);
+            ?>
+            <?php if ($referral_total_records > 0): ?>
+            <div class="flex justify-between items-center mt-6">
+                <div class="text-sm text-gray-600">
+                    Showing <?php echo $referral_start; ?> to <?php echo $referral_end; ?> of <?php echo $referral_total_records; ?> entries
+                </div>
+                <?php if ($referral_total_pages > 1): ?>
+                <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                    <?php if ($referral_page > 1): ?>
+                        <a href="?referral_page=<?php echo $referral_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span class="sr-only">Previous</span>
+                        </button>
+                    <?php endif; ?>
+                    <?php 
+                    $referral_start_page = max(1, $referral_page - 2);
+                    $referral_end_page = min($referral_total_pages, $referral_page + 2);
+                    if ($referral_start_page > 1): ?>
+                        <a href="?referral_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                        <?php if ($referral_start_page > 2): ?>
+                            <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php for ($i = $referral_start_page; $i <= $referral_end_page; $i++): ?>
+                        <?php if ($i == $referral_page): ?>
+                            <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                        <?php else: ?>
+                            <a href="?referral_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+                    <?php if ($referral_end_page < $referral_total_pages): ?>
+                        <?php if ($referral_end_page < $referral_total_pages - 1): ?>
+                            <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                        <?php endif; ?>
+                        <a href="?referral_page=<?php echo $referral_total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $referral_total_pages; ?></a>
+                    <?php endif; ?>
+                    <?php if ($referral_page < $referral_total_pages): ?>
+                        <a href="?referral_page=<?php echo $referral_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                            <span class="sr-only">Next</span>
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                            <span class="sr-only">Next</span>
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
+                    <?php endif; ?>
+                </nav>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -187,10 +277,7 @@ try {
                             </div>
                         </div>
                     </div>
-
                     <!-- Third Row - Incident Information -->
-                    
-
                     <!-- SOAP Notes Section -->
                     <div class="space-y-4 mt-40 pt-8" >
                         <!-- Subjective -->
@@ -209,7 +296,6 @@ try {
                                 </div>
                             </div>
                         </div>
-
                         <!-- Objective -->
                         <div>
                             <span class="font-semibold text-sm">Objective =</span>
@@ -221,7 +307,6 @@ try {
                                 <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
                             </div>
                         </div>
-
                         <!-- Assessment -->
                         <div>
                             <span class="font-semibold text-sm">Assessment =</span>
@@ -233,7 +318,6 @@ try {
                                 <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
                             </div>
                         </div>
-
                         <!-- Plan -->
                         <div>
                             <span class="font-semibold text-sm">Plan =</span>
@@ -245,6 +329,27 @@ try {
                                 <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
                             </div>
                         </div>
+                        <!-- Intervention -->
+                        <div>
+                            <span class="font-semibold text-sm">Intervention =</span>
+                            <div class="ml-4">
+                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]">
+                                    <span id="modalIntervention" class="text-xs"></span>
+                                </div>
+                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
+                            </div>
+                        </div>
+                        <!-- Evaluation -->
+                        <div>
+                            <span class="font-semibold text-sm">Evaluation =</span>
+                            <div class="ml-4">
+                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]">
+                                    <span id="modalEvaluation" class="text-xs"></span>
+                                </div>
+                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
+                            </div>
+                        </div>
+                    </div>
 
                         <!-- Intervention -->
                         <div>
@@ -305,21 +410,25 @@ try {
 
 <script>
 $(document).ready(function() {
-    // Initialize DataTable
-    $('#referralTable').DataTable({
-        "pageLength": 10,
-        "lengthChange": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "order": [[0, "desc"]], // Sort by date descending
-        "language": {
-            "paginate": {
-                "previous": "Prev",
-                "next": "Next"
+    // Search and filter logic (matches admin/users.php)
+    // Search bar logic only
+    document.getElementById('userSearch').addEventListener('input', filterUsers);
+
+    function filterUsers() {
+        const search = document.getElementById('userSearch').value.trim().toLowerCase();
+        const rows = document.querySelectorAll('#referralTableBody tr');
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name') ? row.getAttribute('data-name').toLowerCase() : '';
+            const patientId = row.getAttribute('data-patient-id') ? row.getAttribute('data-patient-id').toLowerCase() : '';
+            const recordedBy = row.getAttribute('data-recorded-by') ? row.getAttribute('data-recorded-by').toLowerCase() : '';
+            const matchesSearch = (!search || name.includes(search) || patientId.includes(search) || recordedBy.includes(search));
+            if (matchesSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
             }
-        }
-    });
+        });
+    }
 
     // View Referral Button Click
     $(document).on('click', '.viewReferralBtn', function() {

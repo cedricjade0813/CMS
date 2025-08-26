@@ -1,15 +1,20 @@
 <?php
 // staff/parent_alerts.php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 // Handle email notification (AJAX POST) before any output or includes
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $db = new PDO('mysql:host=localhost;dbname=clinic_management_system;charset=utf8', 'root', '');
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     if ($_POST['action'] === 'send_alert' && isset($_POST['parent_email'], $_POST['patient_name'], $_POST['visit_count'], $_POST['patient_id'])) {
-        require_once '../mail.php';
+        // PHPMailer logic (simple contact form style)
+    require_once __DIR__ . '/../phpmailer/src/Exception.php';
+    require_once __DIR__ . '/../phpmailer/src/PHPMailer.php';
+    require_once __DIR__ . '/../phpmailer/src/SMTP.php';
 
         $patientId = (int)$_POST['patient_id'];
-        $parentEmail = $_POST['parent_email'];
+        $parentEmail = trim($_POST['parent_email']);
         $patientName = $_POST['patient_name'];
         $visitCount = (int)$_POST['visit_count'];
 
@@ -17,70 +22,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $startOfWeek = date('Y-m-d', strtotime('monday this week'));
         $endOfWeek = date('Y-m-d', strtotime('sunday this week'));
 
-        $subject = "Clinic Medication Alert for $patientName";
-        $body = "
-            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
-                <h2 style='color: #2563eb;'>Clinic Medication Visit Alert</h2>
-                <p>Dear Parent/Guardian,</p>
-                <p>We are writing to inform you that your child, <strong>$patientName</strong>, has received medication from the clinic <strong>$visitCount times</strong> this week (Monday to Sunday).</p>
-                <div style='background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;'>
-                    <h3 style='margin-top: 0; color: #374151;'>Medication Visit Details This Week:</h3>
-                    <p style='margin-bottom: 0;'>$visitDetails</p>
-                </div>
-                <p>We recommend that you:</p>
-                <ul>
-                    <li>Check up on your child's health and wellbeing</li>
-                    <li>Contact the clinic if you have any concerns about the frequent medication needs</li>
-                    <li>Consider scheduling a consultation to discuss any ongoing health issues</li>
-                    <li>Review if there are any patterns or triggers that might be causing frequent visits</li>
-                </ul>
-                <p>Multiple medication visits in a week may indicate an underlying health concern that should be addressed.</p>
-                <p>If you have any questions or concerns, please don't hesitate to contact us.</p>
-                <p style='margin-top: 30px;'>
-                    Best regards,<br>
-                    <strong>Clinic Management Team</strong>
-                </p>
-            </div>
-        ";
-
-        $sent = sendMail($parentEmail, 'Parent/Guardian', $subject, $body, 'jaynujangad03@gmail.com', 'Clinic Management');
-
-        // Log the alert attempt (using patient name as primary key)
-        $alertStatus = $sent ? 'sent' : 'failed';
-        $stmt = $db->prepare("
-            INSERT INTO parent_alerts (patient_id, patient_name, parent_email, visit_count, week_start_date, week_end_date, alert_status, email_content, sent_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE
-                alert_status = VALUES(alert_status),
-                email_content = VALUES(email_content),
-                sent_by = VALUES(sent_by),
-                alert_sent_at = CURRENT_TIMESTAMP
-        ");
-        $stmt->execute([$patientId, $patientName, $parentEmail, $visitCount, $startOfWeek, $endOfWeek, $alertStatus, $body, $_SESSION['username'] ?? 'Staff']);
-
-        // Update weekly summary to mark alert as sent
-        if ($sent) {
-            $stmt = $db->prepare("
-                UPDATE weekly_visit_summary 
-                SET alert_sent = TRUE, updated_at = CURRENT_TIMESTAMP 
-                WHERE patient_id = ? AND week_start_date = ?
-            ");
-            $stmt->execute([$patientId, $startOfWeek]);
+        // Always fetch the latest parent email from prescriptions for this patient
+        $latestPrescriptionStmt = $db->prepare("SELECT parent_email FROM prescriptions WHERE patient_id = ? ORDER BY prescription_date DESC LIMIT 1");
+        $latestPrescriptionStmt->execute([$patientId]);
+        $latestPrescription = $latestPrescriptionStmt->fetch(PDO::FETCH_ASSOC);
+        if ($latestPrescription && !empty($latestPrescription['parent_email'])) {
+            $parentEmail = trim($latestPrescription['parent_email']);
         }
 
+        $subject = "Clinic Medication Alert for $patientName";
+        $body = "<strong>Dear Parent/Guardian,</strong><br><br>Your child, <strong>$patientName</strong>, has received medication from the clinic <strong>$visitCount times</strong> this week.<br><br>Please check up on your child's health and contact the clinic if you have any concerns.<br><br>Best regards,<br>Clinic Management Team";
+
+        $mail = new PHPMailer(true);
+        $success = false;
+        $errorMsg = '';
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'cedricjade13@gmail.com';
+            $mail->Password   = 'brkegvmjmefjqlza';
+            $mail->SMTPSecure = 'ssl';
+            $mail->Port       = 465;
+
+            $mail->setFrom('cedricjade13@gmail.com', 'Clinic Management');
+            // Send to parent email if valid, else fallback
+            if (filter_var($parentEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addAddress($parentEmail);
+            } else {
+                $mail->addAddress('cedricjade13@gmail.com');
+            }
+            $mail->addReplyTo('cedricjade13@gmail.com', 'Clinic Management');
+
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+
+            $mail->send();
+            $success = true;
+        } catch (Exception $e) {
+            $errorMsg = $mail->ErrorInfo;
+        }
         header('Content-Type: application/json');
-        echo json_encode(['success' => $sent, 'message' => $sent ? 'Alert sent successfully!' : 'Failed to send alert.']);
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => 'Message was sent successfully!']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to send message: ' . $errorMsg]);
+        }
         exit;
     }
 
     if ($_POST['action'] === 'refresh_data') {
-        // Refresh clinic visits data
-        $stmt = $db->prepare("CALL sync_clinic_visits()");
-        $stmt->execute();
-
-        header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'message' => 'Data refreshed successfully!']);
-        exit;
+    // Refresh clinic visits data
+    // Removed CALL sync_clinic_visits() since procedure does not exist
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Data refreshed successfully!']);
+    exit;
     }
 }
 
@@ -183,11 +180,7 @@ try {
     }
 
     // Sync recent data first
-    try {
-        $db->exec("CALL sync_clinic_visits()");
-    } catch (Exception $e) {
-        // Ignore if procedure doesn't exist yet
-    }
+    // Removed CALL sync_clinic_visits() since procedure does not exist
 } catch (Exception $e) {
     error_log("Database setup error: " . $e->getMessage());
 }
@@ -340,7 +333,27 @@ try {
     $alerts = [];
     $alertHistory = [];
 }
+
+// Pagination for Students with 3+ Medication Visits
+$visits_per_page = 10;
+$visits_page = isset($_GET['visits_page']) ? (int)$_GET['visits_page'] : 1;
+$visits_page = max($visits_page, 1);
+$visits_offset = ($visits_page - 1) * $visits_per_page;
+$total_visits_records = count($alerts);
+$total_visits_pages = ceil($total_visits_records / $visits_per_page);
+$alerts_paginated = array_slice($alerts, $visits_offset, $visits_per_page);
 ?>
+
+<style>
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+</style>
 
 <main class="flex-1 overflow-y-auto bg-gray-50 p-6 ml-16 md:ml-64 mt-[56px]">
     <div class="flex justify-between items-center mb-6">
@@ -392,30 +405,32 @@ try {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($allPrescriptionVisits)): ?>
-                        <?php foreach ($allPrescriptionVisits as $alert): ?>
-                            <tr class="bg-yellow-50">
-                                <td class="px-4 py-2 font-medium"><?php echo htmlspecialchars($alert['patient_name']); ?></td>
+                    <?php if (!empty($alerts_paginated)): ?>
+                        <?php foreach ($alerts_paginated as $alert): ?>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 flex items-center gap-2">
+                                    <?php echo htmlspecialchars($alert['patient_name']); ?>
+                                </td>
                                 <td class="px-4 py-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <span class="inline-block px-2 py-1 rounded bg-red-100 text-red-800 text-xs">
                                         <?php echo (int)$alert['visit_count']; ?> visits
                                     </span>
                                 </td>
                                 <td class="px-4 py-2 text-sm">
                                     <?php echo date('M j', strtotime($alert['first_visit_this_week'])) . ' - ' . date('M j', strtotime($alert['last_visit_this_week'])); ?>
                                 </td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($alert['parent_email'] ?? 'No email'); ?></td>
+                                <td class="px-4 py-2">
+                                    <?php echo htmlspecialchars($alert['parent_email'] ?? 'No email'); ?>
+                                </td>
                                 <td class="px-4 py-2 text-center">
                                     <?php if (isset($alert['alert_already_sent']) && $alert['alert_already_sent']): ?>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Alert Sent
-                                        </span>
+                                        <span class="inline-block px-2 py-1 rounded bg-green-100 text-green-800 text-xs">Alert Sent</span>
                                         <div class="text-xs text-gray-500 mt-1">
                                             <?php echo isset($alert['last_alert_sent']) ? date('M j, g:i A', strtotime($alert['last_alert_sent'])) : 'Unknown time'; ?>
                                         </div>
                                     <?php else: ?>
                                         <button onclick="sendAlert(<?php echo $alert['patient_id']; ?>, '<?php echo htmlspecialchars($alert['patient_name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($alert['parent_email'] ?? '', ENT_QUOTES); ?>', <?php echo $alert['visit_count']; ?>)"
-                                            class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors">
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 transition-colors">
                                             Send Alert
                                         </button>
                                     <?php endif; ?>
@@ -423,15 +438,82 @@ try {
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-400">
-                                <div>No students with 3+ medication visits this week. Great news!</div>
-                            </td>
-                        </tr>
+                        <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No students with 3+ medication visits this week. Great news!</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Students with 3+ Medication Visits -->
+        <?php if ($total_visits_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $visits_start = $visits_offset + 1;
+                $visits_end = min($visits_offset + $visits_per_page, $total_visits_records);
+                ?>
+                Showing <?php echo $visits_start; ?> to <?php echo $visits_end; ?> of <?php echo $total_visits_records; ?> entries
+            </div>
+            <?php if ($total_visits_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <!-- Previous Button -->
+                <?php if ($visits_page > 1): ?>
+                    <a href="?visits_page=<?php echo $visits_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <!-- Page Numbers -->
+                <?php
+                $visits_start_page = max(1, $visits_page - 2);
+                $visits_end_page = min($total_visits_pages, $visits_page + 2);
+                if ($visits_start_page > 1): ?>
+                    <a href="?visits_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($visits_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $visits_start_page; $i <= $visits_end_page; $i++): ?>
+                    <?php if ($i == $visits_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?visits_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($visits_end_page < $total_visits_pages): ?>
+                    <?php if ($visits_end_page < $total_visits_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?visits_page=<?php echo $total_visits_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $total_visits_pages; ?></a>
+                <?php endif; ?>
+                <!-- Next Button -->
+                <?php if ($visits_page < $total_visits_pages): ?>
+                    <a href="?visits_page=<?php echo $visits_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
 
     <!-- Alert History for This Week -->
@@ -511,30 +593,11 @@ try {
 
             modalTitle.textContent = `Visit Details - ${patientName}`;
 
-            try {
-                const details = JSON.parse(visitDetails);
-                let contentHtml = '<div class="space-y-3">';
-
-                details.forEach((visit, index) => {
-                    contentHtml += `
-                    <div class="border-l-4 border-blue-500 pl-4 py-2">
-                        <div class="flex justify-between items-start mb-1">
-                            <span class="font-medium text-gray-900">Visit ${index + 1}</span>
-                            <span class="text-xs text-gray-500">${visit.visit_date}</span>
-                        </div>
-                        <div class="text-sm text-gray-600 space-y-1">
-                            <div><strong>Time:</strong> ${visit.visit_time}</div>
-                            ${visit.purpose ? `<div><strong>Purpose:</strong> ${visit.purpose}</div>` : ''}
-                            ${visit.notes ? `<div><strong>Notes:</strong> ${visit.notes}</div>` : ''}
-                        </div>
-                    </div>
-                `;
-                });
-
-                contentHtml += '</div>';
-                modalContent.innerHTML = contentHtml;
-            } catch (e) {
-                modalContent.innerHTML = '<div class="text-gray-600">Unable to parse visit details.</div>';
+            // visitDetails is HTML with <br> separators, not JSON
+            if (visitDetails && typeof visitDetails === 'string') {
+                modalContent.innerHTML = `<div class='text-sm text-gray-700 leading-relaxed'>${visitDetails}</div>`;
+            } else {
+                modalContent.innerHTML = '<div class="text-gray-600">No visit details available.</div>';
             }
 
             visitDetailsModal.classList.remove('hidden');
@@ -611,6 +674,47 @@ try {
                     });
             });
         });
+
+        // Define sendAlert function for Send Alert button
+        window.sendAlert = function(patientId, patientName, parentEmail, visitCount) {
+            // Optionally, you can show a modal to confirm or edit the email before sending
+            // For now, send directly as in the previous notifyBtn logic
+            const button = event.target;
+            button.disabled = true;
+            button.innerHTML = '<i class="ri-loader-4-line mr-1 animate-spin"></i>Sending...';
+
+            fetch('parent_alerts.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `action=send_alert&patient_id=${encodeURIComponent(patientId)}&parent_email=${encodeURIComponent(parentEmail)}&patient_name=${encodeURIComponent(patientName)}&visit_count=${encodeURIComponent(visitCount)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    button.innerHTML = '<i class="ri-check-line mr-1"></i>Sent';
+                    button.className = 'bg-green-600 text-white px-3 py-1 rounded text-xs cursor-not-allowed';
+                    // Update status in the table
+                    const row = button.closest('tr');
+                    const statusCell = row.querySelector('td:nth-child(5)');
+                    if (statusCell) {
+                        statusCell.innerHTML = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="ri-check-line mr-1"></i>Sent</span>';
+                    }
+                    showNotification('Alert sent successfully!', 'success');
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = '<i class="ri-mail-send-line mr-1"></i>Send Alert';
+                    showNotification(data.message || 'Failed to send alert', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                button.disabled = false;
+                button.innerHTML = '<i class="ri-mail-send-line mr-1"></i>Send Alert';
+                showNotification('Network error occurred', 'error');
+            });
+        };
 
         function showNotification(message, type) {
             // Create notification element

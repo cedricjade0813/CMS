@@ -72,7 +72,13 @@ try {
                     $nonExpiredMeds = array_filter($medicines, function($med) use ($today) {
                         return $med['expiry'] >= $today;
                     });
-                    foreach ($nonExpiredMeds as $med): ?>
+                    $medlist_total_records = count($nonExpiredMeds);
+                    $medlist_records_per_page = 10;
+                    $medlist_page = isset($_GET['medlist_page']) ? max(1, intval($_GET['medlist_page'])) : 1;
+                    $medlist_total_pages = ceil($medlist_total_records / $medlist_records_per_page);
+                    $medlist_offset = ($medlist_page - 1) * $medlist_records_per_page;
+                    $medlist_data = array_slice(array_values($nonExpiredMeds), $medlist_offset, $medlist_records_per_page);
+                    foreach ($medlist_data as $med): ?>
                     <tr>
                         <td class="px-4 py-2"><?php echo htmlspecialchars($med['name']); ?></td>
                         <td class="px-4 py-2"><?php echo htmlspecialchars($med['dosage']); ?></td>
@@ -84,6 +90,74 @@ try {
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Medicine List -->
+        <?php if ($medlist_total_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $medlist_start = $medlist_offset + 1;
+                $medlist_end = min($medlist_offset + $medlist_records_per_page, $medlist_total_records);
+                ?>
+                Showing <?php echo $medlist_start; ?> to <?php echo $medlist_end; ?> of <?php echo $medlist_total_records; ?> entries
+            </div>
+            <?php if ($medlist_total_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($medlist_page > 1): ?>
+                    <a href="?medlist_page=<?php echo $medlist_page - 1; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <?php
+                $medlist_start_page = max(1, $medlist_page - 2);
+                $medlist_end_page = min($medlist_total_pages, $medlist_page + 2);
+                if ($medlist_start_page > 1): ?>
+                    <a href="?medlist_page=1<?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($medlist_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $medlist_start_page; $i <= $medlist_end_page; $i++): ?>
+                    <?php if ($i == $medlist_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?medlist_page=<?php echo $i; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($medlist_end_page < $medlist_total_pages): ?>
+                    <?php if ($medlist_end_page < $medlist_total_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?medlist_page=<?php echo $medlist_total_pages; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $medlist_total_pages; ?></a>
+                <?php endif; ?>
+                <?php if ($medlist_page < $medlist_total_pages): ?>
+                    <a href="?medlist_page=<?php echo $medlist_page + 1; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
     <!-- Expired Medicines Table -->
     <div class="bg-white rounded shadow p-6 mb-8">
@@ -105,8 +179,14 @@ try {
                     $expiredMeds = array_filter($medicines, function($med) use ($today) {
                         return $med['expiry'] < $today;
                     });
-                    if (!empty($expiredMeds)) {
-                        foreach ($expiredMeds as $med) {
+                    $expired_total_records = count($expiredMeds);
+                    $expired_records_per_page = 10;
+                    $expired_page = isset($_GET['expired_page']) ? max(1, intval($_GET['expired_page'])) : 1;
+                    $expired_total_pages = ceil($expired_total_records / $expired_records_per_page);
+                    $expired_offset = ($expired_page - 1) * $expired_records_per_page;
+                    $expired_data = array_slice(array_values($expiredMeds), $expired_offset, $expired_records_per_page);
+                    if (!empty($expired_data)) {
+                        foreach ($expired_data as $med) {
                             echo '<tr>';
                             echo '<td class="px-4 py-2">' . htmlspecialchars($med['name']) . '</td>';
                             echo '<td class="px-4 py-2">' . htmlspecialchars($med['dosage']) . '</td>';
@@ -122,6 +202,74 @@ try {
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Expired Medicines -->
+        <?php if ($expired_total_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $expired_start = $expired_offset + 1;
+                $expired_end = min($expired_offset + $expired_records_per_page, $expired_total_records);
+                ?>
+                Showing <?php echo $expired_start; ?> to <?php echo $expired_end; ?> of <?php echo $expired_total_records; ?> entries
+            </div>
+            <?php if ($expired_total_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($expired_page > 1): ?>
+                    <a href="?expired_page=<?php echo $expired_page - 1; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <?php
+                $expired_start_page = max(1, $expired_page - 2);
+                $expired_end_page = min($expired_total_pages, $expired_page + 2);
+                if ($expired_start_page > 1): ?>
+                    <a href="?expired_page=1<?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($expired_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $expired_start_page; $i <= $expired_end_page; $i++): ?>
+                    <?php if ($i == $expired_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?expired_page=<?php echo $i; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($expired_end_page < $expired_total_pages): ?>
+                    <?php if ($expired_end_page < $expired_total_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?expired_page=<?php echo $expired_total_pages; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $expired_total_pages; ?></a>
+                <?php endif; ?>
+                <?php if ($expired_page < $expired_total_pages): ?>
+                    <a href="?expired_page=<?php echo $expired_page + 1; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
 </main>
 
@@ -134,6 +282,14 @@ select#year {
 select#year option {
     padding: 4px 8px;
     height: 24px;
+}
+html, body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 </style>
 

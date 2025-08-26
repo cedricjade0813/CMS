@@ -119,8 +119,23 @@ try {
                     </thead>
                     <tbody>
                         <?php
-                        $stmt = $db->query('SELECT id, student_id, name, dob, gender, address, civil_status, year_level, email, contact_number, religion, citizenship, course_program, guardian_name, guardian_contact, emergency_contact_name, emergency_contact_number, MAX(dob) as last_visit FROM imported_patients GROUP BY id, student_id, name ORDER BY id DESC');
-                        foreach ($stmt as $row): ?>
+                        $stmt = $db->query('SELECT id, student_id, name, dob, gender, address, civil_status, year_level, email, contact_number, religion, citizenship, course_program, guardian_name, guardian_contact, emergency_contact_name, emergency_contact_number, parent_email, parent_phone, MAX(dob) as last_visit FROM imported_patients GROUP BY id, student_id, name ORDER BY id DESC');
+                            // Pagination settings
+                            $records_per_page = 10;
+                            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                            $page = max($page, 1);
+                            $offset = ($page - 1) * $records_per_page;
+
+                            // Get total count for pagination
+                            $total_count_stmt = $db->query('SELECT COUNT(*) FROM imported_patients');
+                            $total_records = $total_count_stmt->fetchColumn();
+                            $total_pages = ceil($total_records / $records_per_page);
+
+                            $stmt = $db->prepare('SELECT id, student_id, name, dob, gender, address, civil_status, year_level, email, contact_number, religion, citizenship, course_program, guardian_name, guardian_contact, emergency_contact_name, emergency_contact_number, parent_email, parent_phone, MAX(dob) as last_visit FROM imported_patients GROUP BY id, student_id, name ORDER BY id DESC LIMIT :limit OFFSET :offset');
+                            $stmt->bindValue(':limit', $records_per_page, PDO::PARAM_INT);
+                            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                            $stmt->execute();
+                            foreach ($stmt as $row): ?>
                         <tr>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($row['id']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($row['student_id']); ?></td>
@@ -143,13 +158,95 @@ try {
                                     data-guardian-name="<?php echo htmlspecialchars($row['guardian_name'] ?? ''); ?>"
                                     data-guardian-contact="<?php echo htmlspecialchars($row['guardian_contact'] ?? ''); ?>"
                                     data-emergency-name="<?php echo htmlspecialchars($row['emergency_contact_name'] ?? ''); ?>"
-                                    data-emergency-contact="<?php echo htmlspecialchars($row['emergency_contact_number'] ?? ''); ?>">View</button>
+                                    data-emergency-contact="<?php echo htmlspecialchars($row['emergency_contact_number'] ?? ''); ?>"
+                                    data-parent-email="<?php echo htmlspecialchars($row['parent_email'] ?? ''); ?>"
+                                    data-parent-phone="<?php echo htmlspecialchars($row['parent_phone'] ?? ''); ?>">View</button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
+                <!-- Pagination and Records Info -->
+                <?php if ($total_records > 0): ?>
+                <div class="flex justify-between items-center mt-6">
+                    <!-- Records Information -->
+                    <div class="text-sm text-gray-600">
+                        <?php 
+                        $start = $offset + 1;
+                        $end = min($offset + $records_per_page, $total_records);
+                        ?>
+                        Showing <?php echo $start; ?> to <?php echo $end; ?> of <?php echo $total_records; ?> entries
+                    </div>
+
+                    <!-- Pagination Navigation -->
+                    <?php if ($total_pages > 1): ?>
+                    <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                        <!-- Previous Button -->
+                        <?php if ($page > 1): ?>
+                            <a href="?page=<?php echo $page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                                <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m15 18-6-6 6-6"></path>
+                                </svg>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        <?php else: ?>
+                            <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                                <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m15 18-6-6 6-6"></path>
+                                </svg>
+                                <span class="sr-only">Previous</span>
+                            </button>
+                        <?php endif; ?>
+
+                        <!-- Page Numbers -->
+                        <?php
+                        $start_page = max(1, $page - 2);
+                        $end_page = min($total_pages, $page + 2);
+                        // Show first page if not in range
+                        if ($start_page > 1): ?>
+                            <a href="?page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                            <?php if ($start_page > 2): ?>
+                                <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
+                            <?php if ($i == $page): ?>
+                                <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                            <?php else: ?>
+                                <a href="?page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+
+                        <!-- Show last page if not in range -->
+                        <?php if ($end_page < $total_pages): ?>
+                            <?php if ($end_page < $total_pages - 1): ?>
+                                <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                            <?php endif; ?>
+                            <a href="?page=<?php echo $total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $total_pages; ?></a>
+                        <?php endif; ?>
+
+                        <!-- Next Button -->
+                        <?php if ($page < $total_pages): ?>
+                            <a href="?page=<?php echo $page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                                <span class="sr-only">Next</span>
+                                <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 18 6-6-6-6"></path>
+                                </svg>
+                            </a>
+                        <?php else: ?>
+                            <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                                <span class="sr-only">Next</span>
+                                <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 18 6-6-6-6"></path>
+                                </svg>
+                            </button>
+                        <?php endif; ?>
+                    </nav>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
         </div>
     </div>
     <!-- Profile Modal -->
@@ -366,17 +463,10 @@ try {
 <script>
 $(document).ready(function() {
     var table = $('#importedPatientsTable').DataTable({
-        "pageLength": 10,
-        "lengthChange": false,
+        "paging": false,
         "ordering": true,
-        "info": true,
+        "info": false,
         "autoWidth": false,
-        "language": {
-            "paginate": {
-                "previous": "Prev",
-                "next": "Next"
-            }
-        },
         "dom": 'lrtip'
     });
     // Connect the custom search bar to the table: filter by Name only (case-insensitive, trimmed)
@@ -436,6 +526,8 @@ $(document).ready(function() {
         const guardianContact = $(this).data('guardian-contact');
         const emergencyName = $(this).data('emergency-name');
         const emergencyContact = $(this).data('emergency-contact');
+        const parentEmail = $(this).data('parent-email');
+        const parentPhone = $(this).data('parent-phone');
         
         $('#modalPatientName').text(name + ' (' + id + ')');
         $('#modalPatientDetails').html(
@@ -450,27 +542,22 @@ $(document).ready(function() {
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Student ID:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${studentId || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Date of Birth:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${dob || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Gender:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${gender || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Civil Status:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${civil || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Religion:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${religion || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Citizenship:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${citizenship || 'N/A'}</p>
@@ -486,7 +573,6 @@ $(document).ready(function() {
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Year Level:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${year || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Course/Program:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${course || 'N/A'}</p>
@@ -505,12 +591,18 @@ $(document).ready(function() {
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Email:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${email || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Contact Number:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${contact || 'N/A'}</p>
                             </div>
-                            
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Parent's Email:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${parentEmail || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Parent's Phone:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${parentPhone || 'N/A'}</p>
+                            </div>
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-start">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Address:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${address || 'N/A'}</p>
@@ -526,17 +618,14 @@ $(document).ready(function() {
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Guardian Name:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${guardianName || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Guardian Contact:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${guardianContact || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Emergency Contact:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${emergencyName || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Emergency Number:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${emergencyContact || 'N/A'}</p>
@@ -648,7 +737,14 @@ $(document).ready(function() {
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Contact Number:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${contact || 'N/A'}</p>
                             </div>
-                            
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Parent's Email:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${parentEmail || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Parent's Phone:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${parentPhone || 'N/A'}</p>
+                            </div>
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-start">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Address:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${address || 'N/A'}</p>
@@ -664,17 +760,14 @@ $(document).ready(function() {
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Guardian Name:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${guardianName || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Guardian Contact:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${guardianContact || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Emergency Contact:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${emergencyName || 'N/A'}</p>
                             </div>
-                            
                             <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
                                 <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Emergency Number:</label>
                                 <p class="text-sm text-gray-900 dark:text-neutral-200">${emergencyContact || 'N/A'}</p>
@@ -1116,6 +1209,14 @@ $(document).ready(function() {
 </script>
 
 <style>
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }

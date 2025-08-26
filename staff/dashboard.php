@@ -4,7 +4,6 @@ include '../includes/header.php';
 $db = new PDO('mysql:host=localhost;dbname=clinic_management_system;charset=utf8', 'root', '');
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Total Visits Today: count of prescriptions issued today (match admin dashboard logic)
 $visitsToday = 0;
 try {
     $visitsToday = $db->query("SELECT COUNT(*) FROM prescriptions WHERE DATE(prescription_date) = CURDATE()")->fetchColumn();
@@ -67,6 +66,17 @@ try {
     }
 } catch (Exception $e) {}
 ?>
+
+<style>
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+</style>
 
 <main class="flex-1 overflow-y-auto bg-gray-50 p-6 ml-16 md:ml-64 mt-[56px]">
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>

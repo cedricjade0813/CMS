@@ -126,8 +126,14 @@ $historyPageData = array_slice($flatPrescriptionHistory, $historyStart, $history
                             $stockMap[$key]['quantity'] += (int)$med['quantity'];
                         }
                     }
-                    if (!empty($stockMap)) {
-                        foreach ($stockMap as $stock) {
+                    $medicine_total_records = count($stockMap);
+                    $medicine_records_per_page = 10;
+                    $medicine_page = isset($_GET['medicine_page']) ? max(1, intval($_GET['medicine_page'])) : 1;
+                    $medicine_total_pages = ceil($medicine_total_records / $medicine_records_per_page);
+                    $medicine_offset = ($medicine_page - 1) * $medicine_records_per_page;
+                    $medicine_stock_data = array_slice(array_values($stockMap), $medicine_offset, $medicine_records_per_page);
+                    if (!empty($medicine_stock_data)) {
+                        foreach ($medicine_stock_data as $stock) {
                             $lowerName = strtolower(trim($stock['name']));
                             echo '<tr data-name="' . htmlspecialchars($lowerName) . '">';
                             echo '<td class="px-4 py-2">' . htmlspecialchars($stock['name']) . '</td>';
@@ -142,7 +148,75 @@ $historyPageData = array_slice($flatPrescriptionHistory, $historyStart, $history
                 </tbody>
             </table>
         </div>
-    </div>
+            <!-- Pagination and Records Info for Medicine Stock Available -->
+            <?php if ($medicine_total_records > 0): ?>
+            <div class="flex justify-between items-center mt-6">
+                <div class="text-sm text-gray-600">
+                    <?php 
+                    $medicine_start = $medicine_offset + 1;
+                    $medicine_end = min($medicine_offset + $medicine_records_per_page, $medicine_total_records);
+                    ?>
+                    Showing <?php echo $medicine_start; ?> to <?php echo $medicine_end; ?> of <?php echo $medicine_total_records; ?> entries
+                </div>
+                <?php if ($medicine_total_pages > 1): ?>
+                <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                    <?php if ($medicine_page > 1): ?>
+                        <a href="?medicine_page=<?php echo $medicine_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span class="sr-only">Previous</span>
+                        </button>
+                    <?php endif; ?>
+                    <?php
+                    $medicine_start_page = max(1, $medicine_page - 2);
+                    $medicine_end_page = min($medicine_total_pages, $medicine_page + 2);
+                    if ($medicine_start_page > 1): ?>
+                        <a href="?medicine_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                        <?php if ($medicine_start_page > 2): ?>
+                            <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                    <?php for ($i = $medicine_start_page; $i <= $medicine_end_page; $i++): ?>
+                        <?php if ($i == $medicine_page): ?>
+                            <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                        <?php else: ?>
+                            <a href="?medicine_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+                    <?php if ($medicine_end_page < $medicine_total_pages): ?>
+                        <?php if ($medicine_end_page < $medicine_total_pages - 1): ?>
+                            <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                        <?php endif; ?>
+                        <a href="?medicine_page=<?php echo $medicine_total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $medicine_total_pages; ?></a>
+                    <?php endif; ?>
+                    <?php if ($medicine_page < $medicine_total_pages): ?>
+                        <a href="?medicine_page=<?php echo $medicine_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                            <span class="sr-only">Next</span>
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                            <span class="sr-only">Next</span>
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
+                    <?php endif; ?>
+                </nav>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+        </div>
     <!-- Issue Medication History -->
     <div class="bg-white rounded shadow p-6 mb-8">
         <div class="flex justify-between items-center mb-4">
@@ -210,57 +284,74 @@ $historyPageData = array_slice($flatPrescriptionHistory, $historyStart, $history
                 </tbody>
             </table>
         </div>
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center mt-4 gap-2">
+        <!-- Pagination and Records Info for Issue Medication History -->
+        <?php if ($historyTotal > 0): ?>
+        <div class="flex justify-between items-center mt-6">
             <div class="text-sm text-gray-600">
-                Showing
-                <span class="font-semibold">
-                    <?php echo $historyTotal == 0 ? 0 : ($historyStart + 1); ?>
-                </span>
-                to
-                <span class="font-semibold">
-                    <?php echo min($historyStart + $historyPerPage, $historyTotal); ?>
-                </span>
-                of
-                <span class="font-semibold">
-                    <?php echo $historyTotal; ?>
-                </span>
-                entries
+                <?php 
+                $history_start = $historyStart + 1;
+                $history_end = min($historyStart + $historyPerPage, $historyTotal);
+                ?>
+                Showing <?php echo $historyTotal == 0 ? 0 : $history_start; ?> to <?php echo $history_end; ?> of <?php echo $historyTotal; ?> entries
             </div>
-            <div class="flex flex-wrap gap-1">
-                <?php if ($historyTotalPages > 1): ?>
-                    <?php
-                    $maxPagesToShow = 5;
-                    $startPage = max(1, $historyPage - 2);
-                    $endPage = min($historyTotalPages, $startPage + $maxPagesToShow - 1);
-                    if ($endPage - $startPage < $maxPagesToShow - 1) {
-                        $startPage = max(1, $endPage - $maxPagesToShow + 1);
-                    }
-                    
-                    // Build query string for pagination links to preserve filters
-                    $queryParams = [];
-                    if ($filterYear) $queryParams['year'] = $filterYear;
-                    
-                    function buildPaginationLink($page, $queryParams) {
-                        $queryParams['history_page'] = $page;
-                        return '?' . http_build_query($queryParams);
-                    }
-                    ?>
-                    <a href="<?php echo buildPaginationLink(1, $queryParams); ?>" class="px-2 py-1 rounded <?php echo $historyPage == 1 ? 'bg-primary text-white' : 'bg-gray-200 hover:bg-gray-300'; ?>">&laquo;</a>
-                    <a href="<?php echo buildPaginationLink(max(1, $historyPage-1), $queryParams); ?>" class="px-2 py-1 rounded <?php echo $historyPage == 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'; ?>">&lt;</a>
-                    <?php if ($startPage > 1): ?>
-                        <span class="px-2 py-1">...</span>
-                    <?php endif; ?>
-                    <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
-                        <a href="<?php echo buildPaginationLink($i, $queryParams); ?>" class="px-2 py-1 rounded <?php echo $i == $historyPage ? 'bg-primary text-white' : 'bg-gray-200 hover:bg-gray-300'; ?>"><?php echo $i; ?></a>
-                    <?php endfor; ?>
-                    <?php if ($endPage < $historyTotalPages): ?>
-                        <span class="px-2 py-1">...</span>
-                    <?php endif; ?>
-                    <a href="<?php echo buildPaginationLink(min($historyTotalPages, $historyPage+1), $queryParams); ?>" class="px-2 py-1 rounded <?php echo $historyPage == $historyTotalPages ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'; ?>">&gt;</a>
-                    <a href="<?php echo buildPaginationLink($historyTotalPages, $queryParams); ?>" class="px-2 py-1 rounded <?php echo $historyPage == $historyTotalPages ? 'bg-primary text-white' : 'bg-gray-200 hover:bg-gray-300'; ?>">&raquo;</a>
+            <?php if ($historyTotalPages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($historyPage > 1): ?>
+                    <a href="?history_page=<?php echo $historyPage - 1; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
                 <?php endif; ?>
-            </div>
+                <?php
+                $history_start_page = max(1, $historyPage - 2);
+                $history_end_page = min($historyTotalPages, $historyPage + 2);
+                if ($history_start_page > 1): ?>
+                    <a href="?history_page=1<?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($history_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $history_start_page; $i <= $history_end_page; $i++): ?>
+                    <?php if ($i == $historyPage): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?history_page=<?php echo $i; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($history_end_page < $historyTotalPages): ?>
+                    <?php if ($history_end_page < $historyTotalPages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?history_page=<?php echo $historyTotalPages; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $historyTotalPages; ?></a>
+                <?php endif; ?>
+                <?php if ($historyPage < $historyTotalPages): ?>
+                    <a href="?history_page=<?php echo $historyPage + 1; ?><?php echo $filterYear ? '&year=' . urlencode($filterYear) : ''; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
         </div>
+        <?php endif; ?>
     </div>
     <!-- Add Medicine Modal -->
     <div id="addMedModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
@@ -370,54 +461,14 @@ $historyPageData = array_slice($flatPrescriptionHistory, $historyStart, $history
     </div>
 </main>
 <style>
-.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
-    color: inherit;
-}
-.dataTables_wrapper .dataTables_paginate {
-    float: right;
-    text-align: right;
-    padding-top: .25em;
-}
-
-/* Basic table styling */
-.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
-    color: inherit;
-}
-.dataTables_wrapper .dataTables_paginate {
-    float: right;
-    text-align: right;
-    padding-top: .25em;
-}
-
-/* Year dropdown styling - limit visible options to ~5 */
-select#year {
-    max-height: 120px;
-    overflow-y: auto;
-}
-select#year option {
-    padding: 4px 8px;
-    height: 24px;
-}
-
-/* Medicine autocomplete suggestions styling */
-#medicineNameSuggestions {
-    border-top: none;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-#medicineNameSuggestions .suggestion-item {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #e5e7eb;
-    transition: background-color 0.2s;
-}
-#medicineNameSuggestions .suggestion-item:hover,
-#medicineNameSuggestions .suggestion-item.highlighted {
-    background-color: #f3f4f6;
-}
-#medicineNameSuggestions .suggestion-item:last-child {
-    border-bottom: none;
-}
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
 </style>
 <script>
     // Medicine name autocomplete functionality
@@ -574,7 +625,7 @@ select#year option {
             body: `name=${encodeURIComponent(name)}&dosage=${encodeURIComponent(dosage)}&quantity=${encodeURIComponent(quantity)}&expiry=${encodeURIComponent(expiry)}`
         })
         .then(res => res.json())
-        .then(data => {
+        .then (data => {
             if(data.success) {
                 showSuccessModal('Medicine added!', 'Success');
                 setTimeout(() => location.reload(), 1200);

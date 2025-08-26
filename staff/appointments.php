@@ -244,7 +244,25 @@ $conn->close();
         </form>
     </div>
     
-    <!-- Doctor Schedules Table -->
+    <!-- Doctor Schedules Table with Pagination -->
+    <?php
+    // Pagination for Doctor Schedules
+    $ds_records_per_page = 10;
+    $ds_page = isset($_GET['ds_page']) ? (int)$_GET['ds_page'] : 1;
+    $ds_page = max($ds_page, 1);
+    $ds_offset = ($ds_page - 1) * $ds_records_per_page;
+    $conn = new mysqli('localhost', 'root', '', 'clinic_management_system');
+    if ($conn->connect_errno) {
+        die('Database connection failed: ' . $conn->connect_error);
+    }
+    $ds_total_count_stmt = $conn->query('SELECT COUNT(*) FROM doctor_schedules');
+    $ds_total_records = $ds_total_count_stmt->fetch_row()[0];
+    $ds_total_pages = ceil($ds_total_records / $ds_records_per_page);
+    $ds_stmt = $conn->prepare('SELECT id, doctor_name, schedule_date, schedule_time FROM doctor_schedules ORDER BY schedule_date ASC, schedule_time ASC LIMIT ? OFFSET ?');
+    $ds_stmt->bind_param('ii', $ds_records_per_page, $ds_offset);
+    $ds_stmt->execute();
+    $ds_result = $ds_stmt->get_result();
+    ?>
     <div class="bg-white rounded shadow p-6 mb-8">
         <h3 class="text-lg font-semibold mb-4">Doctor Schedules</h3>
         <div class="overflow-x-auto">
@@ -258,8 +276,8 @@ $conn->close();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($doctor_schedules)): ?>
-                        <?php foreach ($doctor_schedules as $schedule): ?>
+                    <?php if ($ds_result->num_rows > 0): ?>
+                        <?php while ($schedule = $ds_result->fetch_assoc()): ?>
                         <tr>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($schedule['doctor_name']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($schedule['schedule_date']); ?></td>
@@ -269,14 +287,86 @@ $conn->close();
                                         data-id="<?php echo $schedule['id']; ?>">Delete</button>
                             </td>
                         </tr>
-                        <?php endforeach; ?>
+                        <?php endwhile; ?>
                     <?php else: ?>
                         <tr><td colspan="4" class="px-4 py-2 text-center text-gray-400">No doctor schedules found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Doctor Schedules -->
+        <?php if ($ds_total_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $ds_start = $ds_offset + 1;
+                $ds_end = min($ds_offset + $ds_records_per_page, $ds_total_records);
+                ?>
+                Showing <?php echo $ds_start; ?> to <?php echo $ds_end; ?> of <?php echo $ds_total_records; ?> entries
+            </div>
+            <?php if ($ds_total_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($ds_page > 1): ?>
+                    <a href="?ds_page=<?php echo $ds_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <?php
+                $ds_start_page = max(1, $ds_page - 2);
+                $ds_end_page = min($ds_total_pages, $ds_page + 2);
+                if ($ds_start_page > 1): ?>
+                    <a href="?ds_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($ds_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $ds_start_page; $i <= $ds_end_page; $i++): ?>
+                    <?php if ($i == $ds_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?ds_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($ds_end_page < $ds_total_pages): ?>
+                    <?php if ($ds_end_page < $ds_total_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?ds_page=<?php echo $ds_total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $ds_total_pages; ?></a>
+                <?php endif; ?>
+                <?php if ($ds_page < $ds_total_pages): ?>
+                    <a href="?ds_page=<?php echo $ds_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
+    <?php
+    $ds_stmt->close();
+    $conn->close();
+    ?>
     
     <!-- Calendar View -->
     <div class="bg-white rounded shadow p-4 mb-8">
@@ -290,7 +380,25 @@ $conn->close();
         </div>
     </div>
     
-    <!-- Appointment Table: Pending -->
+    <!-- Pending Appointments Table with Pagination -->
+    <?php
+    // Pagination for Pending Appointments
+    $pending_records_per_page = 10;
+    $pending_page = isset($_GET['pending_page']) ? (int)$_GET['pending_page'] : 1;
+    $pending_page = max($pending_page, 1);
+    $pending_offset = ($pending_page - 1) * $pending_records_per_page;
+    $conn = new mysqli('localhost', 'root', '', 'clinic_management_system');
+    if ($conn->connect_errno) {
+        die('Database connection failed: ' . $conn->connect_error);
+    }
+    $pending_total_count_stmt = $conn->query("SELECT COUNT(*) FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE a.status = 'pending'");
+    $pending_total_records = $pending_total_count_stmt->fetch_row()[0];
+    $pending_total_pages = ceil($pending_total_records / $pending_records_per_page);
+    $pending_stmt = $conn->prepare("SELECT a.date, a.time, a.reason, a.status, a.email, ip.name FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE a.status = 'pending' ORDER BY a.date DESC, a.time DESC LIMIT ? OFFSET ?");
+    $pending_stmt->bind_param('ii', $pending_records_per_page, $pending_offset);
+    $pending_stmt->execute();
+    $pending_result = $pending_stmt->get_result();
+    ?>
     <div class="bg-white rounded shadow p-6 mb-8">
         <h3 class="text-lg font-semibold mb-4">Pending Appointments</h3>
         <div class="overflow-x-auto">
@@ -306,43 +414,131 @@ $conn->close();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($appointments)): ?>
-                        <?php foreach ($appointments as $appt): ?>
-                            <?php if ($appt['status'] === 'pending'): ?>
-                            <tr data-email="<?php echo htmlspecialchars($appt['email']); ?>">
-                                <td class="px-4 py-2 flex items-center gap-2">
-                                    <button class="viewAppointmentBtn text-primary hover:text-blue-700" 
-                                            data-name="<?php echo htmlspecialchars($appt['name']); ?>" 
-                                            data-date="<?php echo htmlspecialchars($appt['date']); ?>" 
-                                            data-time="<?php echo htmlspecialchars($appt['time']); ?>" 
-                                            data-reason="<?php echo htmlspecialchars($appt['reason']); ?>" 
-                                            data-email="<?php echo htmlspecialchars($appt['email']); ?>" 
-                                            title="View Details"><i class="ri-eye-line text-lg"></i></button>
-                                    <?php echo htmlspecialchars($appt['name']); ?>
-                                </td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['date']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['time']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['reason']); ?></td>
-                                <td class="px-4 py-2">
-                                    <span class="inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs">Pending</span>
-                                </td>
-                                <td class="px-4 py-2 text-center">
-                                    <button class="approveBtn px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 mr-1">Approve</button>
-                                    <button class="declineBtn px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 mr-1">Decline</button>
-                                    <button class="reschedBtn px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600">Reschedule</button>
-                                </td>
-                            </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
+                    <?php if ($pending_result->num_rows > 0): ?>
+                        <?php while ($appt = $pending_result->fetch_assoc()): ?>
+                        <tr data-email="<?php echo htmlspecialchars($appt['email']); ?>">
+                            <td class="px-4 py-2 flex items-center gap-2">
+                                <button class="viewAppointmentBtn text-primary hover:text-blue-700" 
+                                        data-name="<?php echo htmlspecialchars($appt['name']); ?>" 
+                                        data-date="<?php echo htmlspecialchars($appt['date']); ?>" 
+                                        data-time="<?php echo htmlspecialchars($appt['time']); ?>" 
+                                        data-reason="<?php echo htmlspecialchars($appt['reason']); ?>" 
+                                        data-email="<?php echo htmlspecialchars($appt['email']); ?>" 
+                                        title="View Details"><i class="ri-eye-line text-lg"></i></button>
+                                <?php echo htmlspecialchars($appt['name']); ?>
+                            </td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['date']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['time']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['reason']); ?></td>
+                            <td class="px-4 py-2">
+                                <span class="inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs">Pending</span>
+                            </td>
+                            <td class="px-4 py-2 text-center">
+                                <button class="approveBtn px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 mr-1">Approve</button>
+                                <button class="declineBtn px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 mr-1">Decline</button>
+                                <button class="reschedBtn px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600">Reschedule</button>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
                     <?php else: ?>
                         <tr><td colspan="6" class="px-4 py-2 text-center text-gray-400">No pending appointments found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Pending Appointments -->
+        <?php if ($pending_total_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $pending_start = $pending_offset + 1;
+                $pending_end = min($pending_offset + $pending_records_per_page, $pending_total_records);
+                ?>
+                Showing <?php echo $pending_start; ?> to <?php echo $pending_end; ?> of <?php echo $pending_total_records; ?> entries
+            </div>
+            <?php if ($pending_total_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($pending_page > 1): ?>
+                    <a href="?pending_page=<?php echo $pending_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <?php
+                $pending_start_page = max(1, $pending_page - 2);
+                $pending_end_page = min($pending_total_pages, $pending_page + 2);
+                if ($pending_start_page > 1): ?>
+                    <a href="?pending_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($pending_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $pending_start_page; $i <= $pending_end_page; $i++): ?>
+                    <?php if ($i == $pending_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?pending_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($pending_end_page < $pending_total_pages): ?>
+                    <?php if ($pending_end_page < $pending_total_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?pending_page=<?php echo $pending_total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $pending_total_pages; ?></a>
+                <?php endif; ?>
+                <?php if ($pending_page < $pending_total_pages): ?>
+                    <a href="?pending_page=<?php echo $pending_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
+    <?php
+    $pending_stmt->close();
+    $conn->close();
+    ?>
     
-    <!-- Appointment Table: Done (Approved/Declined) -->
+    <!-- Done Appointments Table with Pagination -->
+    <?php
+    // Pagination for Done Appointments
+    $done_records_per_page = 10;
+    $done_page = isset($_GET['done_page']) ? (int)$_GET['done_page'] : 1;
+    $done_page = max($done_page, 1);
+    $done_offset = ($done_page - 1) * $done_records_per_page;
+    $conn = new mysqli('localhost', 'root', '', 'clinic_management_system');
+    if ($conn->connect_errno) {
+        die('Database connection failed: ' . $conn->connect_error);
+    }
+    $done_total_count_stmt = $conn->query("SELECT COUNT(*) FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE a.status IN ('approved', 'confirmed', 'declined')");
+    $done_total_records = $done_total_count_stmt->fetch_row()[0];
+    $done_total_pages = ceil($done_total_records / $done_records_per_page);
+    $done_stmt = $conn->prepare("SELECT a.date, a.time, a.reason, a.status, a.email, ip.name FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE a.status IN ('approved', 'confirmed', 'declined') ORDER BY a.date DESC, a.time DESC LIMIT ? OFFSET ?");
+    $done_stmt->bind_param('ii', $done_records_per_page, $done_offset);
+    $done_stmt->execute();
+    $done_result = $done_stmt->get_result();
+    ?>
     <div class="bg-white rounded shadow p-6 mb-8">
         <h3 class="text-lg font-semibold mb-4">Done Appointments</h3>
         <div class="overflow-x-auto">
@@ -358,36 +554,124 @@ $conn->close();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($appointments)): ?>
-                        <?php foreach ($appointments as $appt): ?>
-                            <?php if ($appt['status'] === 'approved' || $appt['status'] === 'confirmed' || $appt['status'] === 'declined'): ?>
-                            <tr>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['name']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['date']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['time']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['reason']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['email']); ?></td>
-                                <td class="px-4 py-2">
-                                    <?php if ($appt['status'] === 'approved' || $appt['status'] === 'confirmed'): ?>
-                                        <span class="inline-block px-2 py-1 rounded bg-green-100 text-green-800 text-xs">Approved</span>
-                                    <?php elseif ($appt['status'] === 'declined'): ?>
-                                        <span class="inline-block px-2 py-1 rounded bg-red-100 text-red-800 text-xs">Declined</span>
-                                    <?php else: ?>
-                                        <span class="inline-block px-2 py-1 rounded bg-gray-100 text-gray-800 text-xs"><?php echo htmlspecialchars(ucfirst($appt['status'])); ?></span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
+                    <?php if ($done_result->num_rows > 0): ?>
+                        <?php while ($appt = $done_result->fetch_assoc()): ?>
+                        <tr>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['name']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['date']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['time']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['reason']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['email']); ?></td>
+                            <td class="px-4 py-2">
+                                <?php if ($appt['status'] === 'approved' || $appt['status'] === 'confirmed'): ?>
+                                    <span class="inline-block px-2 py-1 rounded bg-green-100 text-green-800 text-xs">Approved</span>
+                                <?php elseif ($appt['status'] === 'declined'): ?>
+                                    <span class="inline-block px-2 py-1 rounded bg-red-100 text-red-800 text-xs">Declined</span>
+                                <?php else: ?>
+                                    <span class="inline-block px-2 py-1 rounded bg-gray-100 text-gray-800 text-xs"><?php echo htmlspecialchars(ucfirst($appt['status'])); ?></span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
                     <?php else: ?>
                         <tr><td colspan="6" class="px-4 py-2 text-center text-gray-400">No done appointments found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Done Appointments -->
+        <?php if ($done_total_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $done_start = $done_offset + 1;
+                $done_end = min($done_offset + $done_records_per_page, $done_total_records);
+                ?>
+                Showing <?php echo $done_start; ?> to <?php echo $done_end; ?> of <?php echo $done_total_records; ?> entries
+            </div>
+            <?php if ($done_total_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($done_page > 1): ?>
+                    <a href="?done_page=<?php echo $done_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <?php
+                $done_start_page = max(1, $done_page - 2);
+                $done_end_page = min($done_total_pages, $done_page + 2);
+                if ($done_start_page > 1): ?>
+                    <a href="?done_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($done_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $done_start_page; $i <= $done_end_page; $i++): ?>
+                    <?php if ($i == $done_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?done_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($done_end_page < $done_total_pages): ?>
+                    <?php if ($done_end_page < $done_total_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?done_page=<?php echo $done_total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $done_total_pages; ?></a>
+                <?php endif; ?>
+                <?php if ($done_page < $done_total_pages): ?>
+                    <a href="?done_page=<?php echo $done_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
+    <?php
+    $done_stmt->close();
+    $conn->close();
+    ?>
     
-    <!-- Appointment Table: Rescheduled -->
+    <!-- Rescheduled Appointments Table with Pagination -->
+    <?php
+    // Pagination for Rescheduled Appointments
+    $resched_records_per_page = 10;
+    $resched_page = isset($_GET['resched_page']) ? (int)$_GET['resched_page'] : 1;
+    $resched_page = max($resched_page, 1);
+    $resched_offset = ($resched_page - 1) * $resched_records_per_page;
+    $conn = new mysqli('localhost', 'root', '', 'clinic_management_system');
+    if ($conn->connect_errno) {
+        die('Database connection failed: ' . $conn->connect_error);
+    }
+    $resched_total_count_stmt = $conn->query("SELECT COUNT(*) FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE a.status = 'rescheduled'");
+    $resched_total_records = $resched_total_count_stmt->fetch_row()[0];
+    $resched_total_pages = ceil($resched_total_records / $resched_records_per_page);
+    $resched_stmt = $conn->prepare("SELECT a.date, a.time, a.reason, a.status, a.email, ip.name FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE a.status = 'rescheduled' ORDER BY a.date DESC, a.time DESC LIMIT ? OFFSET ?");
+    $resched_stmt->bind_param('ii', $resched_records_per_page, $resched_offset);
+    $resched_stmt->execute();
+    $resched_result = $resched_stmt->get_result();
+    ?>
     <div class="bg-white rounded shadow p-6 mb-8">
         <h3 class="text-lg font-semibold mb-4">Rescheduled Appointments</h3>
         <div class="overflow-x-auto">
@@ -403,28 +687,98 @@ $conn->close();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($appointments)): ?>
-                        <?php foreach ($appointments as $appt): ?>
-                            <?php if ($appt['status'] === 'rescheduled'): ?>
-                            <tr>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['name']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['date']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['time']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['reason']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($appt['email']); ?></td>
-                                <td class="px-4 py-2">
-                                    <span class="inline-block px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs">Rescheduled</span>
-                                </td>
-                            </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
+                    <?php if ($resched_result->num_rows > 0): ?>
+                        <?php while ($appt = $resched_result->fetch_assoc()): ?>
+                        <tr>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['name']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['date']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['time']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['reason']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($appt['email']); ?></td>
+                            <td class="px-4 py-2">
+                                <span class="inline-block px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs">Rescheduled</span>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
                     <?php else: ?>
                         <tr><td colspan="6" class="px-4 py-2 text-center text-gray-400">No rescheduled appointments found.</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
+        <!-- Pagination and Records Info for Rescheduled Appointments -->
+        <?php if ($resched_total_records > 0): ?>
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <?php 
+                $resched_start = $resched_offset + 1;
+                $resched_end = min($resched_offset + $resched_records_per_page, $resched_total_records);
+                ?>
+                Showing <?php echo $resched_start; ?> to <?php echo $resched_end; ?> of <?php echo $resched_total_records; ?> entries
+            </div>
+            <?php if ($resched_total_pages > 1): ?>
+            <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                <?php if ($resched_page > 1): ?>
+                    <a href="?resched_page=<?php echo $resched_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m15 18-6-6 6-6"></path>
+                        </svg>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                <?php endif; ?>
+                <?php
+                $resched_start_page = max(1, $resched_page - 2);
+                $resched_end_page = min($resched_total_pages, $resched_page + 2);
+                if ($resched_start_page > 1): ?>
+                    <a href="?resched_page=1" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                    <?php if ($resched_start_page > 2): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php for ($i = $resched_start_page; $i <= $resched_end_page; $i++): ?>
+                    <?php if ($i == $resched_page): ?>
+                        <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                    <?php else: ?>
+                        <a href="?resched_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                    <?php endif; ?>
+                <?php endfor; ?>
+                <?php if ($resched_end_page < $resched_total_pages): ?>
+                    <?php if ($resched_end_page < $resched_total_pages - 1): ?>
+                        <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                    <?php endif; ?>
+                    <a href="?resched_page=<?php echo $resched_total_pages; ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $resched_total_pages; ?></a>
+                <?php endif; ?>
+                <?php if ($resched_page < $resched_total_pages): ?>
+                    <a href="?resched_page=<?php echo $resched_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </a>
+                <?php else: ?>
+                    <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                        <span class="sr-only">Next</span>
+                        <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </button>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
+    <?php
+    $resched_stmt->close();
+    $conn->close();
+    ?>
     
 
 </main>
@@ -483,6 +837,17 @@ $conn->close();
         </div>
     </div>
 </div>
+
+<style>
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+</style>
 
 <script>
 // Doctor schedules data for calendar
@@ -839,10 +1204,10 @@ function showErrorModal(message, title = 'Error') {
 
 approveBtns.forEach(btn => btn.addEventListener('click', function() {
     const row = btn.closest('tr');
-    const name = row.children[1].textContent.trim(); // Patient name is in column 1
-    const date = row.children[2].textContent.trim(); // Date is in column 2
-    const time = row.children[3].textContent.trim(); // Time is in column 3
-    const reason = row.children[4].textContent.trim(); // Reason is in column 4
+    const name = row.children[0].textContent.trim(); // Patient name is in column 0
+    const date = row.children[1].textContent.trim(); // Date is in column 1
+    const time = row.children[2].textContent.trim(); // Time is in column 2
+    const reason = row.children[3].textContent.trim(); // Reason is in column 3
     showConfirmModal('Are you sure you want to approve this appointment?', function() {
         fetch('', {
             method: 'POST',
@@ -852,7 +1217,7 @@ approveBtns.forEach(btn => btn.addEventListener('click', function() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                const statusCell = row.querySelector('td:nth-child(6) span'); // Status is in column 6
+                const statusCell = row.children[4].querySelector('span'); // Status is in column 4 (index 4)
                 statusCell.textContent = 'Approved';
                 statusCell.className = 'inline-block px-2 py-1 rounded bg-green-100 text-green-800 text-xs';
                 showSuccessModal('Appointment approved successfully!', 'Success');
@@ -865,10 +1230,10 @@ approveBtns.forEach(btn => btn.addEventListener('click', function() {
 
 declineBtns.forEach(btn => btn.addEventListener('click', function() {
     const row = btn.closest('tr');
-    const name = row.children[1].textContent.trim(); // Patient name is in column 1
-    const date = row.children[2].textContent.trim(); // Date is in column 2
-    const time = row.children[3].textContent.trim(); // Time is in column 3
-    const reason = row.children[4].textContent.trim(); // Reason is in column 4
+    const name = row.children[0].textContent.trim(); // Patient name is in column 0
+    const date = row.children[1].textContent.trim(); // Date is in column 1
+    const time = row.children[2].textContent.trim(); // Time is in column 2
+    const reason = row.children[3].textContent.trim(); // Reason is in column 3
     showConfirmModal('Are you sure you want to decline this appointment?', function() {
         fetch('', {
             method: 'POST',
@@ -878,7 +1243,7 @@ declineBtns.forEach(btn => btn.addEventListener('click', function() {
         .then(res => res.json())
         .then (data => {
             if (data.success) {
-                const statusCell = row.querySelector('td:nth-child(6) span'); // Status is in column 6
+                const statusCell = row.children[4].querySelector('span'); // Status is in column 4 (index 4)
                 statusCell.textContent = 'Declined';
                 statusCell.className = 'inline-block px-2 py-1 rounded bg-red-100 text-red-800 text-xs';
                 showSuccessModal('Appointment declined successfully!', 'Success');

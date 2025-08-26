@@ -241,13 +241,19 @@ switch ($reportType) {
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <?php foreach ($reportData as $row): ?>
+                                <?php
+                                $report_total_records = count($reportData);
+                                $report_records_per_page = 10;
+                                $report_page = isset($_GET['report_page']) ? max(1, intval($_GET['report_page'])) : 1;
+                                $report_total_pages = ceil($report_total_records / $report_records_per_page);
+                                $report_offset = ($report_page - 1) * $report_records_per_page;
+                                $report_page_data = array_slice(array_values($reportData), $report_offset, $report_records_per_page);
+                                foreach ($report_page_data as $row): ?>
                                     <tr class="hover:bg-gray-50">
                                         <?php 
                                         $values = array_values($row);
                                         foreach ($values as $index => $value): 
                                             $cellClass = "px-6 py-4 whitespace-nowrap text-sm text-gray-900";
-                                            
                                             // Special formatting for certain columns
                                             if ($reportType === 'appointments' && $index === 4) { // Status column
                                                 if ($value === 'approved') {
@@ -270,6 +276,74 @@ switch ($reportType) {
                             </tbody>
                         </table>
                     </div>
+                    <!-- Pagination and Records Info for System Reports Table -->
+                    <?php if ($report_total_records > 0): ?>
+                    <div class="flex justify-between items-center mt-6">
+                        <div class="text-sm text-gray-600">
+                            <?php 
+                            $report_start = $report_offset + 1;
+                            $report_end = min($report_offset + $report_records_per_page, $report_total_records);
+                            ?>
+                            Showing <?php echo $report_start; ?> to <?php echo $report_end; ?> of <?php echo $report_total_records; ?> entries
+                        </div>
+                        <?php if ($report_total_pages > 1): ?>
+                        <nav class="flex justify-end items-center -space-x-px" aria-label="Pagination">
+                            <?php if ($report_page > 1): ?>
+                                <a href="?<?php echo http_build_query(array_merge($_GET, ['report_page' => $report_page - 1])); ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                                    <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m15 18-6-6 6-6"></path>
+                                    </svg>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            <?php else: ?>
+                                <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                                    <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m15 18-6-6 6-6"></path>
+                                    </svg>
+                                    <span class="sr-only">Previous</span>
+                                </button>
+                            <?php endif; ?>
+                            <?php
+                            $report_start_page = max(1, $report_page - 2);
+                            $report_end_page = min($report_total_pages, $report_page + 2);
+                            if ($report_start_page > 1): ?>
+                                <a href="?<?php echo http_build_query(array_merge($_GET, ['report_page' => 1])); ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100">1</a>
+                                <?php if ($report_start_page > 2): ?>
+                                    <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                            <?php for ($i = $report_start_page; $i <= $report_end_page; $i++): ?>
+                                <?php if ($i == $report_page): ?>
+                                    <button type="button" class="min-h-9.5 min-w-9.5 flex justify-center items-center bg-gray-200 text-gray-800 border border-gray-200 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-300" aria-current="page"><?php echo $i; ?></button>
+                                <?php else: ?>
+                                    <a href="?<?php echo http_build_query(array_merge($_GET, ['report_page' => $i])); ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            <?php if ($report_end_page < $report_total_pages): ?>
+                                <?php if ($report_end_page < $report_total_pages - 1): ?>
+                                    <span class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 py-2 px-3 text-sm">...</span>
+                                <?php endif; ?>
+                                <a href="?<?php echo http_build_query(array_merge($_GET, ['report_page' => $report_total_pages])); ?>" class="min-h-9.5 min-w-9.5 flex justify-center items-center border border-gray-200 text-gray-800 hover:bg-gray-100 py-2 px-3 text-sm first:rounded-s-lg last:rounded-e-lg focus:outline-hidden focus:bg-gray-100"><?php echo $report_total_pages; ?></a>
+                            <?php endif; ?>
+                            <?php if ($report_page < $report_total_pages): ?>
+                                <a href="?<?php echo http_build_query(array_merge($_GET, ['report_page' => $report_page + 1])); ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                                    <span class="sr-only">Next</span>
+                                    <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m9 18 6-6-6-6"></path>
+                                    </svg>
+                                </a>
+                            <?php else: ?>
+                                <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                                    <span class="sr-only">Next</span>
+                                    <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m9 18 6-6-6-6"></path>
+                                    </svg>
+                                </button>
+                            <?php endif; ?>
+                        </nav>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
                 <?php else: ?>
                     <div class="text-center py-12">
                         <i class="ri-file-list-line text-6xl text-gray-300 mb-4"></i>
@@ -293,6 +367,17 @@ switch ($reportType) {
         </div>
     </div>
 </main>
+
+<style>
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+</style>
 
 <script>
 function printReport() {
