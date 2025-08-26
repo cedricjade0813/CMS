@@ -71,6 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
                 foreach ($patients as $patient) {
                     $stmt = $db->prepare('INSERT INTO messages (sender_id, sender_name, sender_role, recipient_id, recipient_name, subject, message) VALUES (?, ?, ?, ?, ?, ?, ?)');
                     $stmt->execute([$sender_id, $sender_name, $sender_role, $patient['id'], $patient['name'], $subject, $message_text]);
+                    // Also insert notification for each patient
+                    $notif_stmt = $db->prepare('INSERT INTO notifications (student_id, message, type, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
+                    $notif_message = "New message from staff: " . $subject;
+                    $notif_type = "message";
+                    $notif_stmt->execute([$patient['id'], $notif_message, $notif_type]);
                     $inserted++;
                 }
                 $success_message = "Message sent successfully to all " . $inserted . " patients";
@@ -84,6 +89,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
                 if ($recipient) {
                     $insert_stmt = $db->prepare('INSERT INTO messages (sender_id, sender_name, sender_role, recipient_id, recipient_name, subject, message) VALUES (?, ?, ?, ?, ?, ?, ?)');
                     $insert_stmt->execute([$sender_id, $sender_name, $sender_role, $recipient_id, $recipient['name'], $subject, $message_text]);
+                    // Also insert notification for the patient
+                    $notif_stmt = $db->prepare('INSERT INTO notifications (student_id, message, type, is_read, created_at) VALUES (?, ?, ?, 0, NOW())');
+                    $notif_message = "New message from staff: " . $subject;
+                    $notif_type = "message";
+                    $notif_stmt->execute([$recipient_id, $notif_message, $notif_type]);
                     $success_message = "Message sent successfully to " . $recipient['name'];
                 }
             }

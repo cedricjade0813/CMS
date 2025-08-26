@@ -65,6 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
         header('Content-Type: application/json');
         if ($success) {
+                // Log alert to parent_alerts table
+                $insertAlertStmt = $db->prepare("INSERT INTO parent_alerts (patient_id, patient_name, parent_email, visit_count, week_start_date, week_end_date, alert_sent_at, alert_status, email_content, sent_by) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'sent', ?, ?)");
+                $insertAlertStmt->execute([
+                    $patientId,
+                    $patientName,
+                    $parentEmail,
+                    $visitCount,
+                    $startOfWeek,
+                    $endOfWeek,
+                    $body,
+                    'staff'
+                ]);
             echo json_encode(['success' => true, 'message' => 'Message was sent successfully!']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to send message: ' . $errorMsg]);
@@ -286,16 +298,21 @@ try {
             }
         }
 
-        // Check for existing alerts
-        $alertStmt = $db->prepare("SELECT alert_sent_at, alert_status, id FROM parent_alerts WHERE patient_name = ? AND week_start_date = ? AND alert_status = 'sent'");
-        $alertStmt->execute([$visit['patient_name'], $startOfWeek]);
-        $alertInfo = $alertStmt->fetch(PDO::FETCH_ASSOC);
+            // Check for existing alerts and compare visit_count
+            $alertStmt = $db->prepare("SELECT alert_sent_at, alert_status, id, visit_count FROM parent_alerts WHERE patient_name = ? AND week_start_date = ? AND alert_status = 'sent' ORDER BY alert_sent_at DESC LIMIT 1");
+            $alertStmt->execute([$visit['patient_name'], $startOfWeek]);
+            $alertInfo = $alertStmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($alertInfo) {
-            $visit['last_alert_sent'] = $alertInfo['alert_sent_at'];
-            $visit['alert_status'] = $alertInfo['alert_status'];
-            $visit['alert_already_sent'] = true;
-        }
+            if ($alertInfo) {
+                $visit['last_alert_sent'] = $alertInfo['alert_sent_at'];
+                $visit['alert_status'] = $alertInfo['alert_status'];
+                // Only mark as sent if visit_count matches
+                if ((int)$alertInfo['visit_count'] === (int)$visit['visit_count']) {
+                    $visit['alert_already_sent'] = true;
+                } else {
+                    $visit['alert_already_sent'] = false;
+                }
+            }
     }
     unset($visit); // Break the reference
 
@@ -516,41 +533,6 @@ $alerts_paginated = array_slice($alerts, $visits_offset, $visits_per_page);
         <?php endif; ?>
     </div>
 
-    <!-- Alert History for This Week -->
-    <?php if (!empty($alertHistory)): ?>
-        <div class="bg-white rounded shadow p-6">
-            <h3 class="text-lg font-semibold mb-4">Alert History This Week</h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-600">Patient Name</th>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-600">Parent Email</th>
-                            <th class="px-4 py-2 text-center font-semibold text-gray-600">Visit Count</th>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-600">Sent At</th>
-                            <th class="px-4 py-2 text-center font-semibold text-gray-600">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($alertHistory as $history): ?>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($history['patient_name']); ?></td>
-                                <td class="px-4 py-2"><?php echo htmlspecialchars($history['parent_email']); ?></td>
-                                <td class="px-4 py-2 text-center"><?php echo (int)$history['visit_count']; ?></td>
-                                <td class="px-4 py-2"><?php echo date('M j, Y g:i A', strtotime($history['alert_sent_at'])); ?></td>
-                                <td class="px-4 py-2 text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                <?php echo $history['alert_status'] === 'sent' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                                        <?php echo ucfirst($history['alert_status']); ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    <?php endif; ?>
 </main>
 
 <!-- Visit Details Modal -->

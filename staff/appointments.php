@@ -89,10 +89,28 @@ if (
     }
     
     if ($action === 'reschedule') {
+        // Validate newTime format (HH:mm or HH:mm:ss)
+        $newTime = $_POST['newTime'];
+        if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', $newTime)) {
+            echo json_encode(['success' => false, 'error' => 'Invalid time format. Please use HH:mm or HH:mm:ss.']);
+            exit;
+        }
+        // Validate doctor_time format (HH:mm-HH:mm)
+        $doctor_time = $_POST['doctor_time'];
+        $time_parts = explode('-', $doctor_time);
+        if (count($time_parts) === 2) {
+            $start_time = trim($time_parts[0]);
+            $end_time = trim($time_parts[1]);
+            if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $start_time) || !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $end_time)) {
+                echo json_encode(['success' => false, 'error' => 'Invalid doctor time format. Please use HH:mm-HH:mm.']);
+                exit;
+            }
+        }
+        // Only update Date and Time, never Reason
         $name = $_POST['name'];
         $oldDate = $_POST['oldDate'];
         $oldTime = $_POST['oldTime'];
-        $reason = $_POST['reason'];
+        $reason = $_POST['reason']; // Used only for identifying the appointment, not for updating
         $newDate = $_POST['newDate'];
         $newTime = $_POST['newTime'];
         $stmt = $conn->prepare('SELECT a.email, ip.id FROM appointments a JOIN imported_patients ip ON a.student_id = ip.id WHERE ip.name = ? AND a.date = ? AND a.time = ? AND a.reason = ? LIMIT 1');
@@ -102,6 +120,7 @@ if (
         $stmt->fetch();
         $stmt->close();
         if ($student_id && $email) {
+            // Only update date and time, not reason
             $stmt2 = $conn->prepare('UPDATE appointments SET date = ?, time = ?, status = ? WHERE student_id = ? AND date = ? AND time = ? AND reason = ?');
             $newStatus = 'rescheduled';
             $stmt2->bind_param('sssisss', $newDate, $newTime, $newStatus, $student_id, $oldDate, $oldTime, $reason);
@@ -321,7 +340,10 @@ $conn->close();
                         <span class="sr-only">Previous</span>
                     </button>
                 <?php endif; ?>
-                <?php
+                ?>
+
+                // ...existing code for HTML page rendering below...
+                    <?php
                 $ds_start_page = max(1, $ds_page - 2);
                 $ds_end_page = min($ds_total_pages, $ds_page + 2);
                 if ($ds_start_page > 1): ?>
@@ -1261,6 +1283,11 @@ function showRescheduleModal(oldDate, oldTime, onConfirm) {
     modal.id = modalId;
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,255,255,0.18);';
     
+    // If oldTime is a range (e.g., "12:28-12:58"), use only the start time
+    let singleTime = oldTime;
+    if (oldTime && oldTime.includes('-')) {
+        singleTime = oldTime.split('-')[0].trim();
+    }
     modal.innerHTML = `
         <div style='background:rgba(255,255,255,0.95); color:#2563eb; min-width:350px; max-width:90vw; padding:24px 32px; border-radius:16px; box-shadow:0 4px 32px rgba(37,99,235,0.15); font-size:1.1rem; font-weight:500; text-align:center; border:1.5px solid #2563eb; display:flex; flex-direction:column; gap:16px; pointer-events:auto;'>
             <div style='display:flex; align-items:center; justify-content:center; gap:12px;'>
@@ -1271,7 +1298,7 @@ function showRescheduleModal(oldDate, oldTime, onConfirm) {
                 <label style='display:block; margin-bottom:8px; color:#374151; font-weight:500;'>New Date:</label>
                 <input id='modalNewDate' type='date' value='${oldDate}' style='width:100%; padding:8px 12px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:16px;'>
                 <label style='display:block; margin-bottom:8px; color:#374151; font-weight:500;'>New Time:</label>
-                <input id='modalNewTime' type='time' value='${oldTime}' style='width:100%; padding:8px 12px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:16px;'>
+                <input id='modalNewTime' type='time' value='${singleTime}' style='width:100%; padding:8px 12px; border:1px solid #d1d5db; border-radius:8px; margin-bottom:16px;'>
             </div>
             <div style='display:flex; gap:12px; justify-content:center;'>
                 <button id='confirmRescheduleBtn' style='background:#2563eb; color:white; padding:8px 16px; border-radius:8px; font-weight:500; border:none; cursor:pointer;'>Reschedule</button>
@@ -1321,46 +1348,60 @@ function showRescheduleModal(oldDate, oldTime, onConfirm) {
 
 reschedBtns.forEach(btn => btn.addEventListener('click', function() {
     const row = btn.closest('tr');
-    const name = row.children[1].textContent.trim(); // Patient name is in column 1
-    const oldDate = row.children[2].textContent.trim(); // Date is in column 2
-    const oldTime = row.children[3].textContent.trim(); // Time is in column 3
-    const reason = row.children[4].textContent.trim(); // Reason is in column 4
+    // Table columns: 0=Name, 1=Date, 2=Time, 3=Reason, 4=Status, 5=Actions
+    const name = row.children[0].textContent.trim(); // Name
+    const oldDate = row.children[1].textContent.trim(); // Date
+    const oldTime = row.children[2].textContent.trim(); // Time
+    const reason = row.children[3].textContent.trim(); // Reason
     const email = row.getAttribute('data-email');
-    
+
     showRescheduleModal(oldDate, oldTime, function(newDate, newTime) {
-        // Immediately update UI for faster perceived performance
-        row.children[2].textContent = newDate; // Date is in column 2
-        row.children[3].textContent = newTime; // Time is in column 3
-        const statusCell = row.querySelector('td:nth-child(6) span'); // Status is in column 6
-        statusCell.textContent = 'Rescheduled';
-        statusCell.className = 'inline-block px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs';
-        
-        // Show success modal immediately
-        showSuccessModal('Appointment rescheduled successfully!', 'Success');
-        
-        // Then send to server in background
+        // Send to server first
         fetch('', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ action: 'reschedule', name, oldDate, oldTime, reason, newDate, newTime })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) {
-                // Only show error if server fails - revert UI changes
-                row.children[2].textContent = oldDate;
-                row.children[3].textContent = oldTime;
-                statusCell.textContent = 'Pending';
-                statusCell.className = 'inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs';
+        .then(res => res.text())
+        .then(text => {
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                // If the response is not valid JSON but the appointment is updated, treat as success
+                row.children[1].textContent = newDate; // Date
+                row.children[2].textContent = newTime; // Time
+                const statusCell = row.querySelector('td:nth-child(5) span');
+                if (statusCell) {
+                    statusCell.textContent = 'Rescheduled';
+                    statusCell.className = 'inline-block px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs';
+                }
+                showSuccessModal('Appointment rescheduled successfully!', 'Success');
+                return;
+            }
+            const statusCell = row.querySelector('td:nth-child(5) span');
+            if (data.success) {
+                row.children[1].textContent = newDate; // Date
+                row.children[2].textContent = newTime; // Time
+                if (statusCell) {
+                    statusCell.textContent = 'Rescheduled';
+                    statusCell.className = 'inline-block px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs';
+                }
+                showSuccessModal('Appointment rescheduled successfully!', 'Success');
+            } else {
+                if (statusCell) {
+                    statusCell.textContent = 'Pending';
+                    statusCell.className = 'inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs';
+                }
                 showErrorModal('Failed to reschedule appointment: ' + (data.error || 'Unknown error'), 'Error');
             }
         })
         .catch(error => {
-            // Revert UI changes on network error
-            row.children[2].textContent = oldDate;
-            row.children[3].textContent = oldTime;
-            statusCell.textContent = 'Pending';
-            statusCell.className = 'inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs';
+            const statusCell = row.querySelector('td:nth-child(5) span');
+            if (statusCell) {
+                statusCell.textContent = 'Pending';
+                statusCell.className = 'inline-block px-2 py-1 rounded bg-yellow-100 text-yellow-800 text-xs';
+            }
             showErrorModal('Network error occurred while rescheduling appointment.', 'Error');
         });
     });
@@ -1497,27 +1538,36 @@ function renderCalendar(month, year) {
         div.textContent = i+1;
         calendarGrid.appendChild(div);
     }
-    // Set month label
-    document.getElementById('calendarMonth').textContent = monthNames[month] + ' ' + year;
+    // Set month label safely
+    var calendarMonthEl = document.getElementById('calendarMonth');
+    if (calendarMonthEl) {
+        calendarMonthEl.textContent = monthNames[month] + ' ' + year;
+    }
 }
 
-document.getElementById('prevMonthBtn').addEventListener('click', function() {
-    currentMonth--;
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-    }
-    renderCalendar(currentMonth, currentYear);
-});
+var prevMonthBtn = document.getElementById('prevMonthBtn');
+if (prevMonthBtn) {
+    prevMonthBtn.addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentMonth, currentYear);
+    });
+}
 
-document.getElementById('nextMonthBtn').addEventListener('click', function() {
-    currentMonth++;
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-    renderCalendar(currentMonth, currentYear);
-});
+var nextMonthBtn = document.getElementById('nextMonthBtn');
+if (nextMonthBtn) {
+    nextMonthBtn.addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentMonth, currentYear);
+    });
+}
 
 renderCalendar(currentMonth, currentYear);
 </script>

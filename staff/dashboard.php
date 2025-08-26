@@ -52,17 +52,124 @@ try {
     $lowStockMeds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 } catch (Exception $e) {}
 
-// Fetch frequent illnesses (top 5 diagnoses in prescriptions this week)
-$illnessLabels = [];
-$illnessCounts = [];
+// Build data for line chart of frequent reasons across time ranges (daily/weekly/monthly)
+$topReasons = [];
+$topReasonsDisplay = [];
+$dailyLabels = [];
+$weeklyLabels = [];
+$monthlyLabels = [];
+$dailySeries = [];
+$weeklySeries = [];
+$monthlySeries = [];
+
 try {
-    $startOfWeek = date('Y-m-d', strtotime('monday this week'));
-    $endOfWeek = date('Y-m-d', strtotime('sunday this week'));
-    $stmt = $db->prepare('SELECT diagnosis, COUNT(*) as cnt FROM prescriptions WHERE prescription_date BETWEEN ? AND ? GROUP BY diagnosis ORDER BY cnt DESC LIMIT 5');
-    $stmt->execute([$startOfWeek, $endOfWeek]);
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $illnessLabels[] = $row['diagnosis'];
-        $illnessCounts[] = (int)$row['cnt'];
+    // Top 5 reasons over last 12 months
+    $stmt = $db->prepare("SELECT norm_reason, COUNT(*) cnt FROM (
+        SELECT COALESCE(NULLIF(LOWER(TRIM(reason)), ''), 'unspecified') AS norm_reason
+        FROM prescriptions
+        WHERE prescription_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+    ) t GROUP BY norm_reason ORDER BY cnt DESC LIMIT 5");
+    $stmt->execute();
+    $topReasons = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    // Build display map (capitalize first letter, rest lowercase)
+    foreach ($topReasons as $r) {
+        $topReasonsDisplay[$r] = ucfirst($r);
+    }
+
+    // DAILY: last 7 days including today
+    $dailyMap = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $d = date('Y-m-d', strtotime("-{$i} day"));
+        $dailyLabels[] = $d;
+        $dailyMap[$d] = array_fill_keys($topReasons, 0);
+    }
+    if (!empty($topReasons)) {
+        $inReasons = implode(',', array_fill(0, count($topReasons), '?'));
+        $params = $topReasons;
+        $params[] = date('Y-m-d', strtotime('-6 day')) . ' 00:00:00';
+        $sql = "SELECT DATE(prescription_date) d, COALESCE(NULLIF(LOWER(TRIM(reason)), ''), 'unspecified') r, COUNT(*) c
+                FROM prescriptions
+                WHERE prescription_date >= ? AND COALESCE(NULLIF(TRIM(reason), ''), 'Unspecified') IN ($inReasons)
+                GROUP BY d, r";
+        // Reorder params: first date, then reasons
+        $params = array_merge([date('Y-m-d', strtotime('-6 day')) . ' 00:00:00'], $topReasons);
+        $st = $db->prepare($sql);
+        $st->execute($params);
+        while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+            $d = $row['d'];
+            if (isset($dailyMap[$d]) && isset($dailyMap[$d][$row['r']])) {
+                $dailyMap[$d][$row['r']] = (int)$row['c'];
+            }
+        }
+    }
+    foreach ($topReasons as $r) {
+        $dailySeries[$r] = array_map(function($d) use ($dailyMap, $r) { return $dailyMap[$d][$r] ?? 0; }, $dailyLabels);
+    }
+
+    // WEEKLY: last 8 weeks (ISO weeks starting Monday). Label by week start date
+    $weeklyMap = [];
+    for ($i = 7; $i >= 0; $i--) {
+        $monday = date('Y-m-d', strtotime("monday -{$i} week"));
+        $weeklyLabels[] = $monday; // "Week of YYYY-MM-DD"
+        $weeklyMap[$monday] = array_fill_keys($topReasons, 0);
+    }
+    if (!empty($topReasons)) {
+        $inReasons = implode(',', array_fill(0, count($topReasons), '?'));
+        $startMonday = $weeklyLabels[0];
+        $sql = "SELECT YEARWEEK(prescription_date, 1) yw, COALESCE(NULLIF(LOWER(TRIM(reason)), ''), 'unspecified') r, COUNT(*) c
+                FROM prescriptions
+                WHERE prescription_date >= ? AND COALESCE(NULLIF(TRIM(reason), ''), 'Unspecified') IN ($inReasons)
+                GROUP BY yw, r";
+        $params = array_merge([$startMonday . ' 00:00:00'], $topReasons);
+        $st = $db->prepare($sql);
+        $st->execute($params);
+        // Map YEARWEEK to Monday date
+        $ywToMonday = [];
+        foreach ($weeklyLabels as $monday) {
+            $ywToMonday[date('oW', strtotime($monday))] = $monday; // ISO week-year + week number
+        }
+        while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+            $key = $row['yw'];
+            // Convert MySQL YEARWEEK mode 1 to ISO year-week like oW
+            $weekYear = substr($key, 0, 4);
+            $weekNum = substr($key, 4);
+            $isoKey = sprintf('%s%02d', $weekYear, (int)$weekNum);
+            $monday = $ywToMonday[$isoKey] ?? null;
+            if ($monday && isset($weeklyMap[$monday]) && isset($weeklyMap[$monday][$row['r']])) {
+                $weeklyMap[$monday][$row['r']] = (int)$row['c'];
+            }
+        }
+    }
+    foreach ($topReasons as $r) {
+        $weeklySeries[$r] = array_map(function($d) use ($weeklyMap, $r) { return $weeklyMap[$d][$r] ?? 0; }, $weeklyLabels);
+    }
+
+    // MONTHLY: last 12 months, label YYYY-MM
+    $monthlyMap = [];
+    for ($i = 11; $i >= 0; $i--) {
+        $ym = date('Y-m', strtotime("first day of -{$i} month"));
+        $monthlyLabels[] = $ym;
+        $monthlyMap[$ym] = array_fill_keys($topReasons, 0);
+    }
+    if (!empty($topReasons)) {
+        $inReasons = implode(',', array_fill(0, count($topReasons), '?'));
+        $startMonth = $monthlyLabels[0] . '-01 00:00:00';
+        $sql = "SELECT DATE_FORMAT(prescription_date, '%Y-%m') ym, COALESCE(NULLIF(LOWER(TRIM(reason)), ''), 'unspecified') r, COUNT(*) c
+                FROM prescriptions
+                WHERE prescription_date >= ? AND COALESCE(NULLIF(TRIM(reason), ''), 'Unspecified') IN ($inReasons)
+                GROUP BY ym, r";
+        $params = array_merge([$startMonth], $topReasons);
+        $st = $db->prepare($sql);
+        $st->execute($params);
+        while ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+            $ym = $row['ym'];
+            if (isset($monthlyMap[$ym]) && isset($monthlyMap[$ym][$row['r']])) {
+                $monthlyMap[$ym][$row['r']] = (int)$row['c'];
+            }
+        }
+    }
+    foreach ($topReasons as $r) {
+        $monthlySeries[$r] = array_map(function($d) use ($monthlyMap, $r) { return $monthlyMap[$d][$r] ?? 0; }, $monthlyLabels);
     }
 } catch (Exception $e) {}
 ?>
@@ -201,47 +308,71 @@ try {
         </div>
         <!-- End Main Cards Layout -->
         
-        <!-- Bar Chart: Frequent Illnesses -->
+        <!-- Line Chart: Frequent Illness Reasons -->
         <div class="bg-white rounded shadow p-6 mb-8">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Frequent Illnesses</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Frequent Illness Reasons</h3>
+                <div class="inline-flex rounded border border-gray-200 overflow-hidden">
+                    <button id="rangeDaily" class="px-3 py-1.5 text-sm bg-gray-100">Daily</button>
+                    <button id="rangeWeekly" class="px-3 py-1.5 text-sm">Weekly</button>
+                    <button id="rangeMonthly" class="px-3 py-1.5 text-sm">Monthly</button>
+                </div>
             </div>
-            <div id="illnessBarChart" class="w-full h-[300px]"></div>
+            <div id="illnessLineChart" class="w-full h-[340px]"></div>
         </div>
 
 </main>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Bar Chart: Frequent Illnesses (live data)
-        const illnessBarChart = echarts.init(document.getElementById('illnessBarChart'));
-        const illnessBarOption = {
-            tooltip: { trigger: 'axis' },
-            grid: { left: '3%', right: '4%', bottom: '3%', top: '3%', containLabel: true },
-            xAxis: {
-                type: 'category',
-                data: <?= json_encode($illnessLabels) ?>,
-                axisLine: { lineStyle: { color: '#e5e7eb' } },
-                axisLabel: { color: '#6b7280' }
-            },
-            yAxis: {
-                type: 'value',
-                axisLine: { show: false },
-                axisLabel: { color: '#6b7280' },
-                splitLine: { lineStyle: { color: '#f3f4f6' } }
-            },
-            series: [{
-                name: 'Cases',
-                type: 'bar',
-                barWidth: '40%',
-                itemStyle: { color: 'rgba(87, 181, 231, 1)', borderRadius: [6, 6, 0, 0] },
-                data: <?= json_encode($illnessCounts) ?>
-            }]
+        // Line Chart: Frequent Illness Reasons with range toggle
+        const lineChart = echarts.init(document.getElementById('illnessLineChart'));
+        // Map normalized keys to display labels (First letter uppercase)
+        const topReasons = <?= json_encode($topReasons) ?>;
+        const reasonDisplay = <?= json_encode($topReasonsDisplay) ?>;
+        const datasets = {
+            daily: { labels: <?= json_encode($dailyLabels) ?>, series: <?= json_encode($dailySeries) ?> },
+            weekly: { labels: <?= json_encode($weeklyLabels) ?>, series: <?= json_encode($weeklySeries) ?> },
+            monthly: { labels: <?= json_encode($monthlyLabels) ?>, series: <?= json_encode($monthlySeries) ?> }
         };
-        illnessBarChart.setOption(illnessBarOption);
-        window.addEventListener('resize', function () {
-            illnessBarChart.resize();
-        });
+
+        function buildOption(rangeKey) {
+            const ds = datasets[rangeKey];
+            const palette = ['#4F46E5', '#60A5FA', '#10B981', '#F59E0B', '#EF4444'];
+            return {
+                tooltip: { trigger: 'axis' },
+                legend: { data: topReasons.map(k => reasonDisplay[k] || k), top: 0 },
+                grid: { left: '3%', right: '4%', bottom: '3%', top: 40, containLabel: true },
+                xAxis: { type: 'category', data: ds.labels, axisLine: { lineStyle: { color: '#e5e7eb' } }, axisLabel: { color: '#6b7280' } },
+                yAxis: { type: 'value', axisLine: { show: false }, axisLabel: { color: '#6b7280' }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
+                series: topReasons.map((r, idx) => ({
+                    name: reasonDisplay[r] || r,
+                    type: 'line',
+                    smooth: true,
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    lineStyle: { width: 3 },
+                    itemStyle: { color: palette[idx % palette.length] },
+                    data: (ds.series[r] || Array(ds.labels.length).fill(0))
+                }))
+            };
+        }
+
+        function setActive(rangeKey) {
+            document.getElementById('rangeDaily').classList.toggle('bg-gray-100', rangeKey === 'daily');
+            document.getElementById('rangeWeekly').classList.toggle('bg-gray-100', rangeKey === 'weekly');
+            document.getElementById('rangeMonthly').classList.toggle('bg-gray-100', rangeKey === 'monthly');
+        }
+
+        let currentRange = 'daily';
+        lineChart.setOption(buildOption(currentRange));
+        setActive(currentRange);
+
+        document.getElementById('rangeDaily').addEventListener('click', () => { currentRange = 'daily'; lineChart.setOption(buildOption(currentRange)); setActive(currentRange); });
+        document.getElementById('rangeWeekly').addEventListener('click', () => { currentRange = 'weekly'; lineChart.setOption(buildOption(currentRange)); setActive(currentRange); });
+        document.getElementById('rangeMonthly').addEventListener('click', () => { currentRange = 'monthly'; lineChart.setOption(buildOption(currentRange)); setActive(currentRange); });
+
+        window.addEventListener('resize', function () { lineChart.resize(); });
     });
 </script>
 

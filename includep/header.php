@@ -34,34 +34,22 @@ if (isset($_SESSION['student_row_id'])) { // expects 'student_row_id' to be set 
         $stmt->close();
     }
     
-    // Get unread message count for patient
+    // Get unread message and notification count for patient
     try {
         $db = new PDO('mysql:host=localhost;dbname=clinic_management_system;charset=utf8', 'root', '');
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        // Create messages table if not exists
-        $db->exec("CREATE TABLE IF NOT EXISTS messages (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            sender_id INT NOT NULL,
-            sender_name VARCHAR(255) NOT NULL,
-            sender_role VARCHAR(50) NOT NULL,
-            recipient_id INT NOT NULL,
-            recipient_name VARCHAR(255) NOT NULL,
-            subject VARCHAR(255) NOT NULL,
-            message TEXT NOT NULL,
-            is_read BOOLEAN DEFAULT FALSE,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_recipient (recipient_id),
-            INDEX idx_sender (sender_id),
-            INDEX idx_created_at (created_at)
-        )");
-        
+        // Unread messages
         $unread_stmt = $db->prepare('SELECT COUNT(*) FROM messages WHERE recipient_id = ? AND is_read = FALSE');
         $unread_stmt->execute([$row_id]);
         $unread_messages = $unread_stmt->fetchColumn();
+        // Unread notifications
+        $unread_notif_stmt = $db->prepare('SELECT COUNT(*) FROM notifications WHERE student_id = ? AND is_read = 0');
+        $unread_notifs = 0;
+        $unread_notif_stmt->execute([$row_id]);
+        $unread_notifs = $unread_notif_stmt->fetchColumn();
     } catch (PDOException $e) {
-        // Ignore database errors for unread count
         $unread_messages = 0;
+        $unread_notifs = 0;
     }
     
     // Only close if we created the connection here
@@ -297,9 +285,8 @@ if (!empty($userName)) {
                         <button class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary">
                             <i class="ri-notification-3-line ri-xl"></i>
                         </button>
-                        <?php if ($unread_messages > 0): ?>
-                            <span
-                                class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full"><?php echo $unread_messages; ?></span>
+                        <?php if ($unread_notifs > 0): ?>
+                            <span class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center rounded-full"><?php echo $unread_notifs > 9 ? '9+' : $unread_notifs; ?></span>
                         <?php endif; ?>
                     </div>
 
@@ -411,8 +398,11 @@ if (!empty($userName)) {
                             <a href="notifications.php"
                                 class="flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-primary hover:bg-opacity-10 hover:text-primary"
                                 data-page="notifications.php">
-                                <div class="w-8 h-8 flex items-center justify-center mr-3 md:mr-4">
+                                <div class="w-8 h-8 flex items-center justify-center mr-3 md:mr-4 relative">
                                     <i class="ri-notification-line ri-lg"></i>
+                                    <?php if ($unread_notifs > 0): ?>
+                                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs flex items-center justify-center rounded-full"><?php echo $unread_notifs > 9 ? '9+' : $unread_notifs; ?></span>
+                                    <?php endif; ?>
                                 </div>
                                 <span class="hidden md:inline">Notification</span>
                             </a>

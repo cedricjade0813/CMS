@@ -494,9 +494,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <label for="forgot_email" class="block text-sm font-medium text-gray-700 mb-2">Enter your email address</label>
           <input type="email" id="forgot_email" name="forgot_email" required class="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" placeholder="you@email.com">
           <div id="forgotEmailError" class="text-xs text-red-600 mt-1 hidden"></div>
+          <div id="forgotSuccessMsg" class="text-xs text-green-600 mt-2 hidden"></div>
         </div>
-        <button type="submit" class="w-full bg-primary text-white py-2 !rounded-button font-medium hover:bg-opacity-90 transition-colors">Send Reset Link</button>
-        <div id="forgotSuccessMsg" class="text-xs text-green-600 mt-2 hidden"></div>
+        <div class="pt-4">
+          <div class="flex gap-3">
+            <button type="button" id="cancelForgotPassword" class="flex-1 bg-gray-200 text-gray-800 py-2 !rounded-button font-medium hover:bg-gray-300 transition-colors text-center">Cancel</button>
+            <button type="submit" class="flex-1 bg-primary text-white py-2 !rounded-button font-medium hover:bg-opacity-90 transition-colors">Send Reset Link</button>
+          </div>
+        </div>
       </form>
     </div>
   </div>
@@ -535,13 +540,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         forgotPasswordLink.addEventListener('click', function (e) {
           e.preventDefault();
           forgotPasswordModal.classList.remove('hidden');
+          loginModal.classList.add('hidden');
           document.body.style.overflow = 'hidden';
         });
       }
       if (closeForgotPasswordModal && forgotPasswordModal) {
         closeForgotPasswordModal.addEventListener('click', function () {
           forgotPasswordModal.classList.add('hidden');
-          document.body.style.overflow = '';
+          loginModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
         });
         forgotPasswordModal.addEventListener('click', function (e) {
           if (e.target === forgotPasswordModal) {
@@ -551,6 +558,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
       }
       if (forgotPasswordForm) {
+      const cancelForgotPassword = document.getElementById('cancelForgotPassword');
+      if (cancelForgotPassword) {
+        cancelForgotPassword.addEventListener('click', function () {
+          forgotPasswordModal.classList.add('hidden');
+          loginModal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        });
+      }
         forgotPasswordForm.addEventListener('submit', async function (e) {
           e.preventDefault();
           forgotEmailError.classList.add('hidden');
@@ -578,17 +593,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           if (data.success) {
             forgotSuccessMsg.textContent = 'A password reset link has been sent to your email.';
             forgotSuccessMsg.classList.remove('hidden');
-            // If reset_link is present (local/dev), show it for testing
-            if (data.reset_link) {
-              forgotSuccessMsg.innerHTML += '<br><span class="text-xs text-gray-500">(For testing: <a href="' + data.reset_link + '" target="_blank" class="underline text-primary">Open reset link</a>)</span>';
-            }
           } else {
             forgotEmailError.textContent = data.message || 'No account found with that email.';
             forgotEmailError.classList.remove('hidden');
-            // If reset_link is present (local/dev), show it for testing
-            if (data.reset_link) {
-              forgotEmailError.innerHTML += '<br><span class="text-xs text-gray-500">(For testing: <a href="' + data.reset_link + '" target="_blank" class="underline text-primary">Open reset link</a>)</span>';
-            }
           }
         });
       }

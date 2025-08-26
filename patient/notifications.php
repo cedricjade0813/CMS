@@ -1,4 +1,17 @@
 <?php
+// Mark notification as read if requested
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_read'], $_POST['id'])) {
+    $conn = new mysqli('localhost', 'root', '', 'clinic_management_system');
+    if (!$conn->connect_errno) {
+        $stmt = $conn->prepare('UPDATE notifications SET is_read = 1 WHERE id = ?');
+        $stmt->bind_param('i', $_POST['id']);
+        $stmt->execute();
+        $stmt->close();
+    }
+    $conn->close();
+    exit;
+}
+
 include '../includep/header.php';
 $student_id = $_SESSION['student_row_id'];
 $conn = new mysqli('localhost', 'root', '', 'clinic_management_system');
@@ -22,9 +35,25 @@ $conn->close();
         <h3 class="text-lg font-semibold mb-4">Notification Feed</h3>
         <ul class="divide-y divide-gray-200">
             <?php foreach ($notifications as $notif): ?>
+            <?php
+                $is_appointment = preg_match('/appointment|approved|declined|cancelled|canceled|rescheduled/i', $notif['message']);
+                $is_message = preg_match('/message|agenda/i', $notif['message']);
+                $redirect_url = '';
+                if ($is_appointment) {
+                    $redirect_url = 'appointments.php';
+                } elseif ($is_message) {
+                    $redirect_url = 'inbox.php';
+                }
+            ?>
             <li class="flex items-start gap-4 py-4<?= $notif['is_read'] ? ' opacity-50' : '' ?>">
                 <div class="flex-1">
-                    <div class="text-gray-800"><?= $notif['message'] ?></div>
+                    <?php if ($redirect_url): ?>
+                        <a href="<?= $redirect_url ?>?notif_id=<?= $notif['id'] ?>" class="block text-gray-800 hover:text-primary transition underline" onclick="markNotificationRead(<?= $notif['id'] ?>)">
+                            <?= $notif['message'] ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="text-gray-800"><?= $notif['message'] ?></span>
+                    <?php endif; ?>
                     <div class="text-xs text-gray-400 mt-1"><?= htmlspecialchars($notif['created_at']) ?></div>
                 </div>
             </li>
@@ -33,6 +62,15 @@ $conn->close();
             <li class="py-4 text-gray-500">No notifications found.</li>
             <?php endif; ?>
         </ul>
+        <script>
+        function markNotificationRead(id) {
+            fetch('notifications.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'mark_read=1&id=' + encodeURIComponent(id)
+            });
+        }
+    </script>
     </div>
 </main>
 

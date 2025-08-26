@@ -85,6 +85,7 @@ try {
 } catch (PDOException $e) {
     die('Database connection failed: ' . $e->getMessage());
 } catch (Exception $e) { /* Ignore if columns already exist */ }// Fetch medicines from DB for dropdown
+
 $medicines = [];
 try {
     $medStmt = $db->query('SELECT name, quantity FROM medicines ORDER BY name ASC');
@@ -92,6 +93,43 @@ try {
 } catch (Exception $e) {
     $medicines = [];
 }
+
+// Dynamic suggestions for prescribe modal fields
+function getDistinctValues($db, $table, $column) {
+    try {
+        $stmt = $db->query("SELECT DISTINCT $column FROM $table WHERE $column IS NOT NULL AND $column != '' LIMIT 50");
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+$reasonSuggestions = getDistinctValues($db, 'prescriptions', 'reason');
+$dosageSuggestions = [];
+$qtySuggestions = [];
+$frequencySuggestions = [];
+$instructionsSuggestions = [];
+
+// Parse medicines field for dosage, qty, frequency, instructions
+try {
+    $medRows = $db->query('SELECT medicines FROM prescriptions WHERE medicines IS NOT NULL AND medicines != "" LIMIT 100')->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($medRows as $row) {
+        $meds = json_decode($row, true);
+        if (is_array($meds)) {
+            foreach ($meds as $med) {
+                if (!empty($med['dosage'])) $dosageSuggestions[] = $med['dosage'];
+                if (!empty($med['quantity'])) $qtySuggestions[] = $med['quantity'];
+                if (!empty($med['frequency'])) $frequencySuggestions[] = $med['frequency'];
+                if (!empty($med['instructions'])) $instructionsSuggestions[] = $med['instructions'];
+            }
+        }
+    }
+} catch (Exception $e) {}
+
+$dosageSuggestions = array_unique(array_filter($dosageSuggestions));
+$qtySuggestions = array_unique(array_filter($qtySuggestions));
+$frequencySuggestions = array_unique(array_filter($frequencySuggestions));
+$instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
 ?>
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -414,21 +452,45 @@ try {
                         <div class="flex gap-2 mb-2">
                             <div class="flex-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
-                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 500mg" />
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 500mg" list="dosageSuggestions" />
+                                <datalist id="dosageSuggestions" style="max-height:120px;overflow-y:auto;">
+                                    <?php $limitedDosage = array_slice($dosageSuggestions, 0, 5); ?>
+                                    <?php foreach ($limitedDosage as $dosage): ?>
+                                        <option value="<?php echo htmlspecialchars($dosage); ?>" />
+                                    <?php endforeach; ?>
+                                </datalist>
                             </div>
                             <div class="flex-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm qtyInput" min="1" />
+                                <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm qtyInput" min="1" list="qtySuggestions" />
+                                <datalist id="qtySuggestions" style="max-height:120px;overflow-y:auto;">
+                                    <?php $limitedQty = array_slice($qtySuggestions, 0, 5); ?>
+                                    <?php foreach ($limitedQty as $qty): ?>
+                                        <option value="<?php echo htmlspecialchars($qty); ?>" />
+                                    <?php endforeach; ?>
+                                </datalist>
                                 <span class="text-xs text-gray-500 stockMsg"></span>
                             </div>
                         </div>
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
-                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 3x a day" />
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 3x a day" list="frequencySuggestions" />
+                            <datalist id="frequencySuggestions" style="max-height:120px;overflow-y:auto;">
+                                <?php $limitedFreq = array_slice($frequencySuggestions, 0, 5); ?>
+                                <?php foreach ($limitedFreq as $freq): ?>
+                                    <option value="<?php echo htmlspecialchars($freq); ?>" />
+                                <?php endforeach; ?>
+                            </datalist>
                         </div>
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
-                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. After meals" />
+                            <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. After meals" list="instructionsSuggestions" />
+                            <datalist id="instructionsSuggestions" style="max-height:120px;overflow-y:auto;">
+                                <?php $limitedInst = array_slice($instructionsSuggestions, 0, 5); ?>
+                                <?php foreach ($limitedInst as $inst): ?>
+                                    <option value="<?php echo htmlspecialchars($inst); ?>" />
+                                <?php endforeach; ?>
+                            </datalist>
                         </div>
                         <button type="button" class="removeMedBtn text-xs text-red-500 hover:underline mt-1">Remove</button>
                     </div>
@@ -436,7 +498,13 @@ try {
                 <button type="button" id="addMedRowBtn" class="mb-4 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">+ Add Another Medicine</button>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Reason for Prescription *</label>
-                    <input type="text" name="reason" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. Fever, Headache, Cough, etc." required />
+                    <input type="text" name="reason" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. Fever, Headache, Cough, etc." required list="reasonSuggestions" />
+                    <datalist id="reasonSuggestions" style="max-height:120px;overflow-y:auto;">
+                        <?php $limitedReason = array_slice($reasonSuggestions, 0, 5); ?>
+                        <?php foreach ($limitedReason as $reason): ?>
+                            <option value="<?php echo htmlspecialchars($reason); ?>" />
+                        <?php endforeach; ?>
+                    </datalist>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
@@ -444,11 +512,27 @@ try {
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Patient Email Address</label>
-                    <input type="email" name="patient_email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter patient's email address" required />
+                    <input type="email" name="patient_email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter patient's email address" required list="patientEmailSuggestions" />
+                    <datalist id="patientEmailSuggestions" style="max-height:120px;overflow-y:auto;">
+                        <?php 
+                        $allPatientEmails = getDistinctValues($db, 'imported_patients', 'email');
+                        $limitedPatientEmails = array_slice($allPatientEmails, 0, 5);
+                        foreach ($limitedPatientEmails as $email): ?>
+                            <option value="<?php echo htmlspecialchars($email); ?>" />
+                        <?php endforeach; ?>
+                    </datalist>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Parent's Email Address</label>
-                    <input type="email" name="parent_email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter parent's email address" required />
+                    <input type="email" name="parent_email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter parent's email address" required list="parentEmailSuggestions" />
+                    <datalist id="parentEmailSuggestions" style="max-height:120px;overflow-y:auto;">
+                        <?php 
+                        $allParentEmails = getDistinctValues($db, 'imported_patients', 'parent_email');
+                        $limitedParentEmails = array_slice($allParentEmails, 0, 5);
+                        foreach ($limitedParentEmails as $email): ?>
+                            <option value="<?php echo htmlspecialchars($email); ?>" />
+                        <?php endforeach; ?>
+                    </datalist>
                 </div>
                 <div class="flex justify-center">
                     <button type="submit" class="py-2 px-3 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-primary text-white hover:bg-primary/90 focus:outline-hidden focus:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none min-w-[200px]">Submit Prescription</button>
@@ -880,21 +964,41 @@ $(document).ready(function() {
                             <div class="flex gap-2 mb-2">
                                 <div class="flex-1">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Dosage</label>
-                                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 500mg" />
+                                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 500mg" list="dosageSuggestions" />
+                                    <datalist id="dosageSuggestions">
+                                        <?php foreach ($dosageSuggestions as $dosage): ?>
+                                            <option value="<?php echo htmlspecialchars($dosage); ?>" />
+                                        <?php endforeach; ?>
+                                    </datalist>
                                 </div>
                                 <div class="flex-1">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                    <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm qtyInput" min="1" />
+                                    <input type="number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm qtyInput" min="1" list="qtySuggestions" />
+                                    <datalist id="qtySuggestions">
+                                        <?php foreach ($qtySuggestions as $qty): ?>
+                                            <option value="<?php echo htmlspecialchars($qty); ?>" />
+                                        <?php endforeach; ?>
+                                    </datalist>
                                     <span class="text-xs text-gray-500 stockMsg"></span>
                                 </div>
                             </div>
                             <div class="mb-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
-                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 3x a day" />
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. 3x a day" list="frequencySuggestions" />
+                                <datalist id="frequencySuggestions">
+                                    <?php foreach ($frequencySuggestions as $freq): ?>
+                                        <option value="<?php echo htmlspecialchars($freq); ?>" />
+                                    <?php endforeach; ?>
+                                </datalist>
                             </div>
                             <div class="mb-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Instructions</label>
-                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. After meals" />
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="e.g. After meals" list="instructionsSuggestions" />
+                                <datalist id="instructionsSuggestions">
+                                    <?php foreach ($instructionsSuggestions as $inst): ?>
+                                        <option value="<?php echo htmlspecialchars($inst); ?>" />
+                                    <?php endforeach; ?>
+                                </datalist>
                             </div>
                             <button type="button" class="removeMedBtn text-xs text-red-500 hover:underline mt-1">Remove</button>
                         </div>`;
