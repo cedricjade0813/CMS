@@ -287,3 +287,33 @@
 2025-08-28 06:55:16 | PASSWORD_RESET TABLE CHECKED
 2025-08-28 06:55:16 | PASSWORD_RESET INSERTED
 2025-08-28 06:55:24 | MAIL SENT (PHPMailer)
+2025-08-31 16:18:54 | DB CONNECT SUCCESS
+2025-08-31 16:18:54 | QUERY EXECUTED for email: marielegabutero@gmail.com
+2025-08-31 16:18:54 | ERROR: No account found with that email: marielegabutero@gmail.com
+2025-08-31 16:19:03 | DB CONNECT SUCCESS
+2025-08-31 16:19:03 | QUERY EXECUTED for email: marielegabutero@gmail.com
+2025-08-31 16:19:03 | ERROR: No account found with that email: marielegabutero@gmail.com
+2025-08-31 16:19:21 | DB CONNECT SUCCESS
+2025-08-31 16:19:21 | QUERY EXECUTED for email: marielegabutero@gmail.com
+2025-08-31 16:19:21 | ERROR: No account found with that email: marielegabutero@gmail.com
+2025-08-31 16:19:21 | DB CONNECT SUCCESS
+2025-08-31 16:19:21 | QUERY EXECUTED for email: marielegabutero@gmail.com
+2025-08-31 16:19:21 | ERROR: No account found with that email: marielegabutero@gmail.com
+2025-08-31 16:19:22 | DB CONNECT SUCCESS
+2025-08-31 16:19:22 | QUERY EXECUTED for email: marielegabutero@gmail.com
+2025-08-31 16:19:22 | ERROR: No account found with that email: marielegabutero@gmail.com
+2025-08-31 16:19:28 | DB CONNECT SUCCESS
+2025-08-31 16:19:28 | QUERY EXECUTED for email: marielegabutero@gmail.com
+2025-08-31 16:19:28 | ERROR: No account found with that email: marielegabutero@gmail.com
+2025-08-31 16:19:58 | DB CONNECT SUCCESS
+2025-08-31 16:19:58 | QUERY EXECUTED for email: cedricjade13@gmail.com
+2025-08-31 16:19:58 | USER FOUND: {"id":11,"username":"staff"}
+2025-08-31 16:19:58 | PASSWORD_RESET TABLE CHECKED
+2025-08-31 16:19:58 | PASSWORD_RESET INSERTED
+2025-08-31 16:20:03 | MAIL SENT (PHPMailer)
+2025-08-31 16:21:10 | DB CONNECT SUCCESS
+2025-08-31 16:21:10 | QUERY EXECUTED for email: cedricjade13@gmail.com
+2025-08-31 16:21:10 | USER FOUND: {"id":11,"username":"staff"}
+2025-08-31 16:21:10 | PASSWORD_RESET TABLE CHECKED
+2025-08-31 16:21:10 | PASSWORD_RESET INSERTED
+2025-08-31 16:21:15 | MAIL SENT (PHPMailer)

@@ -311,14 +311,19 @@ try {
         <!-- Line Chart: Frequent Illness Reasons -->
         <div class="bg-white rounded shadow p-6 mb-8">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">Frequent Illness Reasons</h3>
+                <h3 class="text-lg font-semibold text-gray-800">Frequent Illness</h3>
                 <div class="inline-flex rounded border border-gray-200 overflow-hidden">
                     <button id="rangeDaily" class="px-3 py-1.5 text-sm bg-gray-100">Daily</button>
                     <button id="rangeWeekly" class="px-3 py-1.5 text-sm">Weekly</button>
                     <button id="rangeMonthly" class="px-3 py-1.5 text-sm">Monthly</button>
                 </div>
+                <div class="ml-4">
+                    <button id="printCurrentChart" class="px-3 py-1.5 text-sm bg-green-100 text-green-800 rounded">Print Current</button>
+                    <button id="printAllCharts" class="px-3 py-1.5 text-sm bg-blue-100 text-blue-800 rounded ml-2">Print All</button>
+                </div>
             </div>
             <div id="illnessLineChart" class="w-full h-[340px]"></div>
+            <div id="printChartsArea" style="display:none;"></div>
         </div>
 
 </main>
@@ -336,26 +341,58 @@ try {
             monthly: { labels: <?= json_encode($monthlyLabels) ?>, series: <?= json_encode($monthlySeries) ?> }
         };
 
-        function buildOption(rangeKey) {
+    function buildOption(rangeKey, withDots = true) {
             const ds = datasets[rangeKey];
             const palette = ['#4F46E5', '#60A5FA', '#10B981', '#F59E0B', '#EF4444'];
-            return {
-                tooltip: { trigger: 'axis' },
-                legend: { data: topReasons.map(k => reasonDisplay[k] || k), top: 0 },
-                grid: { left: '3%', right: '4%', bottom: '3%', top: 40, containLabel: true },
-                xAxis: { type: 'category', data: ds.labels, axisLine: { lineStyle: { color: '#e5e7eb' } }, axisLabel: { color: '#6b7280' } },
-                yAxis: { type: 'value', axisLine: { show: false }, axisLabel: { color: '#6b7280' }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-                series: topReasons.map((r, idx) => ({
-                    name: reasonDisplay[r] || r,
-                    type: 'line',
-                    smooth: true,
-                    symbol: 'circle',
-                    symbolSize: 6,
-                    lineStyle: { width: 3 },
-                    itemStyle: { color: palette[idx % palette.length] },
-                    data: (ds.series[r] || Array(ds.labels.length).fill(0))
-                }))
-            };
+                return {
+                    tooltip: { trigger: 'axis' },
+                    legend: {
+                        data: topReasons.map(k => reasonDisplay[k] || k),
+                        top: 10,
+                        right: 10,
+                        orient: 'horizontal',
+                        textStyle: { color: '#373d3f', fontWeight: 'bold', fontSize: 14 }
+                    },
+                    grid: { left: '3%', right: '4%', bottom: '3%', top: 60, containLabel: true, borderColor: '#D9DBF3' },
+                    xAxis: {
+                        type: 'category',
+                        data: ds.labels,
+                        axisLine: { lineStyle: { color: '#e5e7eb' } },
+                        axisLabel: { color: '#6b7280' },
+                        splitLine: { show: true, lineStyle: { color: '#D9DBF3' } },
+                        tooltip: { show: false }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: { show: false },
+                        axisLabel: { color: '#6b7280' },
+                        splitLine: { lineStyle: { color: '#f3f4f6' } }
+                    },
+                    series: topReasons.map((r, idx) => ({
+                        name: reasonDisplay[r] || r,
+                        type: 'line',
+                        smooth: true,
+                        symbol: withDots ? 'circle' : 'none',
+                        symbolSize: 6,
+                        lineStyle: { width: 2 },
+                        itemStyle: { color: palette[idx % palette.length] },
+                        data: (ds.series[r] || Array(ds.labels.length).fill(0)),
+                        emphasis: {
+                            focus: 'series',
+                            itemStyle: {
+                                borderWidth: 0,
+                                shadowBlur: 8,
+                                shadowColor: palette[idx % palette.length],
+                                symbolSize: 9
+                            }
+                        },
+                        animationDuration: 600,
+                        animationEasing: 'cubicOut',
+                        animationDelay: function (idx) { return 0; },
+                        animationDurationUpdate: 600,
+                        animationEasingUpdate: 'cubicOut'
+                    }))
+                };
         }
 
         function setActive(rangeKey) {
@@ -365,16 +402,233 @@ try {
         }
 
         let currentRange = 'daily';
-        lineChart.setOption(buildOption(currentRange));
+        // Step 1: Draw line only
+        lineChart.setOption(buildOption(currentRange, false));
         setActive(currentRange);
+        // Step 2: Show dots after line animation
+        setTimeout(() => {
+            lineChart.setOption(buildOption(currentRange, true));
+        }, 600);
 
-        document.getElementById('rangeDaily').addEventListener('click', () => { currentRange = 'daily'; lineChart.setOption(buildOption(currentRange)); setActive(currentRange); });
-        document.getElementById('rangeWeekly').addEventListener('click', () => { currentRange = 'weekly'; lineChart.setOption(buildOption(currentRange)); setActive(currentRange); });
-        document.getElementById('rangeMonthly').addEventListener('click', () => { currentRange = 'monthly'; lineChart.setOption(buildOption(currentRange)); setActive(currentRange); });
+        function changeRange(nextRange) {
+            if (currentRange === nextRange) return;
+            // Step 1: Draw line only
+            lineChart.setOption(buildOption(nextRange, false));
+            setActive(nextRange);
+            currentRange = nextRange;
+            // Step 2: Show dots after line animation
+            setTimeout(() => {
+                lineChart.setOption(buildOption(nextRange, true));
+            }, 600);
+        }
+
+        document.getElementById('rangeDaily').addEventListener('click', () => changeRange('daily'));
+        document.getElementById('rangeWeekly').addEventListener('click', () => changeRange('weekly'));
+        document.getElementById('rangeMonthly').addEventListener('click', () => changeRange('monthly'));
+
+        // Print logic
+        document.getElementById('printCurrentChart').addEventListener('click', function() {
+            // Convert current chart to image using a visible temp container
+            const printArea = document.getElementById('printChartsArea');
+            // Add a class to print area for landscape print
+            printArea.classList.add('print-landscape');
+            printArea.innerHTML = '';
+            // Create a visible but hidden temp container
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'fixed';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '0';
+            tempDiv.style.width = '800px';
+            tempDiv.style.height = '340px';
+            document.body.appendChild(tempDiv);
+            const tempChart = echarts.init(tempDiv);
+            tempChart.setOption(buildOption(currentRange, true));
+            setTimeout(() => {
+                printArea.innerHTML = '';
+                // Create a wrapper for centering and title
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.flexDirection = 'column';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.justifyContent = 'center';
+                wrapper.style.height = '100vh';
+                wrapper.style.width = '100vw';
+                // Add title above chart
+                const title = document.createElement('h3');
+                title.textContent = currentRange.charAt(0).toUpperCase() + currentRange.slice(1) + ' Chart';
+                title.style.fontSize = '22px';
+                title.style.fontWeight = 'bold';
+                title.style.marginBottom = '18px';
+                title.style.textAlign = 'center';
+                wrapper.appendChild(title);
+                // Chart image
+                const img = document.createElement('img');
+                img.src = tempChart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
+                img.style.width = '700px';
+                img.style.height = '400px';
+                img.style.maxWidth = '90vw';
+                img.style.maxHeight = '60vh';
+                img.style.margin = '0 auto';
+                img.style.display = 'block';
+                wrapper.appendChild(img);
+                printArea.style.display = 'flex';
+                printArea.style.alignItems = 'center';
+                printArea.style.justifyContent = 'center';
+                printArea.style.height = '100vh';
+                printArea.style.width = '100vw';
+                printArea.appendChild(wrapper);
+                setTimeout(() => {
+                    tempChart.dispose();
+                    document.body.removeChild(tempDiv);
+                    window.print();
+                    setTimeout(() => { printArea.style.display = 'none'; printArea.innerHTML = ''; printArea.classList.remove('print-landscape'); }, 1000);
+                }, 500);
+            }, 1000);
+        });
+
+        document.getElementById('printAllCharts').addEventListener('click', function() {
+            // Render all charts as images in hidden area using visible temp containers
+            const printArea = document.getElementById('printChartsArea');
+            printArea.innerHTML = '';
+            let chartsToPrint = ['daily','weekly','monthly'];
+            let loaded = 0;
+            // Always use 1 chart per page
+            document.body.removeAttribute('data-print-layout');
+            chartsToPrint.forEach(function(range) {
+                const chartDiv = document.createElement('div');
+                chartDiv.className = 'chart-print-block';
+                chartDiv.style.width = '100%';
+                chartDiv.style.height = '340px';
+                chartDiv.style.marginBottom = '30px';
+                // Add title as a separate block for better spacing
+                const title = document.createElement('h3');
+                title.textContent = range.charAt(0).toUpperCase() + range.slice(1) + ' Chart';
+                title.style.fontSize = '18px';
+                title.style.fontWeight = 'bold';
+                title.style.marginBottom = '10px';
+                title.style.textAlign = 'center';
+                chartDiv.appendChild(title);
+                printArea.appendChild(chartDiv);
+                // Create a visible but hidden temp container
+                const tempDiv = document.createElement('div');
+                tempDiv.style.position = 'fixed';
+                tempDiv.style.left = '-9999px';
+                tempDiv.style.top = '0';
+                tempDiv.style.width = '800px';
+                tempDiv.style.height = '340px';
+                document.body.appendChild(tempDiv);
+                const tempChart = echarts.init(tempDiv);
+                tempChart.setOption(buildOption(range, true));
+                setTimeout(() => {
+                    const img = document.createElement('img');
+                    img.src = tempChart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#fff' });
+                    img.style.width = '100%';
+                    img.style.height = '340px';
+                    chartDiv.appendChild(img);
+                    setTimeout(() => {
+                        tempChart.dispose();
+                        document.body.removeChild(tempDiv);
+                        loaded++;
+                        if (loaded === chartsToPrint.length) {
+                            printArea.style.display = 'block';
+                            window.print();
+                            setTimeout(() => {
+                                printArea.style.display = 'none';
+                                printArea.innerHTML = '';
+                                document.body.removeAttribute('data-print-layout');
+                            }, 1000);
+                        }
+                    }, 500);
+                }, 1000);
+            });
+        });
 
         window.addEventListener('resize', function () { lineChart.resize(); });
     });
-</script>
+    </script>
+    <style>
+    @media print {
+        /* Force landscape orientation for Print Current only */
+        #printChartsArea.print-landscape {
+            width: 100vw !important;
+            height: 100vh !important;
+        }
+        #printChartsArea.print-landscape > div {
+            width: 100vw !important;
+            height: 100vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        #printChartsArea.print-landscape h3 {
+            font-size: 22px !important;
+            font-weight: bold !important;
+            margin-bottom: 18px !important;
+            text-align: center !important;
+        }
+        #printChartsArea.print-landscape img {
+            width: 700px !important;
+            height: 400px !important;
+            max-width: 90vw !important;
+            max-height: 60vh !important;
+            margin: 0 auto !important;
+            display: block !important;
+        }
+        @page print-landscape {
+            size: landscape;
+            margin: 0;
+        }
+        #printChartsArea.print-landscape {
+            page: print-landscape;
+        }
+        body * {
+            visibility: hidden !important;
+        }
+        #printChartsArea, #printChartsArea * {
+            visibility: visible !important;
+        }
+        #printChartsArea {
+            position: fixed !important;
+            left: 0; top: 0; width: 100vw; min-height: 100vh;
+            background: #fff;
+            z-index: 9999;
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        #printChartsArea .chart-print-block {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            page-break-after: always;
+            page-break-inside: avoid;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        #printChartsArea img {
+            width: 90vw !important;
+            height: 70vh !important;
+            max-width: 90vw !important;
+            max-height: 70vh !important;
+            margin: 0 auto !important;
+            display: block;
+        }
+        #printChartsArea h3 {
+            text-align: center;
+            margin: 20px 0 20px 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        @page {
+            size: auto;
+            margin: 0;
+        }
+    }
+    </style>
 
 <?php
 include '../includes/footer.php';

@@ -9,9 +9,9 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_patient'])) {
         // Check Student ID format
         $student_id = trim($_POST['student_id']);
-        $format_pattern = '/^SCC-\d{2}-\d{7}$/';
+        $format_pattern = '/^SCC-\d{2}-\d{7,8}$/';
         if (!preg_match($format_pattern, $student_id)) {
-            echo json_encode(['success' => false, 'message' => 'Invalid Student ID format. Use format: SCC-00-0000000']);
+            echo json_encode(['success' => false, 'message' => 'Invalid Student ID format. Use format: SCC-00-0000000 or SCC-00-00000000']);
             exit;
         }
         

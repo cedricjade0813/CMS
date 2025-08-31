@@ -8,18 +8,15 @@ try {
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['student_id'])) {
         $student_id = trim($_POST['student_id']);
-        
         if (empty($student_id)) {
             echo json_encode(['exists' => false, 'valid_format' => false, 'message' => '']);
             exit;
         }
-        
-        // Check format: SCC-00-0000000
-        $format_pattern = '/^SCC-\d{2}-\d{7}$/';
+        // Accept SCC-00-0000000 or SCC-00-00000000
+        $format_pattern = '/^SCC-\d{2}-\d{7,8}$/';
         $valid_format = preg_match($format_pattern, $student_id);
-        
         if (!$valid_format) {
-            echo json_encode(['exists' => false, 'valid_format' => false, 'message' => 'Invalid format. Use format: SCC-00-0000000']);
+            echo json_encode(['exists' => false, 'valid_format' => false, 'message' => 'Invalid format. Use format: SCC-00-0000000 or SCC-00-00000000']);
             exit;
         }
         

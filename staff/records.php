@@ -175,7 +175,7 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
   
   /* Ensure blocks even if a utility class tries to override */
   #studentSection[hidden], #visitorSection[hidden]{display:none !important;}
-}</style>
+</style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
@@ -830,9 +830,107 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
             <div class="p-6">
                 <p class="text-sm text-gray-600 dark:text-neutral-300 mb-4">Choose the type of record to add:</p>
                 <div class="grid grid-cols-1 gap-3">
-                    <button id="chooseStudentBtn" class="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">Student</button>
+                    <button id="chooseStudentBtn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Student</button>
                     <button id="chooseVisitorBtn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Visitor</button>
+                    <button id="chooseFacultyBtn" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Faculty</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Faculty Modal -->
+    <div id="addFacultyModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
+        <div class="w-full max-w-5xl h-[85vh] mx-4 flex flex-col bg-white border border-gray-200 shadow-2xl rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+            <div class="flex justify-between items-center py-4 px-6 border-b border-gray-200 dark:border-neutral-700">
+                <h3 class="font-bold text-lg text-gray-800 dark:text-white">Add New Faculty</h3>
+                <button id="closeAddFacultyModalBtn" type="button" class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <form id="addFacultyForm" class="space-y-4" autocomplete="off">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                        <input type="text" name="full_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                        <input type="text" name="address" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Contact *</label>
+                        <input type="text" name="contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact *</label>
+                        <input type="text" name="emergency_contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
+                            <input type="number" name="age" min="1" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                            <select name="gender" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                            <select name="department" id="facultyDepartmentSelect" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                                <option value="">Select Department</option>
+                                <option value="JHS">JHS</option>
+                                <option value="SHS">SHS</option>
+                                <option value="College">College</option>
+                            </select>
+                        </div>
+                        <div id="facultyCourseDiv" style="display:none;">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">College Course *</label>
+                            <select name="college_course" id="facultyCourseSelect" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option value="">Select Course</option>
+                                <option value="BSIT">BSIT</option>
+                                <option value="BSBA">BSBA</option>
+                                <option value="BEED">BEED</option>
+                                <option value="BSED">BSED</option>
+                                <option value="BSHTM">BSHTM</option>
+                                <option value="BSCRIM">BSCRIM</option>
+                                <option value="BSN">BSN</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Civil Status *</label>
+                            <select name="civil_status" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                                <option value="">Select Status</option>
+                                <option value="Single">Single</option>
+                                <option value="Married">Married</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Divorced">Divorced</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Citizenship *</label>
+                            <input type="text" name="citizenship" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700">
+                <button type="submit" form="addFacultyForm" class="py-2 px-3 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-primary text-white hover:bg-primary/90 focus:outline-hidden focus:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none min-w-[200px]">Add Faculty</button>
+            </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1168,7 +1266,50 @@ $(document).ready(function() {
         const closeAddPatientModalBtn = document.getElementById('closeAddPatientModalBtn');
         const addVisitorModal = document.getElementById('addVisitorModal');
         const closeAddVisitorModalBtn = document.getElementById('closeAddVisitorModalBtn');
+        const chooseFacultyBtn = document.getElementById('chooseFacultyBtn');
+        const addFacultyModal = document.getElementById('addFacultyModal');
+        const closeAddFacultyModalBtn = document.getElementById('closeAddFacultyModalBtn');
+        const facultyDepartmentSelect = document.getElementById('facultyDepartmentSelect');
+        const facultyCourseDiv = document.getElementById('facultyCourseDiv');
+        const facultyCourseSelect = document.getElementById('facultyCourseSelect');
 
+        // Choose Faculty
+        chooseFacultyBtn.addEventListener('click', () => {
+            addEntityTypeModal.classList.add('hidden');
+            addFacultyModal.classList.remove('hidden');
+            $('body, html').addClass('overflow-hidden');
+        });
+        closeAddFacultyModalBtn.addEventListener('click', () => {
+            addFacultyModal.classList.add('hidden');
+            addEntityTypeModal.classList.remove('hidden');
+            $('body, html').removeClass('overflow-hidden');
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === addFacultyModal) {
+                addFacultyModal.classList.add('hidden');
+                addEntityTypeModal.classList.remove('hidden');
+                $('body, html').removeClass('overflow-hidden');
+            }
+        });
+        facultyDepartmentSelect.addEventListener('change', function() {
+            if (this.value === 'College') {
+                facultyCourseDiv.style.display = '';
+                facultyCourseSelect.required = true;
+            } else {
+                facultyCourseDiv.style.display = 'none';
+                facultyCourseSelect.required = false;
+                facultyCourseSelect.value = '';
+            }
+        });
+        document.getElementById('addFacultyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // TODO: Add AJAX or form submission logic here
+            alert('Faculty record saved (demo only).');
+            addFacultyModal.classList.add('hidden');
+            addEntityTypeModal.classList.remove('hidden');
+            $('body, html').removeClass('overflow-hidden');
+            this.reset();
+        });
         // Open chooser instead of student modal directly
         addPatientBtn.addEventListener('click', () => { addEntityTypeModal.classList.remove('hidden'); $('body, html').addClass('overflow-hidden'); });
         closeAddEntityTypeModalBtn.addEventListener('click', () => { addEntityTypeModal.classList.add('hidden'); $('body, html').removeClass('overflow-hidden'); });
@@ -1292,9 +1433,10 @@ $(document).ready(function() {
 
             // Check if Student ID is in correct format
             const studentId = $('#student_id_input').val().trim();
-            const formatPattern = /^SCC-\d{2}-\d{7}$/;
+            // Accept SCC-00-0000000 or SCC-00-00000000
+            const formatPattern = /^SCC-\d{2}-\d{7,8}$/;
             if (!formatPattern.test(studentId)) {
-                showErrorModal('Please enter a valid Student ID in format: SCC-00-0000000', 'Invalid Format');
+                showErrorModal('Please enter a valid Student ID in format: SCC-00-0000000 or SCC-00-00000000', 'Invalid Format');
                 return;
             }
 
