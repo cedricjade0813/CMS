@@ -26,12 +26,18 @@ try {
         // Column might already exist, continue
     }
 
-    // Fetch all medication referrals with patient year level and latest vital signs
+    // Fetch all medication referrals with correct vital signs for all entity types
     $stmt = $db->query('
         SELECT mr.*, ip.year_level,
                ip.student_id as matched_student_id,
                mr.patient_id as referral_patient_id,
-               vs.body_temp, vs.resp_rate, vs.pulse, vs.blood_pressure, vs.weight, vs.height, vs.oxygen_sat
+               COALESCE(vs_patient.body_temp, vs_faculty.body_temp, vs_visitor.body_temp) AS body_temp,
+               COALESCE(vs_patient.resp_rate, vs_faculty.resp_rate, vs_visitor.resp_rate) AS resp_rate,
+               COALESCE(vs_patient.pulse, vs_faculty.pulse, vs_visitor.pulse) AS pulse,
+               COALESCE(vs_patient.blood_pressure, vs_faculty.blood_pressure, vs_visitor.blood_pressure) AS blood_pressure,
+               COALESCE(vs_patient.weight, vs_faculty.weight, vs_visitor.weight) AS weight,
+               COALESCE(vs_patient.height, vs_faculty.height, vs_visitor.height) AS height,
+               COALESCE(vs_patient.oxygen_sat, vs_faculty.oxygen_sat, vs_visitor.oxygen_sat) AS oxygen_sat
         FROM medication_referrals mr 
         LEFT JOIN imported_patients ip ON 
             CAST(TRIM(mr.patient_id) AS CHAR) = CAST(TRIM(ip.student_id) AS CHAR)
@@ -40,7 +46,17 @@ try {
             SELECT patient_id, body_temp, resp_rate, pulse, blood_pressure, weight, height, oxygen_sat,
                    ROW_NUMBER() OVER (PARTITION BY patient_id ORDER BY created_at DESC) as rn
             FROM vital_signs
-        ) vs ON CAST(TRIM(mr.patient_id) AS CHAR) = CAST(TRIM(vs.patient_id) AS CHAR) AND vs.rn = 1
+        ) vs_patient ON CAST(TRIM(mr.patient_id) AS CHAR) = CAST(TRIM(vs_patient.patient_id) AS CHAR) AND vs_patient.rn = 1
+        LEFT JOIN (
+            SELECT faculty_id, body_temp, resp_rate, pulse, blood_pressure, weight, height, oxygen_sat,
+                   ROW_NUMBER() OVER (PARTITION BY faculty_id ORDER BY created_at DESC) as rn
+            FROM vital_signs
+        ) vs_faculty ON CAST(TRIM(mr.faculty_id) AS CHAR) = CAST(TRIM(vs_faculty.faculty_id) AS CHAR) AND vs_faculty.rn = 1
+        LEFT JOIN (
+            SELECT visitor_id, body_temp, resp_rate, pulse, blood_pressure, weight, height, oxygen_sat,
+                   ROW_NUMBER() OVER (PARTITION BY visitor_id ORDER BY created_at DESC) as rn
+            FROM vital_signs
+        ) vs_visitor ON CAST(TRIM(mr.visitor_id) AS CHAR) = CAST(TRIM(vs_visitor.visitor_id) AS CHAR) AND vs_visitor.rn = 1
         ORDER BY mr.created_at DESC
     ');
     $referrals = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -89,22 +105,42 @@ try {
                     </thead>
                     <tbody id="referralTableBody">
                         <?php foreach ($referrals as $referral): ?>
+                        <?php
+                            // Determine entity type and display name/id/level
+                            $entityType = 'Student';
+                            $displayName = $referral['patient_name'] ?? '';
+                            $displayId = $referral['patient_id'] ?? '';
+                            $yearLevel = $referral['year_level'] ?? '';
+                            if (!empty($referral['faculty_id'])) {
+                                $entityType = 'Teacher';
+                                $displayName = $referral['faculty_name'] ?? '';
+                                $displayId = $referral['faculty_id'] ?? '';
+                                $yearLevel = 'Teacher';
+                            } elseif (!empty($referral['visitor_id'])) {
+                                $entityType = 'Visitor';
+                                $displayName = $referral['visitor_name'] ?? '';
+                                $displayId = $referral['visitor_id'] ?? '';
+                                $yearLevel = 'Visitor';
+                            }
+                        ?>
                         <tr
-                            data-name="<?php echo htmlspecialchars($referral['patient_name']); ?>"
-                            data-patient-id="<?php echo htmlspecialchars($referral['patient_id']); ?>"
+                            data-name="<?php echo htmlspecialchars($displayName); ?>"
+                            data-patient-id="<?php echo htmlspecialchars($displayId); ?>"
                             data-recorded-by="<?php echo htmlspecialchars($referral['recorded_by'] ?? 'Staff'); ?>"
                             data-status="<?php echo htmlspecialchars($referral['status'] ?? 'Pending'); ?>"
+                            data-entity-type="<?php echo $entityType; ?>"
                         >
                             <td class="px-4 py-2"><?php echo date('Y-m-d', strtotime($referral['created_at'])); ?></td>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($referral['patient_name']); ?></td>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($referral['patient_id']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($displayName); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($displayId); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($referral['recorded_by'] ?? 'Staff'); ?></td>
                             <td class="px-4 py-2 text-center">
                                 <button class="viewReferralBtn px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700" 
                                         data-id="<?php echo $referral['id']; ?>"
-                                        data-patient-name="<?php echo htmlspecialchars($referral['patient_name']); ?>"
-                                        data-patient-id="<?php echo htmlspecialchars($referral['patient_id']); ?>"
-                                        data-year-level="<?php echo htmlspecialchars($referral['year_level'] ?? 'NO-MATCH-FOUND'); ?>"
+                                        data-patient-name="<?php echo htmlspecialchars($displayName); ?>"
+                                        data-patient-id="<?php echo htmlspecialchars($displayId); ?>"
+                                        data-year-level="<?php echo htmlspecialchars($yearLevel ?: $entityType); ?>"
+                                        data-entity-type="<?php echo $entityType; ?>"
                                         data-debug-referral-id="<?php echo htmlspecialchars($referral['referral_patient_id'] ?? 'NULL'); ?>"
                                         data-debug-matched-id="<?php echo htmlspecialchars($referral['matched_student_id'] ?? 'NULL'); ?>"
                                         data-date="<?php echo date('Y-m-d', strtotime($referral['created_at'])); ?>"
@@ -351,37 +387,16 @@ try {
                         </div>
                     </div>
 
-                        <!-- Intervention -->
-                        <div>
-                            <span class="font-semibold text-sm">Intervention =</span>
-                            <div class="ml-4">
-                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]">
-                                    <span id="modalIntervention" class="text-xs"></span>
-                                </div>
-                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
-                            </div>
-                        </div>
-
-                        <!-- Evaluation -->
-                        <div>
-                            <span class="font-semibold text-sm">Evaluation =</span>
-                            <div class="ml-4">
-                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]">
-                                    <span id="modalEvaluation" class="text-xs"></span>
-                                </div>
-                                <div class="border-b border-gray-300 pb-1 mb-1 min-h-[20px]"></div>
-                            </div>
-                        </div>
-                    </div>
+                        
 
                     <!-- Vital Signs Footer -->
                     
 
                     <!-- Referral Section -->
                     <div class="mt-6">
-                        <div class="flex items-center mb-4">
-                            <span class="font-semibold text-sm mr-2">Referral to:</span>
-                            <input type="text" id="modalReferralTo" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Enter referral destination">
+                        <div class="flex items-center">
+                            <span class="font-medium mr-2">Referral to:</span>
+                            <span id="modalReferralTo"></span>
                         </div>
                     </div>
 
@@ -472,9 +487,9 @@ $(document).ready(function() {
         $('#modalIntervention').text(data.intervention || 'No information provided');
         $('#modalEvaluation').text(data.evaluation || 'No information provided');
         
-        // Populate referral_to field - always show as editable input initially
-        const existingReferralTo = data.referralTo || data["referral-to"] || $(this).attr('data-referral-to') || '';
-        $('#modalReferralTo').val(existingReferralTo);
+    // Populate referral_to field in modal as plain text
+    const existingReferralTo = data.referralTo || data["referral-to"] || $(this).attr('data-referral-to') || '';
+    $('#modalReferralTo').text(existingReferralTo);
         
         // Populate vital signs data from the latest records
         console.log('Debug blood pressure data:', {
@@ -521,7 +536,7 @@ $(document).ready(function() {
         const referralSection = $('#modalReferralTo').parent();
         referralSection.html(`
             <span class="font-semibold text-sm mr-2">Referral to:</span>
-            <input type="text" id="modalReferralTo" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Enter referral destination">
+            <span id="modalReferralToLine" class="text-sm font-medium text-gray-800"></span>
         `);
     }
 

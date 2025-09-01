@@ -1003,13 +1003,18 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                         <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                         <input type="text" name="full_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter full name" required />
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter email address" required />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                        <input type="password" name="password" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter password" required />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                            <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter email address" required />
+                        </div>
+                        <div class="relative">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                            <input type="password" name="password" id="add_faculty_password" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary pr-10" placeholder="Enter password" required />
+                            <span class="absolute right-3 top-9 cursor-pointer" onclick="togglePatientPassword('add_faculty_password', this)">
+                                <i class="ri-eye-off-line" id="add_faculty_password_icon"></i>
+                            </span>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
@@ -2691,16 +2696,18 @@ $(document).ready(function() {
         var patientName = patientInfo.replace(/\s*\([^)]*\)$/, '');
         
         // Get form data
-        var formData = {
-            patient_id: patientId ? patientId[1] : '',
-            patient_name: patientName,
-            subjective: $(this).find('textarea[name="subjective"]').val(),
-            objective: $(this).find('textarea[name="objective"]').val(),
-            assessment: $(this).find('textarea[name="assessment"]').val(),
-            plan: $(this).find('textarea[name="plan"]').val(),
-            intervention: $(this).find('textarea[name="intervention"]').val(),
-            evaluation: $(this).find('textarea[name="evaluation"]').val()
-        };
+            var formData = {
+                patient_id: patientId ? patientId[1] : '',
+                patient_name: patientName,
+                subjective: $(this).find('textarea[name="subjective"]').val(),
+                objective: $(this).find('textarea[name="objective"]').val(),
+                assessment: $(this).find('textarea[name="assessment"]').val(),
+                plan: $(this).find('textarea[name="plan"]').val(),
+                intervention: $(this).find('textarea[name="intervention"]').val(),
+                evaluation: $(this).find('textarea[name="evaluation"]').val(),
+                referral_to: $(this).find('input[name="referral_to"]').val(),
+                entity_type: 'patient'
+            };
         
         $.ajax({
             url: 'save_medication_referral.php',
@@ -3063,6 +3070,10 @@ $(document).ready(function() {
         }
 
         // Visitor Vital Signs Form Submission
+        // Ensure Save Vital Signs button triggers form submit
+        $('#saveVisitorVitalsBtn').off('click').on('click', function() {
+            $('#visitorVitalsForm').submit();
+        });
         $('#visitorVitalsForm').on('submit', function(e) {
             e.preventDefault();
 
@@ -3074,6 +3085,11 @@ $(document).ready(function() {
             var vidMatch = vt.match(/\(([^)]+)\)$/);
             var visitorId = vidMatch ? vidMatch[1] : '';
             var visitorName = vt.replace(/\s*\([^)]*\)$/, '');
+               // Enforce modal title format: "Name (ID)" and check for N/A
+               if (!visitorId || !visitorName || visitorId === 'N/A' || visitorName === 'N/A') {
+                   $('#visitorVitalsForm').prepend('<div class="error-msg" style="color:red;margin-bottom:8px;">Visitor ID or name missing or invalid. Please make sure you select a valid visitor. Modal title must be: Name (ID).</div>');
+                   return;
+               }
             var formData = {
                 visitor_id: visitorId,
                 visitor_name: visitorName,
@@ -3143,6 +3159,7 @@ $(document).ready(function() {
                 plan: $(this).find('textarea[name="plan"]').val(),
                 intervention: $(this).find('textarea[name="intervention"]').val(),
                 evaluation: $(this).find('textarea[name="evaluation"]').val(),
+                referral_to: $(this).find('input[name="referral_to"]').val(),
                 entity_type: 'visitor'
             };
 
@@ -3431,8 +3448,33 @@ $(document).ready(function() {
         $('#facultyVitalsForm textarea[name="remarks"]').val('');
         $('#facultyVitalsForm input[name="vital_date"]').val(new Date().toISOString().split('T')[0]);
 
-        // Note: Faculty vital signs would need a separate endpoint or modification to existing ones
-        // For now, this is the structure that matches the pattern
+        // Fetch latest faculty vital signs
+        $.ajax({
+            url: 'get_faculty_vital_signs.php',
+            type: 'POST',
+            data: {
+                faculty_id: facultyId,
+                faculty_name: facultyName
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.vital_signs && response.vital_signs.length > 0) {
+                    var vitals = response.vital_signs[0];
+                    $('#facultyVitalsForm input[name="weight"]').val(vitals.weight || '');
+                    $('#facultyVitalsForm input[name="height"]').val(vitals.height || '');
+                    $('#facultyVitalsForm input[name="body_temp"]').val(vitals.body_temp || '');
+                    $('#facultyVitalsForm input[name="resp_rate"]').val(vitals.resp_rate || '');
+                    $('#facultyVitalsForm input[name="pulse"]').val(vitals.pulse || '');
+                    $('#facultyVitalsForm input[name="blood_pressure"]').val(vitals.blood_pressure || '');
+                    $('#facultyVitalsForm input[name="oxygen_sat"]').val(vitals.oxygen_sat || '');
+                    $('#facultyVitalsForm textarea[name="remarks"]').val(vitals.remarks || '');
+                    $('#facultyVitalsForm input[name="vital_date"]').val(vitals.vital_date || new Date().toISOString().split('T')[0]);
+                }
+            },
+            error: function() {
+                $('#facultyVitalsForm input[name="vital_date"]').val(new Date().toISOString().split('T')[0]);
+            }
+        });
     }
 
     // Faculty vital signs save functionality
