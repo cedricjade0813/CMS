@@ -14,6 +14,7 @@ $age = isset($_POST['age']) ? (int)$_POST['age'] : 0;
 $gender = isset($_POST['gender']) ? trim($_POST['gender']) : '';
 $address = isset($_POST['address']) ? trim($_POST['address']) : '';
 $contact = isset($_POST['contact']) ? trim($_POST['contact']) : '';
+$emergency_contact = isset($_POST['emergency_contact']) ? trim($_POST['emergency_contact']) : '';
 
 if ($full_name === '' || $age <= 0 || $gender === '' || $contact === '') {
     http_response_code(400);
@@ -30,11 +31,12 @@ try {
         gender VARCHAR(16) NOT NULL,
         address TEXT,
         contact VARCHAR(64) NOT NULL,
+        emergency_contact VARCHAR(64),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )')->execute();
 
-    $stmt = $db->prepare('INSERT INTO visitor (full_name, age, gender, address, contact) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$full_name, $age, $gender, $address, $contact]);
+    $stmt = $db->prepare('INSERT INTO visitor (full_name, age, gender, address, contact, emergency_contact) VALUES (?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$full_name, $age, $gender, $address, $contact, $emergency_contact]);
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {
     http_response_code(500);

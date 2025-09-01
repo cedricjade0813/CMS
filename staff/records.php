@@ -164,17 +164,23 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <style id="tableFilterBaseStyles">
   .filter-student #visitorSection{display:none !important;}
+  .filter-student #facultySection{display:none !important;}
   .filter-visitor #studentSection{display:none !important;}
-  /* .filter-all shows both by default */
+  .filter-visitor #facultySection{display:none !important;}
+  .filter-faculty #studentSection{display:none !important;}
+  .filter-faculty #visitorSection{display:none !important;}
+  /* .filter-all shows all by default */
   .filter-all #studentSection{display:block;}
+  .filter-all #facultySection{display:block;}
   .filter-all #visitorSection{display:block;}
   @media (prefers-color-scheme: dark){
     .filter-all #studentSection{display:block;}
+    .filter-all #facultySection{display:block;}
     .filter-all #visitorSection{display:block;}
   }
   
   /* Ensure blocks even if a utility class tries to override */
-  #studentSection[hidden], #visitorSection[hidden]{display:none !important;}
+  #studentSection[hidden], #facultySection[hidden], #visitorSection[hidden]{display:none !important;}
 </style>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -190,6 +196,7 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
             <select id="tableFilter" class="border border-gray-300 rounded px-3 py-2 text-sm">
                 <option value="all" selected>All</option>
                 <option value="student">Student</option>
+                <option value="faculty">Faculty</option>
                 <option value="visitor">Visitor</option>
             </select>
             <input id="searchInput" type="text" class="w-full max-w-xs border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Search patients...">
@@ -202,13 +209,14 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
         <div id="studentSection" class="bg-white rounded shadow p-6">
         <h3 class="text-lg font-semibold mb-4">Student Records</h3>
             <div class="overflow-x-auto">
-                <table id="importedPatientsTable" class="min-w-full divide-y divide-gray-200 text-sm">
+                <table id="importedPatientsTable" class="w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-600">ID</th>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-600">Student ID</th>
-                            <th class="px-4 py-2 text-left font-semibold text-gray-600">Name</th>
-                            <th class="px-4 py-2 text-center font-semibold text-gray-600">Actions</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Student ID</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Name</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Year Level</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Course/Program</th>
+                            <th class="w-1/5 px-4 py-2 text-center font-semibold text-gray-600">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -231,9 +239,10 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                             $stmt->execute();
                             foreach ($stmt as $row): ?>
                         <tr>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($row['id']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($row['student_id']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($row['name']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($row['year_level'] ?? ''); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($row['course_program'] ?? ''); ?></td>
                             <td class="px-4 py-2 text-center">
                                 <button class="viewBtn px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/90" 
                                     data-name="<?php echo htmlspecialchars($row['name']); ?>" 
@@ -343,20 +352,160 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                 <?php endif; ?>
         </div>
 
+    <!-- Faculty Records Table -->
+    <div id="facultySection" class="bg-white rounded shadow p-6 mt-6">
+        <h3 class="text-lg font-semibold mb-4">Faculty Records</h3>
+            <div class="overflow-x-auto">
+                <table id="facultyTable" class="w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Full Name</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Department</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Gender</th>
+                            <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Email</th>
+                            <th class="w-1/5 px-4 py-2 text-center font-semibold text-gray-600">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Pagination settings for faculty
+                        $faculty_records_per_page = 10;
+                        $faculty_page = isset($_GET['faculty_page']) ? (int)$_GET['faculty_page'] : 1;
+                        $faculty_page = max($faculty_page, 1);
+                        $faculty_offset = ($faculty_page - 1) * $faculty_records_per_page;
+
+                        // Get total count for faculty pagination
+                        try {
+                            $faculty_total_count_stmt = $db->query('SELECT COUNT(*) FROM faculty');
+                            $faculty_total_records = $faculty_total_count_stmt->fetchColumn();
+                        } catch (Exception $e) {
+                            $faculty_total_records = 0;
+                        }
+                        $faculty_total_pages = ceil($faculty_total_records / $faculty_records_per_page);
+
+                        try {
+                            $faculty_stmt = $db->prepare('SELECT * FROM faculty ORDER BY faculty_id DESC LIMIT :limit OFFSET :offset');
+                            $faculty_stmt->bindValue(':limit', $faculty_records_per_page, PDO::PARAM_INT);
+                            $faculty_stmt->bindValue(':offset', $faculty_offset, PDO::PARAM_INT);
+                            $faculty_stmt->execute();
+                            foreach ($faculty_stmt as $faculty): ?>
+                        <tr>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($faculty['full_name']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($faculty['department']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($faculty['gender'] ?? ''); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($faculty['email'] ?? ''); ?></td>
+                            <td class="px-4 py-2 text-center">
+                                <button class="viewFacultyBtn px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/90" 
+                                    data-faculty-id="<?php echo htmlspecialchars($faculty['faculty_id']); ?>" 
+                                    data-full-name="<?php echo htmlspecialchars($faculty['full_name']); ?>" 
+                                    data-address="<?php echo htmlspecialchars($faculty['address']); ?>"
+                                    data-contact="<?php echo htmlspecialchars($faculty['contact']); ?>"
+                                    data-emergency-contact="<?php echo htmlspecialchars($faculty['emergency_contact']); ?>"
+                                    data-age="<?php echo htmlspecialchars($faculty['age']); ?>"
+                                    data-department="<?php echo htmlspecialchars($faculty['department']); ?>"
+                                    data-college-course="<?php echo htmlspecialchars($faculty['college_course'] ?? ''); ?>"
+                                    data-gender="<?php echo htmlspecialchars($faculty['gender']); ?>"
+                                    data-email="<?php echo htmlspecialchars($faculty['email']); ?>"
+                                    data-civil-status="<?php echo htmlspecialchars($faculty['civil_status']); ?>"
+                                    data-citizenship="<?php echo htmlspecialchars($faculty['citizenship']); ?>">View</button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php } catch (Exception $e) { ?>
+                            <tr>
+                                <td colspan="4" class="px-4 py-2 text-center text-gray-500">
+                                    No faculty records found. Add your first faculty member using the form above.
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+                <?php if ($faculty_total_records == 0): ?>
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No faculty records found.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Faculty Pagination and Records Info -->
+            <?php if ($faculty_total_records > 0): ?>
+            <div class="flex justify-between items-center mt-6">
+                <!-- Records Information -->
+                <div class="text-sm text-gray-600">
+                    <?php 
+                    $faculty_start = $faculty_offset + 1;
+                    $faculty_end = min($faculty_offset + $faculty_records_per_page, $faculty_total_records);
+                    ?>
+                    Showing <?php echo $faculty_start; ?> to <?php echo $faculty_end; ?> of <?php echo $faculty_total_records; ?> entries
+                </div>
+
+                <!-- Pagination Navigation -->
+                <?php if ($faculty_total_pages > 1): ?>
+                <nav class="flex justify-end items-center -space-x-px" aria-label="Faculty Pagination">
+                    <!-- Previous Button -->
+                    <?php if ($faculty_page > 1): ?>
+                        <a href="?page=<?php echo isset($page) ? $page : 1; ?>&visitor_page=<?php echo isset($visitor_page) ? $visitor_page : 1; ?>&faculty_page=<?php echo $faculty_page - 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Previous">
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Previous">
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"></path>
+                            </svg>
+                            <span class="sr-only">Previous</span>
+                        </button>
+                    <?php endif; ?>
+
+                    <!-- Page Numbers -->
+                    <?php
+                    $faculty_start_page = max(1, $faculty_page - 2);
+                    $faculty_end_page = min($faculty_total_pages, $faculty_page + 2);
+                    
+                    for ($i = $faculty_start_page; $i <= $faculty_end_page; $i++): ?>
+                        <?php if ($i == $faculty_page): ?>
+                            <button type="button" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 bg-primary text-white" aria-current="page"><?php echo $i; ?></button>
+                        <?php else: ?>
+                            <a href="?page=<?php echo isset($page) ? $page : 1; ?>&visitor_page=<?php echo isset($visitor_page) ? $visitor_page : 1; ?>&faculty_page=<?php echo $i; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100"><?php echo $i; ?></a>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+
+                    <!-- Next Button -->
+                    <?php if ($faculty_page < $faculty_total_pages): ?>
+                        <a href="?page=<?php echo isset($page) ? $page : 1; ?>&visitor_page=<?php echo isset($visitor_page) ? $visitor_page : 1; ?>&faculty_page=<?php echo $faculty_page + 1; ?>" class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100" aria-label="Next">
+                            <span class="sr-only">Next</span>
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </a>
+                    <?php else: ?>
+                        <button type="button" disabled class="min-h-9.5 min-w-9.5 py-2 px-2.5 inline-flex justify-center items-center gap-x-1.5 text-sm first:rounded-s-lg last:rounded-e-lg border border-gray-200 text-gray-800 disabled:opacity-50 disabled:pointer-events-none" aria-label="Next">
+                            <span class="sr-only">Next</span>
+                            <svg class="shrink-0 size-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"></path>
+                            </svg>
+                        </button>
+                    <?php endif; ?>
+                </nav>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+    </div>
 
     <!-- Visitor Records Table -->
     <div id="visitorSection" class="bg-white rounded shadow p-6 mt-6 relative z-10">
         <h3 class="text-xl font-bold text-gray-800 mb-4">Visitor Records</h3>
         <div class="overflow-x-auto">
-            <table id="visitorTable" class="min-w-full divide-y divide-gray-200 text-sm">
+            <table id="visitorTable" class="w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Visitor ID</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Full Name</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Age</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Gender</th>
-                        <th class="px-4 py-2 text-left font-semibold text-gray-600">Contact</th>
-                        <th class="px-4 py-2 text-center font-semibold text-gray-600">Actions</th>
+                        <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Full Name</th>
+                        <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Gender</th>
+                        <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Contact</th>
+                        <th class="w-1/5 px-4 py-2 text-left font-semibold text-gray-600">Emergency Contact</th>
+                        <th class="w-1/5 px-4 py-2 text-center font-semibold text-gray-600">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -378,11 +527,10 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                     $visitor_stmt->execute();
                     foreach ($visitor_stmt as $visitor): ?>
                         <tr>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($visitor['visitor_id']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($visitor['full_name']); ?></td>
-                            <td class="px-4 py-2"><?php echo htmlspecialchars($visitor['age']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($visitor['gender']); ?></td>
                             <td class="px-4 py-2"><?php echo htmlspecialchars($visitor['contact']); ?></td>
+                            <td class="px-4 py-2"><?php echo htmlspecialchars($visitor['emergency_contact'] ?? ''); ?></td>
                             <td class="px-4 py-2 text-center">
                                 <button class="viewVisitorBtn px-3 py-1 text-xs bg-primary text-white rounded hover:bg-primary/90"
                                     data-id="<?php echo htmlspecialchars($visitor['visitor_id']); ?>"
@@ -390,7 +538,8 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                                     data-age="<?php echo htmlspecialchars($visitor['age']); ?>"
                                     data-gender="<?php echo htmlspecialchars($visitor['gender']); ?>"
                                     data-address="<?php echo htmlspecialchars($visitor['address']); ?>"
-                                    data-contact="<?php echo htmlspecialchars($visitor['contact']); ?>">View</button>
+                                    data-contact="<?php echo htmlspecialchars($visitor['contact']); ?>"
+                                    data-emergency-contact="<?php echo htmlspecialchars($visitor['emergency_contact'] ?? ''); ?>">View</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -842,38 +991,42 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
     <div id="addFacultyModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
         <div class="w-full max-w-5xl h-[85vh] mx-4 flex flex-col bg-white border border-gray-200 shadow-2xl rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
             <div class="flex justify-between items-center py-4 px-6 border-b border-gray-200 dark:border-neutral-700">
-                <h3 class="font-bold text-lg text-gray-800 dark:text-white">Add New Faculty</h3>
+                <h3 class="font-bold text-lg text-gray-800 dark:text-white">Add New Faculty Patient</h3>
                 <button id="closeAddFacultyModalBtn" type="button" class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close">
                     <span class="sr-only">Close</span>
                     <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
                 </button>
             </div>
             <div class="p-6 overflow-y-auto flex-1">
-                <form id="addFacultyForm" class="space-y-4" autocomplete="off">
+                <form id="addFacultyForm" class="space-y-4" autocomplete="off" novalidate>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                        <input type="text" name="full_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        <input type="text" name="full_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter full name" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter email address" required />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                        <input type="password" name="password" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter password" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
-                        <input type="text" name="address" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        <input type="text" name="address" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter complete address" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Contact *</label>
-                        <input type="text" name="contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        <input type="text" name="contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter contact number" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact *</label>
-                        <input type="text" name="emergency_contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        <input type="text" name="emergency_contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter emergency contact number" required />
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
-                            <input type="number" name="age" min="1" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                            <input type="number" name="age" min="1" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter age" required />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
@@ -922,7 +1075,7 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Citizenship *</label>
-                            <input type="text" name="citizenship" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                            <input type="text" name="citizenship" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter citizenship" required />
                         </div>
                     </div>
                 </form>
@@ -930,7 +1083,6 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
             <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700">
                 <button type="submit" form="addFacultyForm" class="py-2 px-3 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-primary text-white hover:bg-primary/90 focus:outline-hidden focus:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none min-w-[200px]">Add Faculty</button>
             </div>
-                </form>
             </div>
         </div>
     </div>
@@ -949,7 +1101,7 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                 </button>
             </div>
             <div class="p-6 overflow-y-auto flex-1">
-            <form id="addPatientForm" class="space-y-4" autocomplete="off">
+            <form id="addPatientForm" class="space-y-4" autocomplete="off" novalidate>
                 <input type="hidden" name="add_patient" value="1">
 
                 <!-- Personal Information Section -->
@@ -961,7 +1113,7 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                        <input type="text" name="name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" required />
+                        <input type="text" name="name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter full name" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth *</label>
@@ -977,31 +1129,31 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="email" name="email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter email address" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
-                        <input type="tel" name="contact_number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="tel" name="contact_number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter contact number" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Parent's Email</label>
-                        <input type="email" name="parent_email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="email" name="parent_email" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter parent's email" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Parent's Phone</label>
-                        <input type="tel" name="parent_phone" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="tel" name="parent_phone" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter parent's phone number" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Religion</label>
-                        <input type="text" name="religion" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="text" name="religion" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter religion" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Citizenship</label>
-                        <input type="text" name="citizenship" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="text" name="citizenship" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter citizenship" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Course/Program</label>
-                        <input type="text" name="course_program" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="text" name="course_program" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter course or program" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Civil Status</label>
@@ -1036,18 +1188,18 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                 <!-- Address Section -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                    <textarea name="address" rows="2" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
+                    <textarea name="address" rows="2" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter complete address"></textarea>
                 </div>
 
                 <!-- Guardian Information Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Guardian Name</label>
-                        <input type="text" name="guardian_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="text" name="guardian_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter guardian's name" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Guardian Contact</label>
-                        <input type="tel" name="guardian_contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="tel" name="guardian_contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter guardian's contact number" />
                     </div>
                 </div>
 
@@ -1055,11 +1207,11 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact Name</label>
-                        <input type="text" name="emergency_contact_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="text" name="emergency_contact_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter emergency contact name" />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact Number</label>
-                        <input type="tel" name="emergency_contact_number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                        <input type="tel" name="emergency_contact_number" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter emergency contact number" />
                     </div>
                 </div>
 
@@ -1085,15 +1237,15 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                 </button>
             </div>
             <div class="p-6 overflow-y-auto flex-1">
-            <form id="addVisitorForm" class="space-y-4" autocomplete="off">
+            <form id="addVisitorForm" class="space-y-4" autocomplete="off" novalidate>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                    <input type="text" name="full_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    <input type="text" name="full_name" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter full name" required />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
-                        <input type="number" name="age" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                        <input type="number" name="age" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter age" required />
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
@@ -1106,11 +1258,15 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                    <textarea name="address" rows="2" class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                    <textarea name="address" rows="2" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter complete address"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Contact *</label>
-                    <input type="text" name="contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required />
+                    <input type="text" name="contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Enter contact number" required />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
+                    <input type="text" name="emergency_contact" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Emergency contact number" />
                 </div>
             </form>
             </div>
@@ -1252,6 +1408,144 @@ $instructionsSuggestions = array_unique(array_filter($instructionsSuggestions));
         </div>
     </div>
 
+    <!-- Faculty Profile Modal -->
+    <div id="facultyProfileModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 hidden">
+        <div class="w-full max-w-5xl h-[85vh] mx-4 flex flex-col bg-white border border-gray-200 shadow-2xl rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+            <div class="flex justify-between items-center py-4 px-6 border-b border-gray-200 dark:border-neutral-700">
+                <h3 id="facultyModalTitle" class="font-bold text-lg text-gray-800 dark:text-white">Faculty Profile</h3>
+                <button id="closeFacultyProfileModal" type="button" class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-hidden focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close">
+                    <span class="sr-only">Close</span>
+                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto flex-1">
+                <!-- Navigation Tabs -->
+                <div class="flex justify-start space-x-3 mb-6" id="facultyProfileModalTabs">
+                    <button class="tabBtnFaculty px-4 py-2 text-sm rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-primary/10 dark:bg-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-500" data-tab="facultyInfoTab">Information</button>
+                    <button class="tabBtnFaculty px-4 py-2 text-sm rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-primary/10 dark:bg-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-500" data-tab="facultyVitalsTab">Vital Signs</button>
+                    <button class="tabBtnFaculty px-4 py-2 text-sm rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-primary/10 dark:bg-neutral-600 dark:text-neutral-300 dark:hover:bg-neutral-500" data-tab="facultyMedReferralTab">Medication Referral</button>
+                </div>
+                
+                <!-- Tab Contents -->
+                <div id="facultyInfoTab" class="tabContent">
+                    <div id="facultyModalDetails" class="text-base text-gray-700 dark:text-neutral-300 mb-6">
+                        <!-- Faculty details will be shown here -->
+                    </div>
+                </div>
+                
+                <div id="facultyVitalsTab" class="tabContent hidden modal-scroll-area">
+                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white mb-2">Faculty Vital Signs</h4>
+                    <form id="facultyVitalsForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Date</label>
+                            <input type="date" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="vital_date" required />
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Weight (kg)</label>
+                                <input type="number" step="0.01" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="weight" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Height (cm)</label>
+                                <input type="number" step="0.01" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="height" />
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Body Temp (°C)</label>
+                                <input type="number" step="0.01" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="body_temp" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Respiratory Rate</label>
+                                <input type="number" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="resp_rate" />
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Pulse</label>
+                                <input type="number" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="pulse" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Blood Pressure</label>
+                                <input type="text" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="blood_pressure" />
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Oxygen Saturation (%)</label>
+                                <input type="number" step="0.01" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="oxygen_sat" />
+                            </div>
+                            <div class="flex-1"></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Remarks</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="remarks" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="facultyMedReferralTab" class="tabContent hidden modal-scroll-area">
+                    <!-- Faculty's Medication Referral History -->
+                    <div id="facultyMedReferralHistory" class="mb-4">
+                        <h4 class="text-sm font-semibold text-gray-800 dark:text-white mb-2">Previous Medication Referrals</h4>
+                        <div id="facultyMedReferralHistoryContent" class="text-xs text-gray-600 dark:text-neutral-400 mb-4">
+                            <p class="text-center text-gray-400 dark:text-neutral-500">Loading medication referral history...</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="text-sm font-semibold text-gray-800 dark:text-white mb-2">Record New Medication Referral</h4>
+                    <form id="facultyMedReferralForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Subjective</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="subjective" rows="2" placeholder="Faculty's complaints and symptoms"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Objective</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="objective" rows="2" placeholder="Observable signs and measurements"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Assessment</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="assessment" rows="2" placeholder="Clinical judgment and diagnosis"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Plan</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="plan" rows="2" placeholder="Treatment plan and recommendations"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Intervention</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="intervention" rows="2" placeholder="Actions taken during the visit"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Evaluation</label>
+                            <textarea class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="evaluation" rows="2" placeholder="Outcome assessment and follow-up needed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 dark:text-neutral-300">Referral To</label>
+                            <input type="text" class="w-full border border-gray-300 dark:border-neutral-600 rounded px-3 py-2 text-sm dark:bg-neutral-700 dark:text-white" name="referral_to" placeholder="Referral destination (e.g., Dental Clinic, ER, Specialist)" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t border-gray-200 dark:border-neutral-700">
+                <button id="facultyPrescribeMedBtn" type="button" class="py-2 px-3 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none min-w-[200px]">
+                    <i class="ri-capsule-line"></i>
+                    Prescribe Medicine
+                </button>
+                <button id="saveFacultyVitalsBtn" type="button" class="py-2 px-3 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none min-w-[200px] hidden">
+                    Save Vital Signs
+                </button>
+                <button id="saveFacultyMedReferralBtn" type="button" class="py-2 px-3 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none min-w-[200px] hidden">
+                    Save Medication Referral
+                </button>
+            </div>
+        </div>
+    </div>
+
 </main>
 
 <script>
@@ -1303,12 +1597,109 @@ $(document).ready(function() {
         });
         document.getElementById('addFacultyForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            // TODO: Add AJAX or form submission logic here
-            alert('Faculty record saved (demo only).');
-            addFacultyModal.classList.add('hidden');
-            addEntityTypeModal.classList.remove('hidden');
+            
+            // Clear previous messages
+            $('#addFacultyForm .error-msg, #addFacultyForm .success-msg').remove();
+            
+            // Get form data
+            const formData = new FormData(this);
+            
+            // Validate required fields
+            const requiredFields = ['full_name', 'email', 'password', 'address', 'contact', 'emergency_contact', 'age', 'gender', 'department', 'civil_status', 'citizenship'];
+            for (let field of requiredFields) {
+                if (!formData.get(field) || formData.get(field).trim() === '') {
+                    showErrorModal(`Please fill in the ${field.replace('_', ' ')} field.`, 'Validation Error');
+                    return;
+                }
+            }
+            
+            // Validate college course if department is College
+            const department = formData.get('department');
+            if (department === 'College') {
+                const collegeCourse = formData.get('college_course');
+                if (!collegeCourse || collegeCourse.trim() === '') {
+                    showErrorModal('Please select a college course when department is College.', 'Validation Error');
+                    return;
+                }
+            }
+            
+            // Validate age
+            const age = parseInt(formData.get('age'));
+            if (age <= 0 || age > 120) {
+                showErrorModal('Please enter a valid age between 1 and 120.', 'Validation Error');
+                return;
+            }
+            
+            // Validate email format
+            const email = formData.get('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showErrorModal('Please enter a valid email address.', 'Validation Error');
+                return;
+            }
+
+            // Validate password length
+            const password = formData.get('password');
+            if (password.length < 6) {
+                showErrorModal('Password must be at least 6 characters long.', 'Validation Error');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('button[form="addFacultyForm"]');
+            const originalText = submitBtn ? submitBtn.textContent : 'Add Faculty';
+            if (submitBtn) {
+                submitBtn.textContent = 'Adding...';
+                submitBtn.disabled = true;
+            }
+            
+            // Submit form via AJAX
+            fetch('save_faculty.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    if ($('#facultyToast').length) $('#facultyToast').remove();
+                    $('body').append(`
+                      <div id="facultyToast" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,255,255,0.18);">
+                        <div style="background:rgba(255,255,255,0.7); color:#2563eb; min-width:220px; max-width:90vw; padding:20px 36px; border-radius:16px; box-shadow:0 4px 32px rgba(37,99,235,0.10); font-size:1.1rem; font-weight:500; text-align:center; border:1.5px solid #2563eb; display:flex; align-items:center; gap:12px; pointer-events:auto;">
+                          <span style="font-size:2rem;line-height:1;color:#2563eb;">&#10003;</span>
+                          <span>Faculty added successfully!</span>
+                        </div>
+                      </div>
+                    `);
+                    
+                    // Close modal and reset form
+                    document.getElementById('addFacultyModal').classList.add('hidden');
+                    document.getElementById('addEntityTypeModal').classList.remove('hidden');
             $('body, html').removeClass('overflow-hidden');
             this.reset();
+                    
+                    // Reload the page after a short delay
+                    setTimeout(function() {
+                        $('#facultyToast').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    showErrorModal('Error: ' + data.message, 'Error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorModal('An error occurred while adding the faculty. Please try again.', 'Error');
+            })
+            .finally(() => {
+                // Restore button state
+                if (submitBtn) {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+            });
         });
         // Open chooser instead of student modal directly
         addPatientBtn.addEventListener('click', () => { addEntityTypeModal.classList.remove('hidden'); $('body, html').addClass('overflow-hidden'); });
@@ -1519,31 +1910,45 @@ $(document).ready(function() {
             error: function(){ showErrorModal('An error occurred while saving visitor.', 'Error'); }
         });
 
-        // Table filter: show All, Student, Visitor
+        // Table filter: show All, Student, Faculty, Visitor
         function applyTableFilter(val){
             const studentEl = document.getElementById('studentSection');
+            const facultyEl = document.getElementById('facultySection');
             const visitorEl = document.getElementById('visitorSection');
-            if (!studentEl || !visitorEl) return;
+            if (!studentEl || !facultyEl || !visitorEl) return;
             if (val === 'all') {
                 studentEl.style.removeProperty('display');
+                facultyEl.style.removeProperty('display');
                 visitorEl.style.removeProperty('display');
                 studentEl.classList.remove('hidden');
+                facultyEl.classList.remove('hidden');
                 visitorEl.classList.remove('hidden');
             } else if (val === 'student') {
                 studentEl.style.setProperty('display','', 'important');
+                facultyEl.style.setProperty('display','none', 'important');
                 visitorEl.style.setProperty('display','none', 'important');
                 studentEl.classList.remove('hidden');
+                facultyEl.classList.add('hidden');
+                visitorEl.classList.add('hidden');
+            } else if (val === 'faculty') {
+                studentEl.style.setProperty('display','none', 'important');
+                facultyEl.style.setProperty('display','', 'important');
+                visitorEl.style.setProperty('display','none', 'important');
+                studentEl.classList.add('hidden');
+                facultyEl.classList.remove('hidden');
                 visitorEl.classList.add('hidden');
             } else if (val === 'visitor') {
                 studentEl.style.setProperty('display','none', 'important');
+                facultyEl.style.setProperty('display','none', 'important');
                 visitorEl.style.setProperty('display','', 'important');
                 studentEl.classList.add('hidden');
+                facultyEl.classList.add('hidden');
                 visitorEl.classList.remove('hidden');
             }
         }
         // Delegate change to ensure it binds regardless of load order
         function setBodyFilterClass(val){
-            document.body.classList.remove('filter-all','filter-student','filter-visitor');
+            document.body.classList.remove('filter-all','filter-student','filter-faculty','filter-visitor');
             document.body.classList.add('filter-' + val);
         }
         $(document).on('change', '#tableFilter', function(){ setBodyFilterClass(this.value); applyTableFilter(this.value); });
@@ -2349,36 +2754,52 @@ $(document).ready(function() {
             const gender = $(this).data('gender') || 'N/A';
             const address = $(this).data('address') || 'N/A';
             const contact = $(this).data('contact') || 'N/A';
+        const emergencyContact = $(this).data('emergency-contact') || 'N/A';
 
             $('#visitorModalTitle').text(name + ' (' + id + ')');
             $('#visitorModalDetails').html(`
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Left Column -->
                     <div class="space-y-6">
+                        <!-- Personal Information Section -->
+                        <div>
+                            <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-neutral-600">Personal Information</h4>
+                            <div class="space-y-3">
                         <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
-                            <div class="text-sm font-semibold text-gray-600">Visitor ID</div>
-                            <div class="text-sm text-gray-900">${id}</div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Visitor ID:</label>
+                                    <p class="text-sm text-gray-900 dark:text-neutral-200">${id || 'N/A'}</p>
                         </div>
                         <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
-                            <div class="text-sm font-semibold text-gray-600">Full Name</div>
-                            <div class="text-sm text-gray-900">${name}</div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Age:</label>
+                                    <p class="text-sm text-gray-900 dark:text-neutral-200">${age || 'N/A'}</p>
                         </div>
                         <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
-                            <div class="text-sm font-semibold text-gray-600">Age</div>
-                            <div class="text-sm text-gray-900">${age}</div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Gender:</label>
+                                    <p class="text-sm text-gray-900 dark:text-neutral-200">${gender || 'N/A'}</p>
                         </div>
-                        <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
-                            <div class="text-sm font-semibold text-gray-600">Gender</div>
-                            <div class="text-sm text-gray-900">${gender}</div>
                         </div>
                     </div>
+                    </div>
+
+                    <!-- Right Column -->
                     <div class="space-y-6">
+                        <!-- Contact Information Section -->
+                        <div>
+                            <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-neutral-600">Contact Information</h4>
+                            <div class="space-y-3">
                         <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
-                            <div class="text-sm font-semibold text-gray-600">Contact</div>
-                            <div class="text-sm text-gray-900">${contact}</div>
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Contact Number:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${contact || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Emergency Contact:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${emergencyContact || 'N/A'}</p>
                         </div>
                         <div class="grid grid-cols-[140px_1fr] gap-3 items-start">
-                            <div class="text-sm font-semibold text-gray-600">Address</div>
-                            <div class="text-sm text-gray-900">${address}</div>
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Address:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${address || 'N/A'}</p>
+                            </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -2851,6 +3272,267 @@ $(document).ready(function() {
                     }
                 },
                 error: function(){ showErrorModal('An error occurred while saving visitor medication referral.', 'Error'); }
+        });
+    });
+
+    // Faculty Modal functionality
+    const facultyProfileModal = document.getElementById('facultyProfileModal');
+    const closeFacultyProfileModal = document.getElementById('closeFacultyProfileModal');
+
+    function openFacultyModal() { facultyProfileModal.classList.remove('hidden'); $('body, html').addClass('overflow-hidden'); }
+    function closeFacultyModal() { facultyProfileModal.classList.add('hidden'); $('body, html').removeClass('overflow-hidden'); }
+
+    closeFacultyProfileModal.addEventListener('click', closeFacultyModal);
+    window.addEventListener('click', (e) => { if (e.target === facultyProfileModal) closeFacultyModal(); });
+
+    // View faculty button logic - match student modal layout
+    $(document).on('click', '.viewFacultyBtn', function() {
+        const facultyId = $(this).data('faculty-id') || 'N/A';
+        const fullName = $(this).data('full-name') || 'N/A';
+        const address = $(this).data('address') || 'N/A';
+        const contact = $(this).data('contact') || 'N/A';
+        const emergencyContact = $(this).data('emergency-contact') || 'N/A';
+        const age = $(this).data('age') || 'N/A';
+        const department = $(this).data('department') || 'N/A';
+        const collegeCourse = $(this).data('college-course') || 'N/A';
+        const gender = $(this).data('gender') || 'N/A';
+        const email = $(this).data('email') || 'N/A';
+        const civilStatus = $(this).data('civil-status') || 'N/A';
+        const citizenship = $(this).data('citizenship') || 'N/A';
+
+        $('#facultyModalTitle').text(fullName + ' (' + facultyId + ')');
+        $('#facultyModalDetails').html(`
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <!-- Personal Information Section -->
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-neutral-600">Personal Information</h4>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Faculty ID:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${facultyId || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Age:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${age || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Gender:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${gender || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Civil Status:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${civilStatus || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Citizenship:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${citizenship || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information Section -->
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-neutral-600">Academic Information</h4>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Department:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${department || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">College Course:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${collegeCourse || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <!-- Contact Information Section -->
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-neutral-600">Contact Information</h4>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Email:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${email || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Contact Number:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${contact || 'N/A'}</p>
+                            </div>
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-start">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Address:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${address || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Contacts Section -->
+                    <div>
+                        <h4 class="text-base font-semibold text-gray-800 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-neutral-600">Emergency Contacts</h4>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-[140px_1fr] gap-3 items-center">
+                                <label class="text-sm font-medium text-gray-700 dark:text-neutral-300">Emergency Contact:</label>
+                                <p class="text-sm text-gray-900 dark:text-neutral-200">${emergencyContact || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        // Default to Information tab
+        showFacultyTab('facultyInfoTab');
+        openFacultyModal();
+    });
+
+    // Faculty tab switching
+    function showFacultyTab(tabId) {
+        $('#facultyProfileModal .tabContent').addClass('hidden');
+        $('#' + tabId).removeClass('hidden');
+        $('#facultyProfileModalTabs .tabBtnFaculty').removeClass('bg-primary text-white').addClass('bg-gray-200 text-gray-700 dark:bg-neutral-600 dark:text-neutral-300');
+        $('#facultyProfileModalTabs .tabBtnFaculty[data-tab="' + tabId + '"]').addClass('bg-primary text-white').removeClass('bg-gray-200 text-gray-700 dark:bg-neutral-600 dark:text-neutral-300');
+        // Show/hide faculty footer buttons
+        $('#facultyPrescribeMedBtn, #saveFacultyVitalsBtn, #saveFacultyMedReferralBtn').addClass('hidden');
+        if (tabId === 'facultyInfoTab') {
+            $('#facultyPrescribeMedBtn').removeClass('hidden');
+        } else if (tabId === 'facultyVitalsTab') {
+            $('#saveFacultyVitalsBtn').removeClass('hidden');
+        } else if (tabId === 'facultyMedReferralTab') {
+            $('#saveFacultyMedReferralBtn').removeClass('hidden');
+        }
+    }
+
+    $('#facultyProfileModalTabs .tabBtnFaculty').on('click', function() {
+        const tabId = $(this).data('tab');
+        showFacultyTab(tabId);
+        if (tabId === 'facultyVitalsTab' || tabId === 'facultyMedReferralTab') {
+            loadFacultyHistory();
+        }
+    });
+
+    // Load faculty history and populate vitals form
+    function loadFacultyHistory() {
+        var titleText = $('#facultyModalTitle').text();
+        var idMatch = titleText.match(/\(([^)]+)\)$/);
+        var facultyId = idMatch ? idMatch[1] : '';
+        var facultyName = titleText.replace(/\s*\([^)]*\)$/, '');
+
+        // Clear form first
+        $('#facultyVitalsForm input[name="weight"]').val('');
+        $('#facultyVitalsForm input[name="height"]').val('');
+        $('#facultyVitalsForm input[name="body_temp"]').val('');
+        $('#facultyVitalsForm input[name="resp_rate"]').val('');
+        $('#facultyVitalsForm input[name="pulse"]').val('');
+        $('#facultyVitalsForm input[name="blood_pressure"]').val('');
+        $('#facultyVitalsForm input[name="oxygen_sat"]').val('');
+        $('#facultyVitalsForm textarea[name="remarks"]').val('');
+        $('#facultyVitalsForm input[name="vital_date"]').val(new Date().toISOString().split('T')[0]);
+
+        // Note: Faculty vital signs would need a separate endpoint or modification to existing ones
+        // For now, this is the structure that matches the pattern
+    }
+
+    // Faculty vital signs save functionality
+    $('#saveFacultyVitalsBtn').on('click', function() {
+        var titleText = $('#facultyModalTitle').text();
+        var idMatch = titleText.match(/\(([^)]+)\)$/);
+        var facultyId = idMatch ? idMatch[1] : '';
+        var facultyName = titleText.replace(/\s*\([^)]*\)$/, '');
+        
+        var formData = {
+            faculty_id: facultyId,
+            faculty_name: facultyName,
+            vital_date: $('#facultyVitalsForm input[name="vital_date"]').val(),
+            weight: $('#facultyVitalsForm input[name="weight"]').val(),
+            height: $('#facultyVitalsForm input[name="height"]').val(),
+            body_temp: $('#facultyVitalsForm input[name="body_temp"]').val(),
+            resp_rate: $('#facultyVitalsForm input[name="resp_rate"]').val(),
+            pulse: $('#facultyVitalsForm input[name="pulse"]').val(),
+            blood_pressure: $('#facultyVitalsForm input[name="blood_pressure"]').val(),
+            oxygen_sat: $('#facultyVitalsForm input[name="oxygen_sat"]').val(),
+            remarks: $('#facultyVitalsForm textarea[name="remarks"]').val(),
+            entity_type: 'faculty'
+        };
+
+        $.ajax({
+            url: 'save_vital_signs.php',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Remove any previous popup
+                    if ($('#vitalsToast').length) $('#vitalsToast').remove();
+                    $('body').append(`
+                      <div id="vitalsToast" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,255,255,0.18);">
+                        <div style="background:rgba(255,255,255,0.7); color:#2563eb; min-width:220px; max-width:90vw; padding:20px 36px; border-radius:16px; box-shadow:0 4px 32px rgba(37,99,235,0.10); font-size:1.1rem; font-weight:500; text-align:center; border:1.5px solid #2563eb; display:flex; align-items:center; gap:12px; pointer-events:auto;">
+                          <span style="font-size:2rem;line-height:1;color:#2563eb;">&#10003;</span>
+                          <span>Vital signs saved</span>
+                        </div>
+                      </div>
+                    `);
+                    setTimeout(function() {
+                        $('#vitalsToast').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                    }, 1200);
+                } else {
+                    showErrorModal('Error: ' + response.message, 'Error');
+                }
+            },
+            error: function(xhr, status, error) {
+                showErrorModal('An error occurred while saving vital signs. Please try again.', 'Error');
+            }
+        });
+    });
+
+    // Faculty medication referral save functionality
+    $('#saveFacultyMedReferralBtn').on('click', function() {
+        var titleText = $('#facultyModalTitle').text();
+        var idMatch = titleText.match(/\(([^)]+)\)$/);
+        var facultyId = idMatch ? idMatch[1] : '';
+        var facultyName = titleText.replace(/\s*\([^)]*\)$/, '');
+        
+        var formData = {
+            faculty_id: facultyId,
+            faculty_name: facultyName,
+            subjective: $('#facultyMedReferralForm textarea[name="subjective"]').val(),
+            objective: $('#facultyMedReferralForm textarea[name="objective"]').val(),
+            assessment: $('#facultyMedReferralForm textarea[name="assessment"]').val(),
+            plan: $('#facultyMedReferralForm textarea[name="plan"]').val(),
+            intervention: $('#facultyMedReferralForm textarea[name="intervention"]').val(),
+            evaluation: $('#facultyMedReferralForm textarea[name="evaluation"]').val(),
+            referral_to: $('#facultyMedReferralForm input[name="referral_to"]').val(),
+            entity_type: 'faculty'
+        };
+
+        $.ajax({
+            url: 'save_medication_referral.php',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Remove any previous popup
+                    if ($('#medReferralToast').length) $('#medReferralToast').remove();
+                    $('body').append(`
+                      <div id="medReferralToast" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(255,255,255,0.18);">
+                        <div style="background:rgba(255,255,255,0.7); color:#2563eb; min-width:220px; max-width:90vw; padding:20px 36px; border-radius:16px; box-shadow:0 4px 32px rgba(37,99,235,0.10); font-size:1.1rem; font-weight:500; text-align:center; border:1.5px solid #2563eb; display:flex; align-items:center; gap:12px; pointer-events:auto;">
+                          <span style="font-size:2rem;line-height:1;color:#2563eb;">&#10003;</span>
+                          <span>Medication referral saved</span>
+                        </div>
+                      </div>
+                    `);
+                    $('#facultyMedReferralForm')[0].reset();
+                    setTimeout(function(){ $('#medReferralToast').fadeOut(300, function(){ $(this).remove(); }); }, 1200);
+                } else {
+                    showErrorModal('Error: ' + response.message, 'Error');
+                }
+            },
+            error: function(){ showErrorModal('An error occurred while saving faculty medication referral.', 'Error'); }
         });
     });
 });
